@@ -1,0 +1,94 @@
+#+TITLE: Grisha's Emacs Config
+#+AUTHOR: Grisha Khachaturyan
+
+* PACKAGE MANAGEMENT
+
+** Setup package.el to work with MELPA.
+
+  #+begin_src emacs-lisp
+    (require 'package)
+    (add-to-list 'package-archives
+		 '("melpa" . "https://melpa.org/packages/"))
+    (package-refresh-contents)
+    (package-initialize)
+  #+end_src
+
+** Installing use-package
+
+  #+begin_src emacs-lisp
+    (unless (package-installed-p 'use-package)
+      (package-install 'use-package))
+    (require 'use-package)
+    (setq use-package-always-ensure t)
+  #+end_src
+
+
+* GRAPHICAL USER INTERFACE SETTINGS
+
+#+begin_src emacs-lisp
+  (scroll-bar-mode -1)
+#+end_src
+
+
+* THEME
+
+  #+begin_src emacs-lisp
+    (use-package doom-themes
+      :config
+      (setq doom-themes-enable-bold t	; if nil, bold is universally disabled
+	    doom-themes-enable-italic t)	; if nil, italcs is universally disabled
+      :init
+      (load-theme 'doom-one t))
+  #+end_src
+** MODE LINE
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1))
+
+#+end_src
+
+* WHICH KEY
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :config
+    (which-key-mode))
+#+end_src
+
+* IVY MODE
+  #+begin_src emacs-lisp
+
+    (use-package ivy
+      ;; :diminish
+      :bind  ;; (("C-s" . swiper)
+	     ;; ("C-c C-r" . ivy-resume)
+	     ;; ("<f6>" . ivy-resume)
+	     ;; ("M-x" . counsel-M-x)
+	     ;; ("C-x C-f" . counsel-find-file)
+	     ;; ("<f1> f" . counsel-describe-function)
+	     ;; ("<f1> v" . counsel-describe-variable)
+	     ;; ("<f1> o" . counsel-describe-symbol)
+	     ;; ("<f1> l" . counsel-find-library)
+	     ;; ("<f2> i" . counsel-info-lookup-symbol)
+	     ;; ("<f2> u" . counsel-unicode-char)
+	     ;; ("C-c g" . counsel-git)
+	     ;; ("C-c j" . counsel-git-grep)
+	     ;; ("C-c k" . counsel-ag)
+	     ;; ("C-x l" . counsel-locate)
+	     ;; ("C-S-o" . counsel-rhythmbox))
+      :init
+      (ivy-mode 1))
+  #+end_src
+
+** COUNSEL
+  #+begin_src emacs-lisp
+    (use-package counsel
+      :config
+      (setq ivy-initial-inputs-alist nil))	; Don't start searches with ^
+  #+end_src
+
+
+* MAGIT
+#+begin_src emacs-lisp
+  (use-package magit)
+#+end_src
