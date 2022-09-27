@@ -5,41 +5,47 @@
 
 ** Setup package.el to work with MELPA.
 
-  #+begin_src emacs-lisp
-    (require 'package)
-    (add-to-list 'package-archives
-		 '("melpa" . "https://melpa.org/packages/"))
-    (package-refresh-contents)
-    (package-initialize)
-  #+end_src
+#+begin_src emacs-lisp
+  (require 'package)
+  (add-to-list 'package-archives
+               '("melpa" . "https://melpa.org/packages/"))
+  (package-refresh-contents)
+  (package-initialize)
+#+end_src
 
 ** Installing use-package
 
-  #+begin_src emacs-lisp
-    (unless (package-installed-p 'use-package)
-      (package-install 'use-package))
-    (require 'use-package)
-    (setq use-package-always-ensure t)
-  #+end_src
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
 
 
 * GRAPHICAL USER INTERFACE SETTINGS
 
 #+begin_src emacs-lisp
-  (scroll-bar-mode -1)
+  (scroll-bar-mode -1)          ; remove scroll bar
+  (column-number-mode)          ; show column number in modline
+  (global-linum-mode 1)         ; enable line numbers in margin globably
 #+end_src
 
+* TABS OVER SPACES
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
 
 * THEME
 
-  #+begin_src emacs-lisp
-    (use-package doom-themes
-      :config
-      (setq doom-themes-enable-bold t	; if nil, bold is universally disabled
-	    doom-themes-enable-italic t)	; if nil, italcs is universally disabled
-      :init
-      (load-theme 'doom-one t))
-  #+end_src
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :config
+    (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
+          doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
+    :init
+    (load-theme 'doom-one t))
+#+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
   (use-package doom-modeline
@@ -56,39 +62,71 @@
 #+end_src
 
 * IVY MODE
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 
-    (use-package ivy
-      ;; :diminish
-      :bind  ;; (("C-s" . swiper)
-	     ;; ("C-c C-r" . ivy-resume)
-	     ;; ("<f6>" . ivy-resume)
-	     ;; ("M-x" . counsel-M-x)
-	     ;; ("C-x C-f" . counsel-find-file)
-	     ;; ("<f1> f" . counsel-describe-function)
-	     ;; ("<f1> v" . counsel-describe-variable)
-	     ;; ("<f1> o" . counsel-describe-symbol)
-	     ;; ("<f1> l" . counsel-find-library)
-	     ;; ("<f2> i" . counsel-info-lookup-symbol)
-	     ;; ("<f2> u" . counsel-unicode-char)
-	     ;; ("C-c g" . counsel-git)
-	     ;; ("C-c j" . counsel-git-grep)
-	     ;; ("C-c k" . counsel-ag)
-	     ;; ("C-x l" . counsel-locate)
-	     ;; ("C-S-o" . counsel-rhythmbox))
-      :init
-      (ivy-mode 1))
-  #+end_src
+  (use-package ivy
+    ;; :diminish
+    :bind  ;; (("C-s" . swiper)
+    ;; ("C-c C-r" . ivy-resume)
+    ;; ("<f6>" . ivy-resume)
+    ;; ("M-x" . counsel-M-x)
+    ;; ("C-x C-f" . counsel-find-file)
+    ;; ("<f1> f" . counsel-describe-function)
+    ;; ("<f1> v" . counsel-describe-variable)
+    ;; ("<f1> o" . counsel-describe-symbol)
+    ;; ("<f1> l" . counsel-find-library)
+    ;; ("<f2> i" . counsel-info-lookup-symbol)
+    ;; ("<f2> u" . counsel-unicode-char)
+    ;; ("C-c g" . counsel-git)
+    ;; ("C-c j" . counsel-git-grep)
+    ;; ("C-c k" . counsel-ag)
+    ;; ("C-x l" . counsel-locate)
+    ;; ("C-S-o" . counsel-rhythmbox))
+    :init
+    (ivy-mode 1))
+#+end_src
 
 ** COUNSEL
-  #+begin_src emacs-lisp
-    (use-package counsel
-      :config
-      (setq ivy-initial-inputs-alist nil))	; Don't start searches with ^
-  #+end_src
+#+begin_src emacs-lisp
+  (use-package counsel
+    :config
+    (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
+#+end_src
 
 
 * MAGIT
 #+begin_src emacs-lisp
   (use-package magit)
+#+end_src
+
+* MY KEY BINDINGS
+
+** EXITING EMACS
+#+begin_src emacs-lisp
+  ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
+  (global-unset-key (kbd "C-x  C-c")) ; i always accidentilly press this key
+  (global-set-key (kbd "C-x q") 'save-buffers-kill-emacs)
+#+end_src
+
+** UNMAP ACCIDENTAL KEY PRESSES
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "C-z"))          ; unmap suspend-frame from C-z
+#+end_src
+
+** SWITCHING VISUAL BUFFERS
+#+begin_src emacs-lisp
+  ;; switch buffers directionally using ijkl keys similar to right hand wasd
+  (global-set-key (kbd "C-c i") 'windmove-up)
+  (global-set-key (kbd "C-c k") 'windmove-down)
+  (global-set-key (kbd "C-c j") 'windmove-left)
+  (global-set-key (kbd "C-c l") 'windmove-right)
+
+  ;; switch buffers directionally using arrow keys
+  (global-set-key (kbd "C-c <up>") 'windmove-up)
+  (global-set-key (kbd "C-c <down>") 'windmove-down)
+  (global-set-key (kbd "C-c <left>") 'windmove-left)
+  (global-set-key (kbd "C-c <right>") 'windmove-right)
+
+  ;; add C-c o binding to other-window
+  (global-set-key (kbd "C-c o") 'other-window)
 #+end_src
