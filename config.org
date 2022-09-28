@@ -122,6 +122,14 @@
     )
 #+end_src
 
+** Flycheck (better sytax checker)
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :config
+    (global-flycheck-mode)
+    )
+#+end_src
+
 * MY KEY BINDINGS
 
 ** EXITING EMACS
