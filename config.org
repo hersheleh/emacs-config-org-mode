@@ -1,6 +1,8 @@
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 
+**** TODO Add table of contents to this document
+
 * PACKAGE MANAGEMENT
 
 ** Setup package.el to work with MELPA.
