@@ -208,4 +208,20 @@ and jump to definition functionality for a particular language
 #+end_src
 
 
+* DASHBOARD
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :after page-break-lines
+    :init
+    (setq dashboard-startup-banner 'logo)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    :config
+    (dashboard-setup-startup-hook))
+#+end_src
 
+** PAGE BREAK LINES
+#+begin_src emacs-lisp
+  (use-package page-break-lines
+    :config (page-break-lines-mode))
+#+End_src
