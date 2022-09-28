@@ -1,7 +1,9 @@
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 
-**** TODO Add Table of Contents for this document
+**** TODO ADD Table of Contents for this document
+**** TODO ADD general.el package (keybindings package)
+
 
 * PACKAGE MANAGEMENT
 
@@ -33,7 +35,7 @@
   (global-linum-mode 1)         ; enable line numbers in margin globably
 #+end_src
 
-* TABS OVER SPACES
+* SPACES OVER TABS
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
 #+end_src
