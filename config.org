@@ -149,3 +149,11 @@
   ;; add C-c o binding to other-window
   (global-set-key (kbd "C-c o") 'other-window)
 #+end_src
+
+* ORG MODE ADDONS
+** ORG SUPERSTAR
+*** Adds nice looking bullets to org mode
+#+begin_src emacs-lisp
+  (use-package org-superstar)
+#+end_src
+
