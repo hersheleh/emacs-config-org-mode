@@ -33,9 +33,10 @@
   (scroll-bar-mode -1)          ; remove scroll bar
   (column-number-mode)          ; show column number in modline
   (global-linum-mode 1)         ; enable line numbers in margin globably
+  (setq inhibit-startup-message t)        ; No splash screen
 #+end_src
 
-* SPACES OVER TABS
+* Spaces OVER TABS
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
 #+end_src
@@ -48,7 +49,7 @@
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
           doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
     :init
-    (load-theme 'doom-one t))
+    (load-theme 'doom-monokai-classic t))
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -192,7 +193,6 @@ and jump to definition functionality for a particular language
      '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
      '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
      '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
-    )
 #+end_src
 
 ** ORG SUPERSTAR
@@ -200,8 +200,7 @@ and jump to definition functionality for a particular language
 #+begin_src emacs-lisp
   (use-package org-superstar
     :after org
-    :hook (org-mode . org-superstar-mode)
-    :init
+    :hook (org-mode . org-superstar-mode))
 #+end_src
 
 
