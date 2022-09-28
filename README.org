@@ -1,0 +1,9 @@
+* Grisha's Emacs Config
+** inspired by DistroTube & System Crafters:
+
+*** DistroTube Video:
+https://www.youtube.com/watch?v=hoP4I9ounyQ
+
+*** System Crafters Video:
+https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ
+
