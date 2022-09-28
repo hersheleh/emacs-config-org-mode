@@ -114,7 +114,7 @@
 #+begin_src emacs-lisp
   (use-package company
     :config
-    (after-init-hook 'global-company-mode)
+    (add-hook 'after-init-hook 'global-company-mode)
     )
 #+end_src
 
