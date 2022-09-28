@@ -22,7 +22,7 @@
      ("v" . "verse")
      ("el" . "src emacs-lisp")))
  '(package-selected-packages
-   '(org-superstar company company-mode doom-modeline use-package)))
+   '(all-the-icons org-superstar company company-mode doom-modeline use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

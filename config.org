@@ -57,7 +57,11 @@
     :init (doom-modeline-mode 1))
 
 #+end_src
-
+** ICONS
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
+#+end_src
 * WHICH KEY
 
 #+begin_src emacs-lisp
