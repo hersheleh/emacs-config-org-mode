@@ -3,7 +3,7 @@
 
 **** TODO ADD Table of Contents for this document
 **** TODO ADD general.el package (keybindings package)
-
+**** TODO TRY ergomacs or god-mode
 
 * PACKAGE MANAGEMENT
 
@@ -182,25 +182,26 @@ and jump to definition functionality for a particular language
   (global-set-key (kbd "C-c o") 'other-window)
 #+end_src
 
-* ORG MODE ADDONS
+* ORG MODE ADDONS & CONFIGS
+** Org Customizations
+#+begin_src emacs-lisp
+    ;; increase Header heights for each org level
+    (custom-set-faces
+     '(org-level-1 ((t (:inherit outline-1 :height 1.3))))
+     '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
+     '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+     '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
+     '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
+    )
+#+end_src
+
 ** ORG SUPERSTAR
 *** Adds nice looking bullets to org mode
 #+begin_src emacs-lisp
   (use-package org-superstar
+    :after org
+    :hook (org-mode . org-superstar-mode)
     :init
-    ;; increase Header heights for each level
-    (custom-set-faces
-     '(org-level-1 ((t (:inherit outline-1 :height 1.5))))
-     '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
-     '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
-     '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
-     '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-     )
-    :config
-    ;; (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
-    (org-superstar-mode 1)
-    )
-
 #+end_src
 
 
