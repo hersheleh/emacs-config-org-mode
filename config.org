@@ -94,10 +94,28 @@
     (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
 #+end_src
 
-
 * MAGIT
 #+begin_src emacs-lisp
   (use-package magit)
+#+end_src
+
+* EGLOT
+** Setup eglot to wordk with clangd-10
+*** TODO make alias for clangd -> clangd-10
+#+begin_src emacs-lisp
+  (use-package eglot
+    :config
+    (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd-10"))
+    (add-hook 'c-mode-hook 'eglot-ensure)
+    (add-hook 'c++-mode-hook 'eglot-ensure))
+#+end_src
+
+* COMPANY MODE
+#+begin_src emacs-lisp
+  (use-package company
+    :config
+    (after-init-hook 'global-company-mode)
+    )
 #+end_src
 
 * MY KEY BINDINGS
