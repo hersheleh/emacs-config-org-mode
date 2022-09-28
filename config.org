@@ -101,9 +101,11 @@
   (use-package magit)
 #+end_src
 
-* EGLOT
-** Setup eglot to wordk with clangd-10
-*** TODO make alias for clangd -> clangd-10
+* IDE LIKE PACKAGES
+** EGLOT (Language Server Protocol)
+**** TODO make alias for clangd -> clangd-10
+*** provides: syntax checking. error correction. jump to definition
+**** Setup eglot to wordk with clangd-10 (LSP for C/C++)
 #+begin_src emacs-lisp
   (use-package eglot
     :config
@@ -112,7 +114,7 @@
     (add-hook 'c++-mode-hook 'eglot-ensure))
 #+end_src
 
-* COMPANY MODE
+** COMPANY MODE (Code Complettion)
 #+begin_src emacs-lisp
   (use-package company
     :config
