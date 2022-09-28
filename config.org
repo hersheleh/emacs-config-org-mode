@@ -98,23 +98,41 @@
     (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
 #+end_src
 
-* MAGIT
+* MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
   (use-package magit)
 #+end_src
 
 * IDE LIKE PACKAGES
-** EGLOT (Language Server Protocol)
-**** TODO make alias for clangd -> clangd-10
-*** provides: syntax checking. error correction. jump to definition
-**** Setup eglot to wordk with clangd-10 (LSP for C/C++)
+** Language Server Protocol Packages
+A Language Server provides: syntax checking, error correction,
+and jump to definition functionality for a particular language
+
+*** EGLOT (Disabled)
 #+begin_src emacs-lisp
-  (use-package eglot
-    :config
-    (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd-10"))
-    (add-hook 'c-mode-hook 'eglot-ensure)
-    (add-hook 'c++-mode-hook 'eglot-ensure))
+  ;; Setup eglot to wordk with clangd-10 (LSP for C/C++)
+  ;; (use-package eglot
+  ;;   :config
+  ;;   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd-10"))
+  ;;   (add-hook 'c-mode-hook 'eglot-ensure)
+  ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
 #+end_src
+***** DONE make alias for clangd -> clangd-10
+
+*** LSP MODE (Enabled)
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :commands (lsp lsp-deferred)
+    :init
+    (setq lsp-keymap-prefix "C-l")
+
+    :hook
+    (c++-mode . lsp)
+
+    :config
+    (lsp-enable-which-key-integration t))
+#+end_src
+
 
 ** COMPANY MODE (Code Complettion)
 #+begin_src emacs-lisp
