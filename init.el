@@ -7,6 +7,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
+ '(company-minimum-prefix-length 2)
+ '(debug-on-error t)
  '(org-structure-template-alist
    '(("a" . "export ascii")
      ("c" . "center")
@@ -19,7 +22,8 @@
      ("s" . "src")
      ("v" . "verse")
      ("el" . "src emacs-lisp")))
- '(package-selected-packages '(company company-mode doom-modeline use-package)))
+ '(package-selected-packages
+   '(org-superstar company company-mode doom-modeline use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
