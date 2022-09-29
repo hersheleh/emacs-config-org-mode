@@ -49,7 +49,7 @@
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
           doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
     :init
-    (load-theme 'doom-monokai-classic t))
+    (load-theme 'doom-molokai t))
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -126,18 +126,23 @@ and jump to definition functionality for a particular language
 
 *** LSP MODE (Enabled)
 #+begin_src emacs-lisp
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :init
-    (setq lsp-keymap-prefix "C-l")
+    (use-package lsp-mode
+      :commands (lsp lsp-deferred)
+      :init
+      (setq lsp-keymap-prefix "C-l")
 
-    :hook
-    (c++-mode . lsp)
+      :hook
+      (c++-mode . lsp)
 
-    :config
-    (lsp-enable-which-key-integration t))
+      :config
+      (lsp-enable-which-key-integration t))
 #+end_src
 
+** DAP MODE (Debugger)
+Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
+#+begin_src emacs-lisp
+  (use-package dap-mode)
+#+end_src
 
 ** COMPANY MODE (Code Complettion)
 #+begin_src emacs-lisp
@@ -151,8 +156,7 @@ and jump to definition functionality for a particular language
 #+begin_src emacs-lisp
   (use-package flycheck
     :config
-    (global-flycheck-mode)
-    )
+    (global-flycheck-mode))
 #+end_src
 
 * MY KEY BINDINGS
@@ -187,6 +191,13 @@ and jump to definition functionality for a particular language
   (global-set-key (kbd "C-c o") 'other-window)
 #+end_src
 
+** SCROLL UP/DOWN LINES WITH: M-j M-k
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
+  (global-unset-key (kbd "M-k"))       ; was kill-sentence
+  (global-set-key (kbd "M-j") 'scroll-up-line)
+  (global-set-key (kbd "M-k") 'scroll-down-line)
+#+end_src
 * ORG MODE ADDONS & CONFIGS
 ** Org Customizations
 #+begin_src emacs-lisp
