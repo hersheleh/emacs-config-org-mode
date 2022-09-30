@@ -11,10 +11,14 @@
 
 #+begin_src emacs-lisp
   (require 'package)
-  (add-to-list 'package-archives
-               '("melpa" . "https://melpa.org/packages/"))
-  (package-refresh-contents)
+  (setq package-archives
+        '(("melpa" . "https://melpa.org/packages/")
+          ("org" . "https:/orgmonde.org/elpa")
+          ("elpa" . "https://elpa.gnu.org/packages/")))
   (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+
 #+end_src
 
 ** Installing use-package
