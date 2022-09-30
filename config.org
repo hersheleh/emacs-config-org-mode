@@ -1,4 +1,4 @@
-#+TITLE: Grisha's Emacs Config
++TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 
 **** TODO ADD Table of Contents for this document
@@ -62,15 +62,21 @@
   (use-package all-the-icons
     :if (display-graphic-p))
 #+end_src
-* WHICH KEY
+* Smart Navigation
+These are packages which assist in navigating emacs
 
+** WHICH KEY
+Given an initial key sequence Which Key provides hints about the next
+possible key presses along with documentation for that key press.
 #+begin_src emacs-lisp
   (use-package which-key
     :config
     (which-key-mode))
 #+end_src
 
-* IVY MODE
+** IVY MODE
+Ivy Mode speeds up navigation by perfoming text matching against
+possible inputs 
 #+begin_src emacs-lisp
 
     (use-package ivy
@@ -141,7 +147,19 @@ and jump to definition functionality for a particular language
 ** DAP MODE (Debugger)
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 #+begin_src emacs-lisp
-  (use-package dap-mode)
+  (use-package dap-mode
+    :config
+    (dap-mode 1)
+    (dap-ui-mode 1)
+    (dap-tooltip-mode 1)
+    )
+  (require 'dap-lldb)
+    ;; (use-package dap-lldb
+    ;;   :config
+    ;;   (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode")))
+    ;; (dap-auto-configure-mode)
+    ;; )
+  ;; (require 'dap-lldb)
 #+end_src
 
 ** COMPANY MODE (Code Complettion)
@@ -174,6 +192,7 @@ Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extens
 #+end_src
 
 ** SWITCHING VISUAL BUFFERS
+
 #+begin_src emacs-lisp
   ;; switch buffers directionally using ijkl keys similar to right hand wasd
   (global-set-key (kbd "C-c i") 'windmove-up)
