@@ -1,4 +1,4 @@
-+TITLE: Grisha's Emacs Config
+#+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 
 **** TODO ADD Table of Contents for this document
@@ -36,8 +36,8 @@
 #+begin_src emacs-lisp
   (scroll-bar-mode -1)          ; remove scroll bar
   (column-number-mode)          ; show column number in modline
-  (global-linum-mode 1)         ; enable line numbers in margin globably
-  (setq inhibit-startup-message t)        ; No splash screen
+  (global-display-line-numbers-mode 1) ; enable line numbers in margin globably
+  (setq inhibit-startup-message t)     ; No splash screen
 #+end_src
 
 * Spaces OVER TABS
@@ -52,7 +52,8 @@ Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
     :config
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
           doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
-    :init
+    (custom-set-variables
+     '(doom-molokai-brighter-comments t))
     (load-theme 'doom-molokai t))
 #+end_src
 ** MODE LINE
@@ -80,30 +81,40 @@ possible key presses along with documentation for that key press.
 
 ** IVY MODE
 Ivy Mode speeds up navigation by perfoming text matching against
-possible inputs 
+possible inputs
 #+begin_src emacs-lisp
+  (use-package ivy
+    ;; :diminish
+    :bind (("C-s" . swiper)
+           ;; ("C-c C-r" . ivy-resume)
+           ;; ("<f6>" . ivy-resume)
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("C-h d" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-h o" . counsel-describe-symbol)
+           ("C-h l" . counsel-find-library)
+           ("C-h i" . counsel-info-lookup-symbol)
+           ("C-h u" . counsel-unicode-char)
+           ("C-x b" . counsel-switch-buffer)
+           ;; :map minibuffer-local-map
+           ;; ("C-r" . counsel-minibuffer-history)
+           ;; ("C-c g" . counsel-git)
+           ;; ("C-c j" . counsel-git-grep)
+           ;; ("C-c k" . counsel-ag)
+           ;; ("C-x l" . counsel-locate)
+           ;; ("C-S-o" . counsel-rhythmbox)
+           )
+    :config
+    (ivy-mode 1))
+#+end_src
 
-    (use-package ivy
-      ;; :diminish
-      :bind (("C-s" . swiper)
-             ;; ("C-c C-r" . ivy-resume)
-             ;; ("<f6>" . ivy-resume)
-             ;; ("M-x" . counsel-M-x)
-             ("C-x C-f" . counsel-find-file)
-             ;; ("<f1> f" . counsel-describe-function)
-             ;; ("<f1> v" . counsel-describe-variable)
-             ;; ("<f1> o" . counsel-describe-symbol)
-             ;; ("<f1> l" . counsel-find-library)
-             ;; ("<f2> i" . counsel-info-lookup-symbol)
-             ;; ("<f2> u" . counsel-unicode-char)
-             ;; ("C-c g" . counsel-git)
-             ;; ("C-c j" . counsel-git-grep)
-             ;; ("C-c k" . counsel-ag)
-             ;; ("C-x l" . counsel-locate)
-             ;; ("C-S-o" . counsel-rhythmbox)
-             )
-      :config
-      (ivy-mode 1))
+*** Ivy Rich
+Provides function documentation and key binding info in ivy buffer
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
 #+end_src
 
 ** COUNSEL
@@ -132,7 +143,7 @@ and jump to definition functionality for a particular language
   ;;   (add-hook 'c-mode-hook 'eglot-ensure)
   ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
 #+end_src
-***** DONE make alias for clangd -> clangd-10
+***** DONE make alias for clangd - clangd-10
 
 *** LSP MODE (Enabled)
 #+begin_src emacs-lisp
@@ -163,12 +174,6 @@ Instructions/Documentation on configuration files can be found [[https://github.
     (dap-tooltip-mode 1)
     )
   (require 'dap-lldb)
-    ;; (use-package dap-lldb
-    ;;   :config
-    ;;   (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode")))
-    ;; (dap-auto-configure-mode)
-    ;; )
-  ;; (require 'dap-lldb)
 #+end_src
 
 ** COMPANY MODE (Code Complettion)
@@ -235,7 +240,8 @@ Instructions/Documentation on configuration files can be found [[https://github.
      '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
      '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
      '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
-     '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
+     '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+     )
 #+end_src
 
 ** ORG SUPERSTAR
@@ -268,5 +274,13 @@ Adds nice looking bullets to org mode
 * VTERM
 A very good shell in emacs
 #+begin_src emacs-lisp
-  (use-package vterm)
+  (use-package vterm
+    :hook (vterm-mode . (lambda ()(display-line-numbers-mode 0))))
+#+end_src
+
+* Raindbow Delimiters
+Color delimiters like parens and braces according to their depth
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
