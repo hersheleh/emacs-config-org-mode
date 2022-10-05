@@ -40,6 +40,13 @@
   (setq inhibit-startup-message t)     ; No splash screen
 #+end_src
 
+* Beacon (Flash the Cursor)
+#+begin_src emacs-lisp
+    (use-package beacon
+      :config (beacon-mode 1))
+#+end_src
+
+
 * Spaces OVER TABS
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -97,8 +104,8 @@ possible inputs
            ("C-h i" . counsel-info-lookup-symbol)
            ("C-h u" . counsel-unicode-char)
            ("C-x b" . counsel-switch-buffer)
-           ;; :map minibuffer-local-map
-           ;; ("C-r" . counsel-minibuffer-history)
+           :map minibuffer-local-map
+           ("C-r" . counsel-minibuffer-history)
            ;; ("C-c g" . counsel-git)
            ;; ("C-c j" . counsel-git-grep)
            ;; ("C-c k" . counsel-ag)
@@ -251,7 +258,11 @@ Adds nice looking bullets to org mode
     :after org
     :hook (org-mode . org-superstar-mode))
 #+end_src
-
+** Org-Roam
+Slip Card system for organizing thoughts. Zettelkasten Method
+#+begin_src emacs-lisp
+  (use-package org-roam)
+#+end_src
 
 * DASHBOARD
 #+begin_src emacs-lisp
@@ -283,4 +294,17 @@ Color delimiters like parens and braces according to their depth
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+* Helpful (better help documentation)
+#+begin_src emacs-lisp
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
 #+end_src
