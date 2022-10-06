@@ -1,9 +1,12 @@
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 
-**** TODO ADD Table of Contents for this document
-**** TODO ADD general.el package (keybindings package)
-**** TODO TRY ergomacs or god-mode
+*** TODOS:
+**** TODO ADD Table of Contents for this document.
+**** TODO ADD general.el package (keybindings package).
+**** TODO TRY ergomacs or god-mode.
+**** TODO TRY [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] mode. video: [[https://youtu.be/VcgjTEa0kU4?list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&t=2495][here]]
+
 
 * PACKAGE MANAGEMENT
 
@@ -30,7 +33,6 @@
   (setq use-package-always-ensure t)
 #+end_src
 
-
 * GRAPHICAL USER INTERFACE SETTINGS
 
 #+begin_src emacs-lisp
@@ -45,7 +47,6 @@
     (use-package beacon
       :config (beacon-mode 1))
 #+end_src
-
 
 * Spaces OVER TABS
 #+begin_src emacs-lisp
@@ -82,6 +83,8 @@ Given an initial key sequence Which Key provides hints about the next
 possible key presses along with documentation for that key press.
 #+begin_src emacs-lisp
   (use-package which-key
+    :bind
+    (("C-c w" . which-key-show-full-keymap))
     :config
     (which-key-mode))
 #+end_src
@@ -235,12 +238,16 @@ Instructions/Documentation on configuration files can be found [[https://github.
 #+begin_src emacs-lisp
   (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
   (global-unset-key (kbd "M-k"))       ; was kill-sentence
-  (global-set-key (kbd "M-j") 'scroll-up-line)
-  (global-set-key (kbd "M-k") 'scroll-down-line)
+  (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
+  (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
 #+end_src
 * ORG MODE ADDONS & CONFIGS
 ** Org Customizations
 #+begin_src emacs-lisp
+  (use-package org
+    :init
+    (setq org-startup-indented t)
+    ;; (setq org-hide-emphasis-markers t)
     ;; increase Header heights for each org level
     (custom-set-faces
      '(org-level-1 ((t (:inherit outline-1 :height 1.4))))
@@ -248,7 +255,14 @@ Instructions/Documentation on configuration files can be found [[https://github.
      '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
      '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
      '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-     )
+     ))
+#+end_src
+
+** Org Agenda Files
+#+begin_src emacs-lisp
+  (setq org-agenda-files
+        '("~/new_projects/orgi/orgi_plan.org"
+          "~/recording_bullet_journal/sc_bujo.org"))
 #+end_src
 
 ** ORG SUPERSTAR
@@ -272,8 +286,19 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (setq dashboard-startup-banner 'logo)
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
+    (setq dashboard-center-content nil)
+    (setq dashboard-projects-backend 'projectile)
+    (setq dashboard-items '((agenda . 5)
+                            (projects . 5)
+                            (recents . 7)
+                            ;; (bookmarks . 5)
+                            ))
+    (setq dashboard-page-separator "\n\f\n")
+    (setq dashboard-agenda-sort-strategy '(time-up))
+    (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
     :config
     (dashboard-setup-startup-hook))
+
 #+end_src
 
 ** PAGE BREAK LINES
@@ -303,8 +328,20 @@ Color delimiters like parens and braces according to their depth
     (counsel-describe-function-function #'helpful-callable)
     (counsel-describe-variable-function #'helpful-variable)
     :bind
+    (("C-h ." . helpful-at-point))   ; show help docs for current symbol
     ([remap describe-function] . counsel-describe-function)
     ([remap describe-command] . helpful-command)
     ([remap describe-variable] . counsel-describe-variable)
     ([remap describe-key] . helpful-key))
+#+end_src
+* Projectile (Project Management)
+#+begin_src emacs-lisp
+  (use-package projectile
+    :config (projectile-mode)
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/new_projects")
+      (setq projectile-project-search-path '("~/new_projects")))
+    (setq projectile-switch-project-action #'projectile-dired))
 #+end_src

@@ -23,7 +23,7 @@
      ("v" . "verse")
      ("el" . "src emacs-lisp")))
  '(package-selected-packages
-   '(beacon baeacon org-roam helpful ivy-rich rainbow-delimiters vterm dap-mode page-break-lines all-the-icons org-superstar company company-mode doom-modeline use-package)))
+   '(projectile beacon org-roam helpful ivy-rich rainbow-delimiters vterm dap-mode page-break-lines all-the-icons org-superstar company company-mode doom-modeline use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
