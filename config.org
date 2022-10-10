@@ -4,7 +4,7 @@
 *** TODOS:
 **** TODO ADD Table of Contents for this document.
 **** TODO ADD general.el package (keybindings package).
-**** TODO TRY ergomacs or god-mode.
+**** TODO TRY ergomacs or god-mode or evil mode.
 **** TODO TRY [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] mode. video: [[https://youtu.be/VcgjTEa0kU4?list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&t=2495][here]]
 
 
@@ -16,7 +16,7 @@
   (require 'package)
   (setq package-archives
         '(("melpa" . "https://melpa.org/packages/")
-          ("org" . "https:/orgmonde.org/elpa")
+          ("org" . "https://orgmode.org/elpa/")
           ("elpa" . "https://elpa.gnu.org/packages/")))
   (package-initialize)
   (unless package-archive-contents
@@ -261,8 +261,11 @@ Instructions/Documentation on configuration files can be found [[https://github.
 ** Org Agenda Files
 #+begin_src emacs-lisp
   (setq org-agenda-files
-        '("~/new_projects/orgi/orgi_plan.org"
-          "~/recording_bullet_journal/sc_bujo.org"))
+        '("~/hub/new_projects/orgi/orgi_plan.org"
+          "~/hub/recording_bullet_journal/sc_bujo.org"
+          "~/.emacs.d/config.org"))
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
 #+end_src
 
 ** ORG SUPERSTAR
@@ -275,9 +278,25 @@ Adds nice looking bullets to org mode
 ** Org-Roam
 Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
-  (use-package org-roam)
+  (use-package org-roam
+    :custom
+    (org-roam-directory "~/hub/org-roam")
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert))
+    :config
+    (org-roam-setup))
 #+end_src
-
+** Org-Roam-UI
+#+begin_src emacs-lisp
+  (use-package org-roam-ui
+    :after org-roam
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+end_src
 * DASHBOARD
 #+begin_src emacs-lisp
   (use-package dashboard
@@ -341,7 +360,7 @@ Color delimiters like parens and braces according to their depth
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :init
-    (when (file-directory-p "~/new_projects")
-      (setq projectile-project-search-path '("~/new_projects")))
+    (when (file-directory-p "~/hub/new_projects")
+      (setq projectile-project-search-path '("~/hub/new_projects")))
     (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
