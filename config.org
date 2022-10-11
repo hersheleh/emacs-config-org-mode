@@ -262,7 +262,7 @@ Instructions/Documentation on configuration files can be found [[https://github.
 #+begin_src emacs-lisp
   (setq org-agenda-files
         '("~/hub/new_projects/orgi/orgi_plan.org"
-          "~/hub/recording_bullet_journal/sc_bujo.org"
+          "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
           "~/.emacs.d/config.org"))
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
@@ -360,7 +360,9 @@ Color delimiters like parens and braces according to their depth
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :init
-    (when (file-directory-p "~/hub/new_projects")
-      (setq projectile-project-search-path '("~/hub/new_projects")))
+    (when (file-directory-p "~/hub")
+      (setq projectile-project-search-path
+            '("~/hub/new_projects"
+              "~/hub/recording_bullet_journal/super_collider_projects")))
     (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
