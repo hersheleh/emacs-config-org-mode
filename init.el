@@ -23,12 +23,13 @@
      ("v" . "verse")
      ("el" . "src emacs-lisp")))
  '(package-selected-packages
-   '(org-roam-ui projectile beacon org-roam helpful ivy-rich rainbow-delimiters vterm dap-mode page-break-lines all-the-icons org-superstar company company-mode doom-modeline use-package)))
+   '(w3m org-roam-ui projectile beacon org-roam helpful ivy-rich rainbow-delimiters vterm dap-mode page-break-lines all-the-icons org-superstar company company-mode doom-modeline use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#1c1e1f" :foreground "#d6d6d4" :inverse-video nil :box nil :strike-through nil :extend nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "nil" :family "Menlo"))))
  '(counsel--mark-ring-highlight ((t (:inherit highlight))))
  '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
  '(org-level-1 ((t (:inherit outline-1 :height 1.4))))

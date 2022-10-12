@@ -57,12 +57,14 @@
 Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
 #+begin_src emacs-lisp
   (use-package doom-themes
+    :custom
+    (doom-monokai-classic-brighter-comments t)
     :config
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
           doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
-    (custom-set-variables
-     '(doom-molokai-brighter-comments t))
-    (load-theme 'doom-molokai t))
+    ;; (custom-set-variables
+     ;; '(doom-molokai-brighter-comments t))
+    (load-theme 'doom-monokai-classic t))
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -309,8 +311,9 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (setq dashboard-projects-backend 'projectile)
     (setq dashboard-items '((agenda . 5)
                             (projects . 5)
+                            (bookmarks . 3)
                             (recents . 7)
-                            ;; (bookmarks . 5)
+
                             ))
     (setq dashboard-page-separator "\n\f\n")
     (setq dashboard-agenda-sort-strategy '(time-up))
@@ -365,4 +368,31 @@ Color delimiters like parens and braces according to their depth
             '("~/hub/new_projects"
               "~/hub/recording_bullet_journal/super_collider_projects")))
     (setq projectile-switch-project-action #'projectile-dired))
+#+end_src
+
+* SuperCollider
+
+** sclang-extensions (unmaintained package)
+Uses AutoComplete which is not as good as Company. Hasn't been updated
+for 7 years as of Oct 2022. 
+#+begin_src emacs-lisp
+  ;; (use-package sclang-extensions)
+#+end_src
+
+** scel (sclang' mode for emacs)
+This is a mode for the sclang language for SuperCollider
+#+begin_src emacs-lisp
+  (setq exec-path
+        (append exec-path
+                '("/Applications/SuperCollider.app/Contents/MacOS/")))
+  (add-to-list
+   'load-path
+   "~/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
+  (require 'sclang)
+#+end_src
+
+* w3m (Web Browser for emacs)
+Installed this to browse Help documentation for SuperCollider
+#+begin_src emacs-lisp
+  (use-package w3m)
 #+end_src
