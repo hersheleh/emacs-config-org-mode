@@ -34,13 +34,22 @@
 #+end_src
 
 * GRAPHICAL USER INTERFACE SETTINGS
-
+Disable Scrollbar.
+Show Columns in Modeline.
+Display Line Numbers Globaly.
+Supress splash screen.
 #+begin_src emacs-lisp
   (scroll-bar-mode -1)          ; remove scroll bar
   (column-number-mode)          ; show column number in modline
   (global-display-line-numbers-mode 1) ; enable line numbers in margin globably
   (setq inhibit-startup-message t)     ; No splash screen
 #+end_src
+
+** Set Default Font
+#+begin_src emacs-lisp
+  (set-frame-font "Menlo 14" nil t)
+#+end_src
+
 
 * Beacon (Flash the Cursor)
 #+begin_src emacs-lisp
@@ -54,7 +63,8 @@
 #+end_src
 
 * THEME
-Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
+# Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
+Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
 #+begin_src emacs-lisp
   (use-package doom-themes
     :custom
@@ -109,6 +119,7 @@ possible inputs
            ("C-h i" . counsel-info-lookup-symbol)
            ("C-h u" . counsel-unicode-char)
            ("C-x b" . counsel-switch-buffer)
+           ("C-c t" . counsel-load-theme)
            :map minibuffer-local-map
            ("C-r" . counsel-minibuffer-history)
            ;; ("C-c g" . counsel-git)
@@ -161,18 +172,29 @@ and jump to definition functionality for a particular language
 #+begin_src emacs-lisp
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
-    :init
-    (setq lsp-keymap-prefix "C-l")
+    ;; :init
+    ;; (setq lsp-keymap-prefix "C-l")
 
-    :hook
-    (c++-mode . lsp)
-    (python-mode . lsp)
+    ;; :hook
+    ;; (c++-mode . lsp)
+    ;; (python-mode . lsp)
 
     :config
     (lsp-enable-which-key-integration t))
 
+
   (use-package lsp-ui
-    :commands lsp-ui-mode)
+    :hook (lsp-mode . lsp-ui-mode))
+    :config
+    (setq lsp-ui-doc-position 'bottom)
+
+
+#+end_src
+**** LSP Treemacs
+#+begin_src emacs-lisp
+  ;; (use-package lsp-treemacs
+  ;; :after lsp)
+
 #+end_src
 
 ** DAP MODE (Debugger)
@@ -180,6 +202,7 @@ Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extens
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
 #+begin_src emacs-lisp
   (use-package dap-mode
+    :after lsp-mode
     :config
     (dap-mode 1)
     (dap-ui-mode 1)
@@ -191,9 +214,15 @@ Instructions/Documentation on configuration files can be found [[https://github.
 ** COMPANY MODE (Code Complettion)
 #+begin_src emacs-lisp
   (use-package company
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0)
     :config
-    (add-hook 'after-init-hook 'global-company-mode)
-    )
+    (add-hook 'after-init-hook 'global-company-mode))
+
+
+  (use-package company-box          ; Show icons in company complettions
+    :hook (company-mode . company-box-mode))
 #+end_src
 
 ** Flycheck (better sytax checker)
@@ -201,6 +230,22 @@ Instructions/Documentation on configuration files can be found [[https://github.
   (use-package flycheck
     :config
     (global-flycheck-mode))
+#+end_src
+
+* Programming Languages
+** Python
+#+begin_src emacs-lisp
+  (use-package python
+    :hook
+    (python-mode . lsp-deferred)
+    (python-mode . dap-mode)
+    (python-mode . dap-ui-mode)
+    :custom
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
 #+end_src
 
 * MY KEY BINDINGS
@@ -242,6 +287,10 @@ Instructions/Documentation on configuration files can be found [[https://github.
   (global-unset-key (kbd "M-k"))       ; was kill-sentence
   (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
   (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
+#+end_src
+** Whitespace Cleanup on Save
+#+begin_src emacs-lisp
+  (add-hook 'before-save-hook 'whitespace-cleanup)
 #+end_src
 * ORG MODE ADDONS & CONFIGS
 ** Org Customizations
@@ -374,7 +423,7 @@ Color delimiters like parens and braces according to their depth
 
 ** sclang-extensions (unmaintained package)
 Uses AutoComplete which is not as good as Company. Hasn't been updated
-for 7 years as of Oct 2022. 
+for 7 years as of Oct 2022.
 #+begin_src emacs-lisp
   ;; (use-package sclang-extensions)
 #+end_src
