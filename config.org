@@ -87,6 +87,7 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
   (use-package all-the-icons
     :if (display-graphic-p))
 #+end_src
+
 * Smart Navigation
 These are packages which assist in navigating emacs
 
@@ -152,7 +153,13 @@ Provides function documentation and key binding info in ivy buffer
   (use-package magit)
 #+end_src
 
+* Treemacs
+#+begin_src emacs-lisp
+  (use-package treemacs)
+#+end_src
+
 * IDE LIKE PACKAGES
+Code Completion, Documentaion, Syntax checking, Jump to Definition.
 ** Language Server Protocol Packages
 A Language Server provides: syntax checking, error correction,
 and jump to definition functionality for a particular language
@@ -175,9 +182,9 @@ and jump to definition functionality for a particular language
     ;; :init
     ;; (setq lsp-keymap-prefix "C-l")
 
-    ;; :hook
-    ;; (c++-mode . lsp)
-    ;; (python-mode . lsp)
+    :hook
+    (c++-mode . lsp)
+    (python-mode . lsp)
 
     :config
     (lsp-enable-which-key-integration t))
@@ -226,6 +233,7 @@ Instructions/Documentation on configuration files can be found [[https://github.
 #+end_src
 
 ** Flycheck (better sytax checker)
+Syntax checking and linting.
 #+begin_src emacs-lisp
   (use-package flycheck
     :config
@@ -233,19 +241,37 @@ Instructions/Documentation on configuration files can be found [[https://github.
 #+end_src
 
 * Programming Languages
+* SuperCollider
+
+** sclang-extensions (unmaintained package)
+Uses AutoComplete which is not as good as Company. Hasn't been updated
+for 7 years as of Oct 2022.
+#+begin_src emacs-lisp
+  ;; (use-package sclang-extensions)
+#+end_src
+
+** scel (sclang' mode for emacs)
+This is a mode for the sclang language for SuperCollider
+#+begin_src emacs-lisp
+  (setq exec-path
+        (append exec-path
+                '("/Applications/SuperCollider.app/Contents/MacOS/")))
+  (add-to-list
+   'load-path
+   "~/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
+  (add-to-list
+   'load-path
+   "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
+  (require 'sclang)
+#+end_src
+
+
 ** Python
 #+begin_src emacs-lisp
-  (use-package python
-    :hook
-    (python-mode . lsp-deferred)
-    (python-mode . dap-mode)
-    (python-mode . dap-ui-mode)
-    :custom
-    (python-shell-interpreter "python3")
-    (dap-python-executable "python3")
-    (dap-python-debugger 'debugpy)
-    :config
-    (require 'dap-python))
+  ;; (use-package python
+  ;;   :custom
+  ;;   ;; (python-shell-interpreter "python3")
+  ;;   )
 #+end_src
 
 * MY KEY BINDINGS
@@ -326,6 +352,7 @@ Adds nice looking bullets to org mode
     :after org
     :hook (org-mode . org-superstar-mode))
 #+end_src
+
 ** Org-Roam
 Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
@@ -338,6 +365,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     :config
     (org-roam-setup))
 #+end_src
+
 ** Org-Roam-UI
 #+begin_src emacs-lisp
   (use-package org-roam-ui
@@ -348,6 +376,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 #+end_src
+
 * DASHBOARD
 #+begin_src emacs-lisp
   (use-package dashboard
@@ -405,6 +434,7 @@ Color delimiters like parens and braces according to their depth
     ([remap describe-variable] . counsel-describe-variable)
     ([remap describe-key] . helpful-key))
 #+end_src
+
 * Projectile (Project Management)
 #+begin_src emacs-lisp
   (use-package projectile
@@ -419,25 +449,162 @@ Color delimiters like parens and braces according to their depth
     (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
 
-* SuperCollider
 
-** sclang-extensions (unmaintained package)
-Uses AutoComplete which is not as good as Company. Hasn't been updated
-for 7 years as of Oct 2022.
+
+
+** Python
 #+begin_src emacs-lisp
-  ;; (use-package sclang-extensions)
+  ;; (use-package python
+  ;;   :custom
+  ;;   ;; (python-shell-interpreter "python3")
+  ;;   )
 #+end_src
 
-** scel (sclang' mode for emacs)
-This is a mode for the sclang language for SuperCollider
+* MY KEY BINDINGS
+
+** EXITING EMACS
 #+begin_src emacs-lisp
-  (setq exec-path
-        (append exec-path
-                '("/Applications/SuperCollider.app/Contents/MacOS/")))
-  (add-to-list
-   'load-path
-   "~/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
-  (require 'sclang)
+  ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
+  (global-unset-key (kbd "C-x  C-c")) ; i always accidentilly press this key
+  (global-set-key (kbd "C-x q") 'save-buffers-kill-emacs)
+#+end_src
+
+** UNMAP ACCIDENTAL KEY PRESSES
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "C-z"))          ; unmap suspend-frame from C-z
+#+end_src
+
+** SWITCHING VISUAL BUFFERS
+
+#+begin_src emacs-lisp
+  ;; switch buffers directionally using ijkl keys similar to right hand wasd
+  (global-set-key (kbd "C-c i") 'windmove-up)
+  (global-set-key (kbd "C-c k") 'windmove-down)
+  (global-set-key (kbd "C-c j") 'windmove-left)
+  (global-set-key (kbd "C-c l") 'windmove-right)
+
+  ;; switch buffers directionally using arrow keys
+  (global-set-key (kbd "C-c <up>") 'windmove-up)
+  (global-set-key (kbd "C-c <down>") 'windmove-down)
+  (global-set-key (kbd "C-c <left>") 'windmove-left)
+  (global-set-key (kbd "C-c <right>") 'windmove-right)
+
+  ;; add C-c o binding to other-window
+  (global-set-key (kbd "C-c o") 'other-window)
+#+end_src
+
+** SCROLL UP/DOWN LINES WITH: M-j M-k
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
+  (global-unset-key (kbd "M-k"))       ; was kill-sentence
+  (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
+  (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
+#+end_src
+
+** Whitespace Cleanup on Save
+#+begin_src emacs-lisp
+  (add-hook 'before-save-hook 'whitespace-cleanup)
+#+end_src
+
+* ORG MODE ADDONS & CONFIGS
+** Org Customizations
+#+begin_src emacs-lisp
+  (use-package org
+    :init
+    (setq org-startup-indented t)
+    ;; (setq org-hide-emphasis-markers t)
+    ;; increase Header heights for each org level
+    (custom-set-faces
+     '(org-level-1 ((t (:inherit outline-1 :height 1.4))))
+     '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
+     '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+     '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
+     '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+     ))
+#+end_src
+
+** Org Agenda Files
+#+begin_src emacs-lisp
+  (setq org-agenda-files
+        '("~/hub/new_projects/orgi/orgi_plan.org"
+          "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
+          "~/.emacs.d/config.org"))
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+#+end_src
+
+** ORG SUPERSTAR
+Adds nice looking bullets to org mode
+#+begin_src emacs-lisp
+  (use-package org-superstar
+    :after org
+    :hook (org-mode . org-superstar-mode))
+#+end_src
+
+** Org-Roam
+Slip Card system for organizing thoughts. Zettelkasten Method
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :custom
+    (org-roam-directory "~/hub/org-roam")
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert))
+    :config
+    (org-roam-setup))
+#+end_src
+
+** Org-Roam-UI
+#+begin_src emacs-lisp
+  (use-package org-roam-ui
+    :after org-roam
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+end_src
+
+* VTERM
+A very good shell in emacs
+#+begin_src emacs-lisp
+  (use-package vterm
+    :hook (vterm-mode . (lambda ()(display-line-numbers-mode 0))))
+#+end_src
+
+* Raindbow Delimiters
+Color delimiters like parens and braces according to their depth
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+* Helpful (better help documentation)
+#+begin_src emacs-lisp
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    (("C-h ." . helpful-at-point))   ; show help docs for current symbol
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+#+end_src
+
+* Projectile (Project Management)
+#+begin_src emacs-lisp
+  (use-package projectile
+    :config (projectile-mode)
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/hub")
+      (setq projectile-project-search-path
+            '("~/hub/new_projects"
+              "~/hub/recording_bullet_journal/super_collider_projects")))
+    (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
 
 * w3m (Web Browser for emacs)
@@ -445,3 +612,31 @@ Installed this to browse Help documentation for SuperCollider
 #+begin_src emacs-lisp
   (use-package w3m)
 #+end_src
+
+* DASHBOARD
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :init
+    (setq dashboard-startup-banner 'logo)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-center-content nil)
+    (setq dashboard-projects-backend 'projectile)
+    (setq dashboard-items '(;; (agenda . 5)
+                            (projects . 5)
+                            (bookmarks . 3)
+                            (recents . 7)
+                            ))
+    (setq dashboard-page-separator "\n\f\n")
+    (setq dashboard-agenda-sort-strategy '(time-up))
+    (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
+    :config
+    (dashboard-setup-startup-hook))
+
+#+end_src
+
+** PAGE BREAK LINES
+#+begin_src emacs-lisp
+  (use-package page-break-lines
+    :config (page-break-lines-mode))
+#+End_src
