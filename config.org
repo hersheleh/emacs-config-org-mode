@@ -46,6 +46,7 @@ Supress splash screen.
 #+end_src
 
 ** Set Default Font
+Sets font for MacOS X emacs
 #+begin_src emacs-lisp
   (set-frame-font "Menlo 14" nil t)
 #+end_src
@@ -200,28 +201,71 @@ and jump to definition functionality for a particular language
 
 
 #+end_src
-**** LSP Treemacs
-#+begin_src emacs-lisp
-  ;; (use-package lsp-treemacs
-  ;; :after lsp)
 
-#+end_src
-
-** DAP MODE (Debugger)
+** Debuggers
+*** DAP-MODE (Disabled)
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
+Having trouble getting this to work. Debugger won't attach to session/stack-frame.
+When debugging python dap-mode does not stop at breakpoints. (check back later).
+[[https://github.com/emacs-lsp/dap-mode/issues/678][This issue]] and [[https://github.com/emacs-lsp/lsp-treemacs/issues/144][this one]] highlight the issue.
 #+begin_src emacs-lisp
-  (use-package dap-mode
-    :after lsp-mode
-    :config
-    (dap-mode 1)
-    (dap-ui-mode 1)
-    (dap-tooltip-mode 1)
-    )
-  (require 'dap-lldb)
+  ;;  (use-package dap-mode
+  ;;    :ensure t
+  ;;    :after lsp-mode
+
+  ;;    :custom
+  ;;    ;; python config
+  ;;    (dap-python-executable "python3")
+  ;;    (dap-python-debugger 'debugpy)
+
+  ;;    :config
+  ;;    (require 'dap-ui)
+  ;;    ;; (require 'dap-cpptools)
+  ;;    (require 'dap-lldb)
+  ;;    (require 'dap-python)
+
+  ;;    ;; (dap-auto-configure-mode 1)
+  ;;    ;; (dap-cpptools-setup)
+  ;;    (dap-mode 1)
+  ;;    (dap-ui-mode 1)
+  ;;    (dap-tooltip-mode 1)
+  ;;    (dap-ui-controls-mode 1)
+
+  ;;    ;; lldb config
+  ;;    ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
+
+  ;;    (setq dap-print-io t)
+
+  ;;    ;; Dap-cpptools debug configuration for reverse_string
+  ;;    ;; (dap-register-debug-template
+  ;;    ;;  "cpptools::Run Configuration reverse_string"
+  ;;    ;;  (list :type "cppdbg"
+  ;;    ;;        :request "launch"
+  ;;    ;;        :name "cpptools::Run Configuration"
+  ;;    ;;        :MIMode "gdb"
+  ;;    ;;        :program "${workspaceFolder}/cpp/reverse_string"
+  ;;    ;;        :cwd "${workspaceFolder}/cpp"))
+
+  ;; ;; Debug Configuration for reverse_string.cpp
+  ;;    (dap-register-debug-template
+  ;;     "LLDB::Run reverse_string"
+  ;;     (list :type "lldb-vscode"
+  ;;           :request "launch"
+  ;;           :cwd "/home/grish/hub/new_projects/interview_prep/cpp/"
+  ;;           :program "/home/grish/hub/new_projects/interview_prep/cpp/reverse_string"
+  ;;           :name "LLDB::Run reverse_string")))
+#+end_src
+
+*** Real-GUD
+Trying this debugger
+#+begin_src emacs-lisp
+  (use-package realgud)                   ; RealGUD debugger
+  (use-package realgud-ipdb)              ; ipdb integration for RealGUD
 #+end_src
 
 ** COMPANY MODE (Code Complettion)
+COMplete ANYthing: Code completion framework.
 #+begin_src emacs-lisp
   (use-package company
     :custom
