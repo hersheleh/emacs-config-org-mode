@@ -50,7 +50,6 @@ Supress splash screen.
   (set-frame-font "Menlo 14" nil t)
 #+end_src
 
-
 * Beacon (Flash the Cursor)
 #+begin_src emacs-lisp
     (use-package beacon
@@ -90,7 +89,10 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
 
 * Smart Navigation
 These are packages which assist in navigating emacs
-
+** Find Recent Files
+#+begin_src emacs-lisp
+(recentf-mode 1)
+#+end_src
 ** WHICH KEY
 Given an initial key sequence Which Key provides hints about the next
 possible key presses along with documentation for that key press.
@@ -113,6 +115,7 @@ possible inputs
            ;; ("<f6>" . ivy-resume)
            ("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
+           ("C-c C-f" . counsel-buffer-or-recentf) ; open recent file or buffer
            ("C-h d" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
            ("C-h o" . counsel-describe-symbol)
@@ -224,8 +227,11 @@ Instructions/Documentation on configuration files can be found [[https://github.
     :custom
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.0)
-    :config
-    (add-hook 'after-init-hook 'global-company-mode))
+    :hook
+    (prog-mode . company-mode)            ; add completion to programming language modes
+    (org-mode . company-mode))            ; add completion to org-mode
+  ;; :config
+  ;; (add-hook 'after-init-hook 'global-company-mode)
 
 
   (use-package company-box          ; Show icons in company complettions
@@ -264,7 +270,6 @@ This is a mode for the sclang language for SuperCollider
    "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
   (require 'sclang)
 #+end_src
-
 
 ** Python
 #+begin_src emacs-lisp
@@ -314,10 +319,12 @@ This is a mode for the sclang language for SuperCollider
   (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
   (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
 #+end_src
+
 ** Whitespace Cleanup on Save
 #+begin_src emacs-lisp
   (add-hook 'before-save-hook 'whitespace-cleanup)
 #+end_src
+
 * ORG MODE ADDONS & CONFIGS
 ** Org Customizations
 #+begin_src emacs-lisp
