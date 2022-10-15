@@ -33,6 +33,63 @@
   (setq use-package-always-ensure t)
 #+end_src
 
+* MY KEY BINDINGS
+
+** EXITING EMACS
+#+begin_src emacs-lisp
+  ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
+  (global-unset-key (kbd "C-x  C-c")) ; i always accidentilly press this key
+  (global-set-key (kbd "C-x q") 'save-buffers-kill-emacs)
+#+end_src
+
+** UNMAP ACCIDENTAL KEY PRESSES
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "C-z"))          ; unmap suspend-frame from C-z
+#+end_src
+
+** SWITCHING VISUAL BUFFERS
+
+#+begin_src emacs-lisp
+  ;; switch buffers directionally using ijkl keys similar to right hand wasd
+  (global-set-key (kbd "C-c i") 'windmove-up)
+  (global-set-key (kbd "C-c k") 'windmove-down)
+  (global-set-key (kbd "C-c j") 'windmove-left)
+  (global-set-key (kbd "C-c l") 'windmove-right)
+
+  ;; switch buffers directionally using arrow keys
+  (global-set-key (kbd "C-c <up>") 'windmove-up)
+  (global-set-key (kbd "C-c <down>") 'windmove-down)
+  (global-set-key (kbd "C-c <left>") 'windmove-left)
+  (global-set-key (kbd "C-c <right>") 'windmove-right)
+
+  ;; add C-c o binding to other-window
+  (global-set-key (kbd "C-c o") 'other-window)
+#+end_src
+
+** SCROLL UP/DOWN LINES WITH: M-j M-k
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
+  (global-unset-key (kbd "M-k"))       ; was kill-sentence
+  (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
+  (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
+#+end_src
+
+** Whitespace Cleanup on Save
+#+begin_src emacs-lisp
+  (add-hook 'before-save-hook 'whitespace-cleanup)
+#+end_src
+
+* My Functions
+** Easy Insert Underscore (M-SPC)
+#+begin_src emacs-lisp
+  (global-unset-key (kbd "M-SPC"))
+  (defun insert-underscore ()
+    "Inserting an underscore '_' character"
+    (interactive)
+    (insert #x5F))
+  (global-set-key (kbd "M-SPC") 'insert-underscore)
+#+end_src
+
 * GRAPHICAL USER INTERFACE SETTINGS
 Disable Scrollbar.
 Show Columns in Modeline.
@@ -41,7 +98,8 @@ Supress splash screen.
 #+begin_src emacs-lisp
   (scroll-bar-mode -1)          ; remove scroll bar
   (column-number-mode)          ; show column number in modline
-  (global-display-line-numbers-mode 1) ; enable line numbers in margin globably
+  ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (setq inhibit-startup-message t)     ; No splash screen
 #+end_src
 
@@ -116,7 +174,7 @@ possible inputs
            ;; ("<f6>" . ivy-resume)
            ("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
-           ("C-c C-f" . counsel-buffer-or-recentf) ; open recent file or buffer
+           ("C-x C-r" . counsel-buffer-or-recentf) ; open recent file or buffer
            ("C-h d" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
            ("C-h o" . counsel-describe-symbol)
@@ -203,65 +261,70 @@ and jump to definition functionality for a particular language
 #+end_src
 
 ** Debuggers
-*** DAP-MODE (Disabled)
+
+*** DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
-Having trouble getting this to work. Debugger won't attach to session/stack-frame.
+Thread/Session attaching fixed. But dap-mode is still buggy.
+It errors out randomly disconnects.
 When debugging python dap-mode does not stop at breakpoints. (check back later).
+(possible solution is to upgrade debugpy)
 [[https://github.com/emacs-lsp/dap-mode/issues/678][This issue]] and [[https://github.com/emacs-lsp/lsp-treemacs/issues/144][this one]] highlight the issue.
+:dap_drawer:
 #+begin_src emacs-lisp
-  ;;  (use-package dap-mode
-  ;;    :ensure t
-  ;;    :after lsp-mode
+   (use-package dap-mode
+     :ensure t
+     :after lsp-mode
 
-  ;;    :custom
-  ;;    ;; python config
-  ;;    (dap-python-executable "python3")
-  ;;    (dap-python-debugger 'debugpy)
+     :custom
+     ;; python config
+     (dap-python-executable "python3")
+     (dap-python-debugger 'debugpy)
+     :config
+     (require 'dap-ui)
+     (require 'dap-cpptools)
+     (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
+     (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
 
-  ;;    :config
-  ;;    (require 'dap-ui)
-  ;;    ;; (require 'dap-cpptools)
-  ;;    (require 'dap-lldb)
-  ;;    (require 'dap-python)
+     ;; (dap-auto-configure-mode 1)
+     (dap-cpptools-setup)
+     (dap-mode 1)
+     (dap-ui-mode 1)
+     (dap-tooltip-mode 1)
+     (dap-ui-controls-mode 1)
 
-  ;;    ;; (dap-auto-configure-mode 1)
-  ;;    ;; (dap-cpptools-setup)
-  ;;    (dap-mode 1)
-  ;;    (dap-ui-mode 1)
-  ;;    (dap-tooltip-mode 1)
-  ;;    (dap-ui-controls-mode 1)
+     ;; lldb config
+     ;; (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
+     ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
+     (setq dap-print-io t)
 
-  ;;    ;; lldb config
-  ;;    ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
+     ;; Dap-cpptools debug configuration for reverse_string
+     (dap-register-debug-template
+      "cpptools::Run Configuration reverse_string"
+      (list :type "cppdbg"
+            :request "launch"
+            :name "cpptools::Run Configuration"
+            :MIMode "gdb"
+            :program "${workspaceFolder}/cpp/reverse_string"
+            :cwd "${workspaceFolder}/cpp"))
 
-  ;;    (setq dap-print-io t)
-
-  ;;    ;; Dap-cpptools debug configuration for reverse_string
-  ;;    ;; (dap-register-debug-template
-  ;;    ;;  "cpptools::Run Configuration reverse_string"
-  ;;    ;;  (list :type "cppdbg"
-  ;;    ;;        :request "launch"
-  ;;    ;;        :name "cpptools::Run Configuration"
-  ;;    ;;        :MIMode "gdb"
-  ;;    ;;        :program "${workspaceFolder}/cpp/reverse_string"
-  ;;    ;;        :cwd "${workspaceFolder}/cpp"))
-
-  ;; ;; Debug Configuration for reverse_string.cpp
-  ;;    (dap-register-debug-template
-  ;;     "LLDB::Run reverse_string"
-  ;;     (list :type "lldb-vscode"
-  ;;           :request "launch"
-  ;;           :cwd "/home/grish/hub/new_projects/interview_prep/cpp/"
-  ;;           :program "/home/grish/hub/new_projects/interview_prep/cpp/reverse_string"
-  ;;           :name "LLDB::Run reverse_string")))
+  ;; Debug Configuration for reverse_string.cpp
+     (dap-register-debug-template
+      "LLDB::Run reverse_string"
+      (list :type "lldb-vscode"
+            :request "launch"
+            :cwd "${workspaceFolder}cpp/"
+            :program "${workspaceFolder}cpp/reverse_string"
+            :name "LLDB::Run reverse_string")))
 #+end_src
+:END:
+
 
 *** Real-GUD
 Trying this debugger
 #+begin_src emacs-lisp
-  (use-package realgud)                   ; RealGUD debugger
-  (use-package realgud-ipdb)              ; ipdb integration for RealGUD
+  ;; (use-package realgud)                   ; RealGUD debugger
+  ;; (use-package realgud-ipdb)              ; ipdb integration for RealGUD
 #+end_src
 
 ** COMPANY MODE (Code Complettion)
@@ -291,16 +354,16 @@ Syntax checking and linting.
 #+end_src
 
 * Programming Languages
-* SuperCollider
+** SuperCollider
 
-** sclang-extensions (unmaintained package)
+*** sclang-extensions (unmaintained package)
 Uses AutoComplete which is not as good as Company. Hasn't been updated
 for 7 years as of Oct 2022.
 #+begin_src emacs-lisp
   ;; (use-package sclang-extensions)
 #+end_src
 
-** scel (sclang' mode for emacs)
+*** scel (sclang' mode for emacs)
 This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
   (setq exec-path
@@ -321,52 +384,6 @@ This is a mode for the sclang language for SuperCollider
   ;;   :custom
   ;;   ;; (python-shell-interpreter "python3")
   ;;   )
-#+end_src
-
-* MY KEY BINDINGS
-
-** EXITING EMACS
-#+begin_src emacs-lisp
-  ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
-  (global-unset-key (kbd "C-x  C-c")) ; i always accidentilly press this key
-  (global-set-key (kbd "C-x q") 'save-buffers-kill-emacs)
-#+end_src
-
-** UNMAP ACCIDENTAL KEY PRESSES
-#+begin_src emacs-lisp
-  (global-unset-key (kbd "C-z"))          ; unmap suspend-frame from C-z
-#+end_src
-
-** SWITCHING VISUAL BUFFERS
-
-#+begin_src emacs-lisp
-  ;; switch buffers directionally using ijkl keys similar to right hand wasd
-  (global-set-key (kbd "C-c i") 'windmove-up)
-  (global-set-key (kbd "C-c k") 'windmove-down)
-  (global-set-key (kbd "C-c j") 'windmove-left)
-  (global-set-key (kbd "C-c l") 'windmove-right)
-
-  ;; switch buffers directionally using arrow keys
-  (global-set-key (kbd "C-c <up>") 'windmove-up)
-  (global-set-key (kbd "C-c <down>") 'windmove-down)
-  (global-set-key (kbd "C-c <left>") 'windmove-left)
-  (global-set-key (kbd "C-c <right>") 'windmove-right)
-
-  ;; add C-c o binding to other-window
-  (global-set-key (kbd "C-c o") 'other-window)
-#+end_src
-
-** SCROLL UP/DOWN LINES WITH: M-j M-k
-#+begin_src emacs-lisp
-  (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
-  (global-unset-key (kbd "M-k"))       ; was kill-sentence
-  (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
-  (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
-#+end_src
-
-** Whitespace Cleanup on Save
-#+begin_src emacs-lisp
-  (add-hook 'before-save-hook 'whitespace-cleanup)
 #+end_src
 
 * ORG MODE ADDONS & CONFIGS
@@ -438,11 +455,10 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (setq dashboard-set-file-icons t)
     (setq dashboard-center-content nil)
     (setq dashboard-projects-backend 'projectile)
-    (setq dashboard-items '((agenda . 5)
-                            (projects . 5)
+    (setq dashboard-items '((projects . 5)
                             (bookmarks . 3)
                             (recents . 7)
-
+                            (agenda . 5)
                             ))
     (setq dashboard-page-separator "\n\f\n")
     (setq dashboard-agenda-sort-strategy '(time-up))
