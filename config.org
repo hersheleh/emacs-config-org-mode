@@ -455,35 +455,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           org-roam-ui-open-on-start t))
 #+end_src
 
-* DASHBOARD
-#+begin_src emacs-lisp
-  (use-package dashboard
-    :after page-break-lines
-    :init
-    (setq dashboard-startup-banner 'logo)
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-center-content nil)
-    (setq dashboard-projects-backend 'projectile)
-    (setq dashboard-items '((projects . 5)
-                            (bookmarks . 3)
-                            (recents . 7)
-                            (agenda . 5)
-                            ))
-    (setq dashboard-page-separator "\n\f\n")
-    (setq dashboard-agenda-sort-strategy '(time-up))
-    (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
-    :config
-    (dashboard-setup-startup-hook))
-
-#+end_src
-
-** PAGE BREAK LINES
-#+begin_src emacs-lisp
-  (use-package page-break-lines
-    :config (page-break-lines-mode))
-#+End_src
-
 * VTERM
 A very good shell in emacs
 #+begin_src emacs-lisp
@@ -699,7 +670,7 @@ Installed this to browse Help documentation for SuperCollider
     (setq dashboard-set-file-icons t)
     (setq dashboard-center-content nil)
     (setq dashboard-projects-backend 'projectile)
-    (setq dashboard-items '(;; (agenda . 5)
+    (setq dashboard-items '((agenda . 5)
                             (projects . 5)
                             (bookmarks . 3)
                             (recents . 7)
