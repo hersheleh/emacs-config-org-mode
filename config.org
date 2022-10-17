@@ -661,6 +661,15 @@ Installed this to browse Help documentation for SuperCollider
   (use-package w3m)
 #+end_src
 
+* Buffer Move
+Simplify Swapping buffers
+#+begin_src emacs-lisp
+  (use-package buffer-move
+    :bind (("C-c b l" . buf-move-right)
+           ("C-c b j" . buf-move-left)
+           ("C-c b i" . buf-move-up)
+           ("C-c b k" . buf-move-down)))
+#+end_src
 * DASHBOARD
 #+begin_src emacs-lisp
   (use-package dashboard
