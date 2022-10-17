@@ -363,6 +363,16 @@ Syntax checking and linting.
     (global-flycheck-mode))
 #+end_src
 
+** iEdit(edit multiple lines simulatneously)
+#+begin_src emacs-lisp
+  (use-package iedit)
+
+#+end_src
+** Yasnippet
+#+begin_src emacs-lisp
+    (use-package yasnippet
+      :config (yas-global-mode 1))
+#+end_src
 * Programming Languages
 ** SuperCollider
 

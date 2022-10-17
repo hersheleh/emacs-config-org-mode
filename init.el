@@ -23,7 +23,7 @@
      ("v" . "verse")
      ("el" . "src emacs-lisp")))
  '(package-selected-packages
-   '(buffer-move w3m org-roam-ui projectile beacon org-roam helpful ivy-rich rainbow-delimiters vterm page-break-lines all-the-icons org-superstar company company-mode doom-modeline use-package))
+   '(yasnippet iedit buffer-move w3m org-roam-ui projectile beacon org-roam helpful ivy-rich rainbow-delimiters vterm page-break-lines all-the-icons org-superstar company company-mode doom-modeline use-package))
  '(warning-suppress-types '(((python python-shell-completion-native-turn-on-maybe)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
