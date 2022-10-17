@@ -272,50 +272,60 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
 [[https://github.com/emacs-lsp/dap-mode/issues/678][This issue]] and [[https://github.com/emacs-lsp/lsp-treemacs/issues/144][this one]] highlight the issue.
 :dap_drawer:
 #+begin_src emacs-lisp
-   (use-package dap-mode
-     :ensure t
-     :after lsp-mode
+  (use-package dap-mode
+    :ensure t
+    :after lsp-mode
 
-     :custom
-     ;; python config
-     (dap-python-executable "python3")
-     (dap-python-debugger 'debugpy)
-     :config
-     (require 'dap-ui)
-     (require 'dap-cpptools)
-     (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
-     (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
+    :custom
+    ;; python config
+    (dap-python-executable "python3.10")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-ui)
+    (require 'dap-cpptools)
+    (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
+    (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
 
-     ;; (dap-auto-configure-mode 1)
-     (dap-cpptools-setup)
-     (dap-mode 1)
-     (dap-ui-mode 1)
-     (dap-tooltip-mode 1)
-     (dap-ui-controls-mode 1)
+    ;; (dap-auto-configure-mode 1)
+    (dap-cpptools-setup)
+    (dap-mode 1)
+    (dap-ui-mode 1)
+    (dap-tooltip-mode 1)
+    (dap-ui-controls-mode 1)
 
-     ;; lldb config
-     ;; (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
-     ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
-     (setq dap-print-io t)
+    ;; lldb config
+    ;; (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
+    ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
+    (setq dap-print-io t)
 
-     ;; Dap-cpptools debug configuration for reverse_string
-     (dap-register-debug-template
-      "cpptools::Run Configuration reverse_string"
-      (list :type "cppdbg"
-            :request "launch"
-            :name "cpptools::Run Configuration"
-            :MIMode "gdb"
-            :program "${workspaceFolder}/cpp/reverse_string"
-            :cwd "${workspaceFolder}/cpp"))
+    ;; Dap-cpptools debug configuration for reverse_string
+    (dap-register-debug-template
+     "cpptools::Run Configuration reverse_string"
+     (list :type "cppdbg"
+           :request "launch"
+           :name "cpptools::Run Configuration"
+           :MIMode "gdb"
+           :program "${workspaceFolder}/cpp/reverse_string"
+           :cwd "${workspaceFolder}/cpp"))
 
-  ;; Debug Configuration for reverse_string.cpp
-     (dap-register-debug-template
-      "LLDB::Run reverse_string"
-      (list :type "lldb-vscode"
-            :request "launch"
-            :cwd "${workspaceFolder}cpp/"
-            :program "${workspaceFolder}cpp/reverse_string"
-            :name "LLDB::Run reverse_string")))
+    ;; Debug Configuration for reverse_string.cpp
+    (dap-register-debug-template
+     "LLDB::Run reverse_string"
+     (list :type "lldb-vscode"
+           :request "launch"
+           :cwd "${workspaceFolder}cpp/"
+           :program "${workspaceFolder}cpp/reverse_string"
+           :name "LLDB::Run reverse_string"))
+    (dap-register-debug-template
+     "Python :: Run unittest (buffer)"
+     (list :type "python"
+           :args ""
+           :cwd nil
+           :program nil
+           :module "unittest"
+           :request "launch"
+           :name "Python :: Run unittest (buffer)")))
+
 #+end_src
 :END:
 
@@ -521,10 +531,10 @@ Color delimiters like parens and braces according to their depth
 
 ** Python
 #+begin_src emacs-lisp
-  ;; (use-package python
-  ;;   :custom
-  ;;   ;; (python-shell-interpreter "python3")
-  ;;   )
+  (use-package python
+    :custom
+    (python-shell-interpreter "python3.10")
+    )
 #+end_src
 
 * MY KEY BINDINGS
