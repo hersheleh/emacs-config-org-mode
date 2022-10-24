@@ -123,6 +123,9 @@ Sets font for MacOS X emacs
 * THEME
 # Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
 Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
+Other good themes:
+ * doom-ir-black
+ * doom-moonlight
 #+begin_src emacs-lisp
   (use-package doom-themes
     :custom
@@ -262,7 +265,7 @@ and jump to definition functionality for a particular language
 
 ** Debuggers
 
-*** DAP-MODE
+*** COMMENT DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
 Thread/Session attaching fixed. But dap-mode is still buggy.
@@ -296,7 +299,7 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
     ;; lldb config
     ;; (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
     ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
-    (setq dap-print-io t)
+    ;; (setq dap-print-io t)
 
     ;; Dap-cpptools debug configuration for reverse_string
     (dap-register-debug-template
@@ -333,7 +336,7 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
 *** Real-GUD
 Trying this debugger
 #+begin_src emacs-lisp
-  ;; (use-package realgud)                   ; RealGUD debugger
+  (use-package realgud)                   ; RealGUD debugger
   ;; (use-package realgud-ipdb)              ; ipdb integration for RealGUD
 #+end_src
 
@@ -415,10 +418,10 @@ This is a mode for the sclang language for SuperCollider
     ;; (setq org-hide-emphasis-markers t)
     ;; increase Header heights for each org level
     (custom-set-faces
-     '(org-level-1 ((t (:inherit outline-1 :height 1.4))))
-     '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
-     '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
-     '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
+     '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+     '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
+     '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
+     '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
      '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
      ))
 #+end_src
@@ -573,10 +576,10 @@ Color delimiters like parens and braces according to their depth
     ;; (setq org-hide-emphasis-markers t)
     ;; increase Header heights for each org level
     (custom-set-faces
-     '(org-level-1 ((t (:inherit outline-1 :height 1.4))))
-     '(org-level-2 ((t (:inherit outline-2 :height 1.3))))
-     '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
-     '(org-level-4 ((t (:inherit outline-4 :height 1.0))))
+     '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+     '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
+     '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
+     '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
      '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
      ))
 #+end_src
