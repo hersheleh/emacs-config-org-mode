@@ -126,6 +126,8 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
 Other good themes:
  * doom-ir-black
  * doom-moonlight
+ * doom-outrun-electric
+ * doom-fairy-floss (nice light/dark theme)
 #+begin_src emacs-lisp
   (use-package doom-themes
     :custom
@@ -161,7 +163,7 @@ possible key presses along with documentation for that key press.
 #+begin_src emacs-lisp
   (use-package which-key
     :bind
-    (("C-c w" . which-key-show-full-keymap))
+    (("C-c w" . which-key-show-major-mode))
     :config
     (which-key-mode))
 #+end_src
@@ -242,25 +244,34 @@ and jump to definition functionality for a particular language
 
 *** LSP MODE (Enabled)
 #+begin_src emacs-lisp
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    ;; :init
-    ;; (setq lsp-keymap-prefix "C-l")
+    (use-package lsp-mode
+      :commands (lsp lsp-deferred)
+      ;; :init
+      ;; (setq lsp-keymap-prefix "C-l")
 
-    :hook
-    (c++-mode . lsp)
-    (python-mode . lsp)
+      :hook
+      (c++-mode . lsp)
+      (python-mode . lsp)
 
-    :config
-    (lsp-enable-which-key-integration t))
+      :config
+      (lsp-enable-which-key-integration t))
 
 
   (use-package lsp-ui
-    :hook (lsp-mode . lsp-ui-mode))
+    :hook (lsp-mode . lsp-ui-mode)
     :config
+    (setq lsp-ui-doc-show-with-cursor 't)
     (setq lsp-ui-doc-position 'bottom)
+    (setq lsp-ui-sideline-show-hover 't))
+#+end_src
 
+**** Sideline
+#+begin_src emacs-lisp
+  ;; (use-package sideline
+  ;;   :after lsp-mode
 
+  ;;   :init
+  ;;   (setq sideline-backends-right '(sideline-lsp)))
 #+end_src
 
 ** Debuggers
@@ -403,10 +414,10 @@ This is a mode for the sclang language for SuperCollider
 
 ** Python
 #+begin_src emacs-lisp
-  ;; (use-package python
-  ;;   :custom
-  ;;   ;; (python-shell-interpreter "python3")
-  ;;   )
+  (use-package python-mode
+    :config
+    ;; (setq py-python-command "python3")
+    (setq py-shell-name "python3"))
 #+end_src
 
 * ORG MODE ADDONS & CONFIGS
@@ -513,13 +524,6 @@ Color delimiters like parens and braces according to their depth
 
 
 
-** Python
-#+begin_src emacs-lisp
-  (use-package python
-    :custom
-    (python-shell-interpreter "python3.10")
-    )
-#+end_src
 
 * MY KEY BINDINGS
 
