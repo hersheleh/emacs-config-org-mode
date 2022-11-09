@@ -222,7 +222,8 @@ Provides function documentation and key binding info in ivy buffer
 
 * Treemacs
 #+begin_src emacs-lisp
-  (use-package treemacs)
+  (use-package treemacs
+    :config (treemacs-project-follow-mode))
 #+end_src
 
 * IDE LIKE PACKAGES
@@ -231,7 +232,7 @@ Code Completion, Documentaion, Syntax checking, Jump to Definition.
 A Language Server provides: syntax checking, error correction,
 and jump to definition functionality for a particular language
 
-*** EGLOT (Disabled)
+*** COMMENT EGLOT (Disabled)
 #+begin_src emacs-lisp
   ;; Setup eglot to wordk with clangd-10 (LSP for C/C++)
   ;; (use-package eglot
@@ -240,18 +241,19 @@ and jump to definition functionality for a particular language
   ;;   (add-hook 'c-mode-hook 'eglot-ensure)
   ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
 #+end_src
-***** DONE make alias for clangd - clangd-10
+*** DONE make alias for clangd -> clangd-10
 
 *** LSP MODE (Enabled)
 #+begin_src emacs-lisp
     (use-package lsp-mode
       :commands (lsp lsp-deferred)
       ;; :init
-      ;; (setq lsp-keymap-prefix "C-l")
+      ;; (setq lsp-keymap-prefix "C-c l")
 
       :hook
       (c++-mode . lsp)
       (python-mode . lsp)
+      (js2-mode . lsp)
 
       :config
       (lsp-enable-which-key-integration t))
@@ -261,8 +263,7 @@ and jump to definition functionality for a particular language
     :hook (lsp-mode . lsp-ui-mode)
     :config
     (setq lsp-ui-doc-show-with-cursor 't)
-    (setq lsp-ui-doc-position 'bottom)
-    (setq lsp-ui-sideline-show-hover 't))
+    (setq lsp-ui-doc-position 'bottom))
 #+end_src
 
 **** Sideline
@@ -276,7 +277,7 @@ and jump to definition functionality for a particular language
 
 ** Debuggers
 
-*** COMMENT DAP-MODE
+*** DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
 Thread/Session attaching fixed. But dap-mode is still buggy.
@@ -330,6 +331,7 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
            :cwd "${workspaceFolder}cpp/"
            :program "${workspaceFolder}cpp/reverse_string"
            :name "LLDB::Run reverse_string"))
+    ;; Debug Configuration for python unittest
     (dap-register-debug-template
      "Python :: Run unittest (buffer)"
      (list :type "python"
@@ -338,8 +340,19 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
            :program nil
            :module "unittest"
            :request "launch"
-           :name "Python :: Run unittest (buffer)")))
-
+           :name "Python :: Run unittest (buffer)"))
+    ;; Debug Configuration for python file which reads from stdin
+    (dap-register-debug-template
+     "Python :: Run file User Input (buffer)"
+     (list :type "python"
+           :args ""
+           :cwd nil
+           :module nil
+           :program nil
+           :console "integratedTerminal"  ; launches vterm
+           :request "launch"
+           :name "Python :: Run file User Input (buffer)"))
+    )
 #+end_src
 :END:
 
@@ -348,7 +361,6 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
 Trying this debugger
 #+begin_src emacs-lisp
   (use-package realgud)                   ; RealGUD debugger
-  ;; (use-package realgud-ipdb)              ; ipdb integration for RealGUD
 #+end_src
 
 ** COMPANY MODE (Code Complettion)
@@ -360,7 +372,8 @@ COMplete ANYthing: Code completion framework.
     (company-idle-delay 0.0)
     :hook
     (prog-mode . company-mode)            ; add completion to programming language modes
-    (org-mode . company-mode))            ; add completion to org-mode
+    ;; (org-mode . company-mode)            ; add completion to org-mode
+    )
   ;; :config
   ;; (add-hook 'after-init-hook 'global-company-mode)
 
@@ -418,6 +431,20 @@ This is a mode for the sclang language for SuperCollider
     :config
     ;; (setq py-python-command "python3")
     (setq py-shell-name "python3"))
+#+end_src
+** Javascript
+Install js2-mode
+#+begin_src emacs-lisp
+  (use-package js2-mode
+    :defer t
+    :mode "\\.js\\'"
+    :config
+    (require 'js2-mode)
+  )
+#+end_src
+*** PUG templates for Express framework
+#+begin_src emacs-lisp
+  (use-package pug-mode)
 #+end_src
 
 * ORG MODE ADDONS & CONFIGS
@@ -479,11 +506,23 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           org-roam-ui-open-on-start t))
 #+end_src
 
+* Markdown
+#+begin_src emacs-lisp
+  (use-package markdown-preview-mode)
+#+end_src
 * VTERM
 A very good shell in emacs
+Notes: need to find a way to execute bash profile.
+       current way interferes with dap-mode terminal input
 #+begin_src emacs-lisp
   (use-package vterm
-    :hook (vterm-mode . (lambda ()(display-line-numbers-mode 0))))
+    ;; :hook
+    ;; turn off line numbers in vterm
+    ;; (vterm-mode . (lambda () (display-line-numbers-mode 0)))
+    ;; execute bash_profile for this terminal session
+    ;; :hook
+    ;; (vterm-mode . (lambda () (vterm-send-string "source ~/.bash_profile\n")))
+    )
 #+end_src
 
 * Raindbow Delimiters
@@ -537,6 +576,7 @@ Color delimiters like parens and braces according to their depth
 ** UNMAP ACCIDENTAL KEY PRESSES
 #+begin_src emacs-lisp
   (global-unset-key (kbd "C-z"))          ; unmap suspend-frame from C-z
+  (global-unset-key (kbd "C-x C-z"))
 #+end_src
 
 ** SWITCHING VISUAL BUFFERS
@@ -555,7 +595,17 @@ Color delimiters like parens and braces according to their depth
   (global-set-key (kbd "C-c <right>") 'windmove-right)
 
   ;; add C-c o binding to other-window
-  (global-set-key (kbd "C-c o") 'other-window)
+  (global-set-key (kbd "C-c o") 'other-window) ; (o)ther
+
+  ;; split buffer with v and h keys
+  (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
+  (global-set-key (kbd "C-c b v") 'split-window-below) ;(v)ertical
+
+  ;; delete other windows
+  (global-set-key (kbd "C-c 1") 'delete-other-windows)
+  (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
+  (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
+
 #+end_src
 
 ** SCROLL UP/DOWN LINES WITH: M-j M-k
@@ -630,13 +680,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           org-roam-ui-open-on-start t))
 #+end_src
 
-* VTERM
-A very good shell in emacs
-#+begin_src emacs-lisp
-  (use-package vterm
-    :hook (vterm-mode . (lambda ()(display-line-numbers-mode 0))))
-#+end_src
-
 * Raindbow Delimiters
 Color delimiters like parens and braces according to their depth
 #+begin_src emacs-lisp
@@ -690,6 +733,7 @@ Simplify Swapping buffers
 * DASHBOARD
 #+begin_src emacs-lisp
   (use-package dashboard
+    :after org
     :init
     (setq dashboard-startup-banner 'logo)
     (setq dashboard-set-heading-icons t)
