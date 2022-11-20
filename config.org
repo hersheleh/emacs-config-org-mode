@@ -128,6 +128,7 @@ Other good themes:
  * doom-moonlight
  * doom-outrun-electric
  * doom-fairy-floss (nice light/dark theme)
+ * doom-acario-light (good light theme)
 #+begin_src emacs-lisp
   (use-package doom-themes
     :custom
