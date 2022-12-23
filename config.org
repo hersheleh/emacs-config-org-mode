@@ -1,6 +1,6 @@
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
-#+PROPERTY: header-args:emacs-lisp :tangle ./init.el mkdirp yes
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
 *** TODOS:
 **** TODO ADD Table of Contents for this document.
@@ -16,7 +16,24 @@
 **** TODO 'C-c c b' command to create comment block
 
 
-* PACKAGE MANAGEMENT
+* Emacs Performace
+
+#+begin_src emacs-lisp
+  ;; Set Garbage collection threshold very high at startup
+  (setq gc-cons-threshold (* 50 1000 1000))
+#+end_src
+Define function to time Emacs startup and determine # of garbage collections
+#+begin_src emacs-lisp
+  (defun gsh/display-startup-time ()
+    (message "Emacs loaded in %s with %d garbage collections."
+             (format "%.2f seconds"
+                     (float-time
+                      (time-subtract after-init-time before-init-time)))
+             gcs-done))
+  (add-hook 'emacs-startup-hook #'gsh/display-startup-time)
+#+end_src
+
+ PACKAGE MANAGEMENT
 ** Setup package.el to work with MELPA.
 #+begin_src emacs-lisp
   (require 'package)
@@ -30,13 +47,13 @@
 #+end_src
 
 ** Installing use-package
-
 #+begin_src emacs-lisp
   (unless (package-installed-p 'use-package)
     (package-install 'use-package))
   (require 'use-package)
   (setq use-package-always-ensure t)
   (setq use-package-always-defer t)
+  ;; (setq use-package-verbose t)
 #+end_src
 
 * Emacs System configs
@@ -59,7 +76,7 @@
         `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
 
   (use-package no-littering
-    :defer nil)
+    :demand t)
 #+end_src
 * MY KEY BINDINGS
 ** EXITING EMACS
@@ -172,7 +189,7 @@ Other good themes:
  * doom-acario-light (good light theme)
 #+begin_src emacs-lisp
   (use-package doom-themes
-    :defer nil
+    :demand t
     :custom
     (doom-monokai-classic-brighter-comments t)
     :config
@@ -191,8 +208,9 @@ Other good themes:
 ** MODE LINE
 #+begin_src emacs-lisp
   (use-package doom-modeline
-    :init (doom-modeline-mode 1))
-
+    ;; :demand t
+    :init (doom-modeline-mode 1)
+    )
 #+end_src
 ** ICONS
 #+begin_src emacs-lisp
@@ -203,7 +221,7 @@ Other good themes:
 #+begin_src emacs-lisp
   (use-package all-the-icons-dired
     :after all-the-icons
-    :init
+    :config
     (setq all-the-icons-dired-monochrome nil)
     :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
@@ -211,59 +229,60 @@ Other good themes:
 These are packages which assist in navigating emacs
 ** Find Recent Files
 #+begin_src emacs-lisp
-(recentf-mode 1)
+  ;; (recentf-mode 1)
 #+end_src
 ** IVY MODE
 Ivy Mode speeds up navigation by perfoming text matching against
 possible inputs
 #+begin_src emacs-lisp
-  (use-package ivy
-    :diminish
-    :bind (("C-s" . swiper)
-           ;; ("C-c C-r" . ivy-resume)
-           ;; ("<f6>" . ivy-resume)
-           ("M-x" . counsel-M-x)
-           ("C-x C-f" . counsel-find-file)
-           ("C-x f" . counsel-find-file)
-           ("C-c r" . counsel-recentf)    ; open recent file
-           ("C-c f" . counsel-recentf)    ; open recent file
-           ("C-c C-f" .  counsel-recentf)
-           ("C-h d" . counsel-describe-function)
-           ("C-h v" . counsel-describe-variable)
-           ("C-h o" . counsel-describe-symbol)
-           ("C-h l" . counsel-find-library)
-           ("C-h i" . counsel-info-lookup-symbol)
-           ("C-h u" . counsel-unicode-char)
-           ("C-h b" . counsel-descbinds)
-           ("C-x b" . counsel-switch-buffer)
-           ("C-c t" . counsel-load-theme)
-           :map minibuffer-local-map
-           ("C-r" . counsel-minibuffer-history)
-           ;; ("C-c g" . counsel-git)
-           ;; ("C-c j" . counsel-git-grep)
-           ;; ("C-c k" . counsel-ag)
-           ;; ("C-x l" . counsel-locate)
-           ;; ("C-S-o" . counsel-rhythmbox)
-           )
-    :config
-    (ivy-mode 1))
+      (use-package ivy
+        ;; :diminish
+        :bind (("C-s" . swiper)
+               ;; ("C-c C-r" . ivy-resume)
+               ;; ("<f6>" . ivy-resume)
+               ("M-x" . counsel-M-x)
+               ("C-x C-f" . counsel-find-file)
+               ("C-x f" . counsel-find-file)
+               ("C-c r" . counsel-recentf)    ; open recent file
+               ("C-c f" . counsel-recentf)    ; open recent file
+               ("C-c C-f" .  counsel-recentf)
+               ("C-h d" . counsel-describe-function)
+               ("C-h v" . counsel-describe-variable)
+               ("C-h o" . counsel-describe-symbol)
+               ("C-h l" . counsel-find-library)
+               ("C-h i" . counsel-info-lookup-symbol)
+               ("C-h u" . counsel-unicode-char)
+               ("C-h b" . counsel-descbinds)
+               ("C-x b" . counsel-switch-buffer)
+               ("C-c t" . counsel-load-theme)
+               :map minibuffer-local-map
+               ("C-r" . counsel-minibuffer-history)
+               ;; ("C-c g" . counsel-git)
+               ;; ("C-c j" . counsel-git-grep)
+               ;; ("C-c k" . counsel-ag)
+               ;; ("C-x l" . counsel-locate)
+               ;; ("C-S-o" . counsel-rhythmbox)
+               )
+        :config
+        (ivy-mode 1))
+#+end_src
+
+*** Ivy Rich
+Provides function documentation and key binding info in ivy buffer
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :after counsel
+    :init
+    (ivy-rich-mode 1))
+    ;; (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 #+end_src
 
 *** All the Icons Ivy Rich
 #+begin_src emacs-lisp
   (use-package all-the-icons-ivy-rich
+    :after ivy
     :init (all-the-icons-ivy-rich-mode 1))
-#+end_src
-*** Ivy Rich
-Provides function documentation and key binding info in ivy buffer
-#+begin_src emacs-lisp
-  (use-package ivy-rich
-    :init
-    (ivy-rich-mode 1)
-    :config
-    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
-#+end_src
-
+  #+end_src
 ** COUNSEL
 #+begin_src emacs-lisp
   (use-package counsel
@@ -274,20 +293,20 @@ Provides function documentation and key binding info in ivy buffer
 * MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
     (use-package magit
-      :defer t)
+      :commands magit-status)
 #+end_src
 * WHICH KEY
 Given an initial key sequence Which Key provides hints about the next
 possible key presses along with documentation for that key press.
 #+begin_src emacs-lisp
   (use-package which-key
-    :init
-    (setq which-key-idle-delay 0.3)
-    (which-key-mode)
-    :diminish
+    :defer 0
     :bind
     (("C-c w w" . which-key-show-major-mode)
-     ("C-c w i" . which-key-show-minor-mode-keymap)))
+     ("C-c w i" . which-key-show-minor-mode-keymap))
+    :config
+    (setq which-key-idle-delay 0.8)
+    (which-key-mode))
 #+end_src
 
 * Precient
@@ -370,8 +389,8 @@ and jump to definition functionality for a particular language
 *** LSP MODE (Enabled)
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :init
-    (setq lsp-keymap-prefix "C-x l")
+    ;; :init
+    ;; (setq lsp-keymap-prefix "C-x l")
     :commands (lsp lsp-deferred)
     ;; :init
     ;; (setq lsp-keymap-prefix "C-c l")
@@ -386,6 +405,7 @@ and jump to definition functionality for a particular language
      "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
      )
     :config
+    (setq lsp-keymap-prefix "C-x l")
     ;; (setq lsp-disabled-clients '(tfls))
     (lsp-enable-which-key-integration t)
     (setq lsp-diagnostics-provider :none)
@@ -424,9 +444,8 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
 :dap_drawer:
 #+begin_src emacs-lisp
   (use-package dap-mode
-    :ensure t
-    :after lsp-mode
-
+    ;; :ensure t
+    :commands dap-debug
     :config
     (require 'dap-ui)
     ;; (dap-auto-configure-mode 1)
@@ -649,6 +668,7 @@ Notes: need to find a way to execute bash profile.
        current way interferes with dap-mode terminal input
 #+begin_src emacs-lisp
   (use-package vterm
+    :commands vterm
     ;; :hook
     ;; turn off line numbers in vterm
     ;; (vterm-mode . (lambda () (display-line-numbers-mode 0)))
@@ -693,8 +713,8 @@ Color delimiters like parens and braces according to their depth
 ** Org Customizations
 #+begin_src emacs-lisp
   (use-package org
-    :init
-    (setq org-startup-indented t)
+    ;; :init
+    ;; (setq org-startup-indented t)
     ;; (setq org-hide-emphasis-markers t)
     ;; increase Header heights for each org level
 
@@ -702,6 +722,7 @@ Color delimiters like parens and braces according to their depth
     ;; (org-mode . (lambda () (add-hook 'after-save-hook
     ;;                                  #'g/org-babel-tangle-config)))
     :config
+    (setq org-startup-indented t)
     (custom-set-faces
      '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
      '(org-level-2 ((t (:inherit outline-2 :height 1.10))))
@@ -734,6 +755,7 @@ Adds nice looking bullets to org mode
 Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (use-package org-roam
+    :after org
     :custom
     (org-roam-directory "~/hub/org-roam")
     :bind (("C-c n l" . org-roam-buffer-toggle)
@@ -787,19 +809,14 @@ Simplify Swapping buffers
            ("C-c b k" . buf-move-down)))
 #+end_src
 
-* Project
-#+begin_src emacs-lisp
-  (use-package project
-    :defer nil)
-#+end_src
-
 * DASHBOARD
 #+begin_src emacs-lisp
   (use-package dashboard
-    :defer nil
+    :demand t
     :after (;; org
             page-break-lines)
-    :init
+    ;; :init
+    :config
     (setq dashboard-startup-banner 'logo)
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
@@ -812,22 +829,30 @@ Simplify Swapping buffers
     (setq dashboard-page-separator "\n\f\n")
     (setq dashboard-agenda-sort-strategy '(time-up))
     (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
-    :config
     (dashboard-setup-startup-hook))
 #+end_src
 
 ** PAGE BREAK LINES
 #+begin_src emacs-lisp
   (use-package page-break-lines
-    :defer nil
+    :demand t
     :config (page-break-lines-mode))
 #+End_src
 
 * Save History
 #+begin_src emacs-lisp
   (use-package savehist
-    :defer nil
+    :after counsel
     :init
     (savehist-mode 1)
     (setq history-length 25))
+#+end_src
+* Garbage Collection
+#+begin_src emacs-lisp
+  ;; Set Garbage collection threshold back down after startup completes
+  ;; (defun gsh/lower-gc-threshold()
+  ;;   (setq gc-cons-threshold (* 2 1000 1000))
+  ;;     )
+  ;; (add-hook 'after-init-hook 'gsh/lower-gc-threshold)
+  (setq gc-cons-threshold (* 2 1000 1000))
 #+end_src
