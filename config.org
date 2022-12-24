@@ -18,9 +18,11 @@
 
 * Emacs Performace
 
-#+begin_src emacs-lisp
-  ;; Set Garbage collection threshold very high at startup
+#+begin_src emacs-lisp :tangle ./early-init.el
+    ;; Set Garbage collection threshold very high at startup
   (setq gc-cons-threshold (* 50 1000 1000))
+  (defvar default-file-name-handler-alist file-name-handler-alist)
+  (setq file-name-handler-alist nil)
 #+end_src
 Define function to time Emacs startup and determine # of garbage collections
 #+begin_src emacs-lisp
@@ -1377,9 +1379,9 @@ Simplify Swapping buffers
 * Garbage Collection
 #+begin_src emacs-lisp
   ;; Set Garbage collection threshold back down after startup completes
-  ;; (defun gsh/lower-gc-threshold()
-  ;;   (setq gc-cons-threshold (* 2 1000 1000))
-  ;;     )
-  ;; (add-hook 'after-init-hook 'gsh/lower-gc-threshold)
-  (setq gc-cons-threshold (* 2 1000 1000))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq gc-cons-threshold (* 2 1000 1000))
+              (setq file-name-handler-alist default-file-name-handler-alist)))
+  ;; (setq gc-cons-threshold (* 2 1000 1000))
 #+end_src
