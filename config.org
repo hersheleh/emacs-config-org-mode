@@ -62,20 +62,20 @@ Define function to time Emacs startup and determine # of garbage collections
 
 #+begin_src emacs-lisp
   ;; Set Dired default directory
-  (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
+  ;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
   ;; set re-builder sytax to string
   (setq reb-re-syntax 'string)
   ;; keep folders clean
   (setq backup-directory-alist
-        `(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
+	`(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
   ;; create path for auto save mode
   (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
 
   (setq auto-save-list-file-prefix (expand-file-name
-                                    "tmp/auto-saves/sessions/"
-                                    user-emacs-directory)
-        auto-save-file-name-transforms
-        `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+				    "tmp/auto-saves/sessions/"
+				    user-emacs-directory)
+	auto-save-file-name-transforms
+	`((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
 
   (use-package no-littering
     :demand t)
@@ -104,7 +104,7 @@ Supress splash screen.
   (setq inhibit-startup-message t)     ; No splash screen
 #+end_src
 
-** Set Default Font
+** COMMENT Set Default Font
 Sets font for MacOS X emacs
 #+begin_src emacs-lisp
   (set-frame-font "Menlo 14" nil t)
@@ -164,8 +164,8 @@ Given an initial key sequence Which Key provides hints about the next
 possible key presses along with documentation for that key press.
 #+begin_src emacs-lisp
   (use-package which-key
-    :bind
-    (("C-c w" . which-key-show-major-mode))
+    ;; :bind
+    ;; (("C-c w" . which-key-show-major-mode))
     :config
     (which-key-mode))
 #+end_src
@@ -412,7 +412,7 @@ for 7 years as of Oct 2022.
   ;; (use-package sclang-extensions)
 #+end_src
 
-*** scel (sclang' mode for emacs)
+*** COMMENT scel (sclang' mode for emacs)
 This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
   (setq exec-path
@@ -676,7 +676,7 @@ Sets font for MacOS X emacs
   (set-frame-font "Menlo 14" nil t)
 #+end_src
 
-** Set Default Font for Windows
+** COMMENT Set Default Font for Windows
 #+begin_src emacs-lisp
   (set-frame-font "Consolas-11:bold" nil t)
 #+end_src
@@ -810,14 +810,14 @@ Provides function documentation and key binding info in ivy buffer
     :commands (dired dired-jump)
     :custom ((dired-listing-switches "-ghoa --group-directories-first"))
     :bind (:map
-           dired-mode-map
-           ("h" . dired-up-directory)
-           ("l" . dired-find-file)
-           ("j" . dired-next-line)
-           ("k" . dired-previous-line))
-    :config
-    (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
-    (setq ls-lisp-use-insert-directory-program t))
+	   dired-mode-map
+	   ("h" . dired-up-directory)
+	   ("l" . dired-find-file)
+	   ("j" . dired-next-line)
+	   ("k" . dired-previous-line)))
+    ;; :config
+    ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+    ;; (setq ls-lisp-use-insert-directory-program t))
 #+end_src
 * MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
@@ -928,11 +928,11 @@ and jump to definition functionality for a particular language
     (js-mode . lsp-deferred)
     (terraform-mode . lsp-deferred)
 
-    :custom
-    ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
-    (lsp-terraform-ls-server
-     "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
-     )
+    ;; :custom
+    ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
+    ;; (lsp-terraform-ls-server
+    ;;  "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
+    ;;  )
     :config
     (setq lsp-keymap-prefix "C-x l")
     ;; (setq lsp-disabled-clients '(tfls))

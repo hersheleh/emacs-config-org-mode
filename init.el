@@ -1,6 +1,3 @@
-;; Set Garbage collection threshold very high at startup
-(setq gc-cons-threshold (* 50 1000 1000))
-
 (defun gsh/display-startup-time ()
   (message "Emacs loaded in %s with %d garbage collections."
            (format "%.2f seconds"
@@ -26,7 +23,7 @@
 ;; (setq use-package-verbose t)
 
 ;; Set Dired default directory
-(setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
+;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
 ;; set re-builder sytax to string
 (setq reb-re-syntax 'string)
 ;; keep folders clean
@@ -36,13 +33,299 @@
 (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
 
 (setq auto-save-list-file-prefix (expand-file-name
-                                  "tmp/auto-saves/sessions/"
-                                  user-emacs-directory)
+				  "tmp/auto-saves/sessions/"
+				  user-emacs-directory)
       auto-save-file-name-transforms
       `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
 
 (use-package no-littering
   :demand t)
+
+(global-unset-key (kbd "M-SPC"))
+(defun insert-underscore ()
+  "Inserting an underscore '_' character"
+  (interactive)
+  (insert #x5F))
+(global-set-key (kbd "M-SPC") 'insert-underscore)
+
+(scroll-bar-mode -1)          ; remove scroll bar
+(column-number-mode)          ; show column number in modline
+;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(setq inhibit-startup-message t)     ; No splash screen
+
+(use-package beacon
+  :config (beacon-mode 1))
+
+(setq-default indent-tabs-mode nil)
+
+(use-package doom-themes
+  :custom
+  (doom-monokai-classic-brighter-comments t)
+  :config
+  (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
+        doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
+  ;; (custom-set-variables
+   ;; '(doom-molokai-brighter-comments t))
+  (load-theme 'doom-monokai-classic t))
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1))
+
+(use-package all-the-icons
+  :if (display-graphic-p))
+
+(recentf-mode 1)
+
+(use-package which-key
+  ;; :bind
+  ;; (("C-c w" . which-key-show-major-mode))
+  :config
+  (which-key-mode))
+
+(use-package ivy
+  ;; :diminish
+  :bind (("C-s" . swiper)
+         ;; ("C-c C-r" . ivy-resume)
+         ;; ("<f6>" . ivy-resume)
+         ("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-x C-r" . counsel-buffer-or-recentf) ; open recent file or buffer
+         ("C-h d" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable)
+         ("C-h o" . counsel-describe-symbol)
+         ("C-h l" . counsel-find-library)
+         ("C-h i" . counsel-info-lookup-symbol)
+         ("C-h u" . counsel-unicode-char)
+         ("C-x b" . counsel-switch-buffer)
+         ("C-c t" . counsel-load-theme)
+         :map minibuffer-local-map
+         ("C-r" . counsel-minibuffer-history)
+         ;; ("C-c g" . counsel-git)
+         ;; ("C-c j" . counsel-git-grep)
+         ;; ("C-c k" . counsel-ag)
+         ;; ("C-x l" . counsel-locate)
+         ;; ("C-S-o" . counsel-rhythmbox)
+         )
+  :config
+  (ivy-mode 1))
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+(use-package counsel
+  :config
+  (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
+
+(use-package magit)
+
+(use-package treemacs
+  :config (treemacs-project-follow-mode))
+
+(use-package lsp-mode
+    :commands (lsp lsp-deferred)
+    ;; :init
+    ;; (setq lsp-keymap-prefix "C-c l")
+
+    :hook
+    (c++-mode . lsp)
+    (python-mode . lsp)
+    (js2-mode . lsp)
+
+    :config
+    (lsp-enable-which-key-integration t))
+
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-ui-doc-show-with-cursor 't)
+  (setq lsp-ui-doc-position 'bottom))
+
+;; (use-package sideline
+;;   :after lsp-mode
+
+;;   :init
+;;   (setq sideline-backends-right '(sideline-lsp)))
+
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+
+  :custom
+  ;; python config
+  (dap-python-executable "python3.10")
+  (dap-python-debugger 'debugpy)
+  :config
+  (require 'dap-ui)
+  (require 'dap-cpptools)
+  (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
+  (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
+
+  ;; (dap-auto-configure-mode 1)
+  (dap-cpptools-setup)
+  (dap-mode 1)
+  (dap-ui-mode 1)
+  (dap-tooltip-mode 1)
+  (dap-ui-controls-mode 1)
+
+  ;; lldb config
+  ;; (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
+  ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
+  ;; (setq dap-print-io t)
+
+  ;; Dap-cpptools debug configuration for reverse_string
+  (dap-register-debug-template
+   "cpptools::Run Configuration reverse_string"
+   (list :type "cppdbg"
+         :request "launch"
+         :name "cpptools::Run Configuration"
+         :MIMode "gdb"
+         :program "${workspaceFolder}/cpp/reverse_string"
+         :cwd "${workspaceFolder}/cpp"))
+
+  ;; Debug Configuration for reverse_string.cpp
+  (dap-register-debug-template
+   "LLDB::Run reverse_string"
+   (list :type "lldb-vscode"
+         :request "launch"
+         :cwd "${workspaceFolder}cpp/"
+         :program "${workspaceFolder}cpp/reverse_string"
+         :name "LLDB::Run reverse_string"))
+  ;; Debug Configuration for python unittest
+  (dap-register-debug-template
+   "Python :: Run unittest (buffer)"
+   (list :type "python"
+         :args ""
+         :cwd nil
+         :program nil
+         :module "unittest"
+         :request "launch"
+         :name "Python :: Run unittest (buffer)"))
+  ;; Debug Configuration for python file which reads from stdin
+  (dap-register-debug-template
+   "Python :: Run file User Input (buffer)"
+   (list :type "python"
+         :args ""
+         :cwd nil
+         :module nil
+         :program nil
+         :console "integratedTerminal"  ; launches vterm
+         :request "launch"
+         :name "Python :: Run file User Input (buffer)"))
+  )
+
+(use-package realgud)                   ; RealGUD debugger
+
+(use-package company
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0)
+  :hook
+  (prog-mode . company-mode)            ; add completion to programming language modes
+  ;; (org-mode . company-mode)            ; add completion to org-mode
+  )
+;; :config
+;; (add-hook 'after-init-hook 'global-company-mode)
+
+
+(use-package company-box          ; Show icons in company complettions
+  :hook (company-mode . company-box-mode))
+
+(use-package flycheck
+  :config
+  (global-flycheck-mode))
+
+(use-package iedit)
+
+(use-package yasnippet
+  :config (yas-global-mode 1))
+
+;; (use-package sclang-extensions)
+
+(use-package python
+  :config
+  ;; (setq py-python-command "python3")
+  ;; (setq py-shell-name "python3")
+  (setq python-shell-interpreter "python"))
+
+(use-package pyvenv)
+
+(use-package js2-mode
+  :defer t
+  :mode "\\.js\\'"
+  :config
+  (require 'js2-mode)
+)
+
+(use-package pug-mode)
+
+(use-package org
+  :init
+  (setq org-startup-indented t)
+  ;; (setq org-hide-emphasis-markers t)
+  ;; increase Header heights for each org level
+  (custom-set-faces
+   '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
+   '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
+   '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+   ))
+
+(setq org-agenda-files
+      '("~/hub/new_projects/orgi/orgi_plan.org"
+        "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
+        "~/.emacs.d/config.org"))
+(setq org-agenda-start-with-log-mode t)
+(setq org-log-done 'time)
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode))
+
+(use-package org-roam
+  :custom
+  (org-roam-directory "~/hub/org-roam")
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert))
+  :config
+  (org-roam-setup))
+
+(use-package org-roam-ui
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+
+(use-package markdown-preview-mode)
+
+(use-package vterm
+  ;; :hook
+  ;; turn off line numbers in vterm
+  ;; (vterm-mode . (lambda () (display-line-numbers-mode 0)))
+  ;; execute bash_profile for this terminal session
+  ;; :hook
+  ;; (vterm-mode . (lambda () (vterm-send-string "source ~/.bash_profile\n")))
+  )
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  (("C-h ." . helpful-at-point))   ; show help docs for current symbol
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
 
 ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
 (global-unset-key (kbd "C-x  C-c")) ; i always accidentilly press this key
@@ -81,6 +364,20 @@
 
 ;; (add-hook 'before-save-hook 'whitespace-cleanup)
 
+(defun scroll-up-window-half ()
+  "Scroll the buffer window up by half the length of the window."
+  (interactive)
+  (scroll-up (/ (window-total-height) 2)))
+(defun scroll-down-window-half ()
+  "Scroll the buffer window down by half the length of the window."
+  (interactive)
+  (scroll-down (/ (window-total-height) 2)))
+
+(global-unset-key (kbd "C-v"))          ; unset default page down key
+(global-unset-key (kbd "M-v"))          ; unset default page up key
+(global-set-key (kbd "C-v") 'scroll-up-window-half)
+(global-set-key (kbd "M-v") 'scroll-down-window-half)
+
 (global-unset-key (kbd "M-SPC"))
 (defun insert-underscore ()
   "Inserting an underscore '_' character"
@@ -94,8 +391,6 @@
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (setq inhibit-startup-message t)     ; No splash screen
 (global-visual-line-mode t)
-
-(set-frame-font "Consolas-11:bold" nil t)
 
 (setq-default indent-tabs-mode nil)
 
@@ -181,14 +476,14 @@
   :commands (dired dired-jump)
   :custom ((dired-listing-switches "-ghoa --group-directories-first"))
   :bind (:map
-         dired-mode-map
-         ("h" . dired-up-directory)
-         ("l" . dired-find-file)
-         ("j" . dired-next-line)
-         ("k" . dired-previous-line))
-  :config
-  (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
-  (setq ls-lisp-use-insert-directory-program t))
+	 dired-mode-map
+	 ("h" . dired-up-directory)
+	 ("l" . dired-find-file)
+	 ("j" . dired-next-line)
+	 ("k" . dired-previous-line)))
+  ;; :config
+  ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+  ;; (setq ls-lisp-use-insert-directory-program t))
 
 (use-package magit
   :commands magit-status)
@@ -263,11 +558,11 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (js-mode . lsp-deferred)
   (terraform-mode . lsp-deferred)
 
-  :custom
-  ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
-  (lsp-terraform-ls-server
-   "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
-   )
+  ;; :custom
+  ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
+  ;; (lsp-terraform-ls-server
+  ;;  "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
+  ;;  )
   :config
   (setq lsp-keymap-prefix "C-x l")
   ;; (setq lsp-disabled-clients '(tfls))
@@ -534,8 +829,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq history-length 25))
 
 ;; Set Garbage collection threshold back down after startup completes
-;; (defun gsh/lower-gc-threshold()
-;;   (setq gc-cons-threshold (* 2 1000 1000))
-;;     )
-;; (add-hook 'after-init-hook 'gsh/lower-gc-threshold)
-(setq gc-cons-threshold (* 2 1000 1000))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 2 1000 1000))
+            (setq file-name-handler-alist default-file-name-handler-alist)))
+;; (setq gc-cons-threshold (* 2 1000 1000))
