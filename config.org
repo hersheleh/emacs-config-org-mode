@@ -74,6 +74,24 @@
   (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
 #+end_src
 
+** Move half page down with
+#+begin_src emacs-lisp
+  (defun scroll-up-window-half ()
+    "Scroll the buffer window up by half the length of the window."
+    (interactive)
+    (scroll-up (/ (window-total-height) 2)))
+  (defun scroll-down-window-half ()
+    "Scroll the buffer window down by half the length of the window."
+    (interactive)
+    (scroll-down (/ (window-total-height) 2)))
+
+  (global-unset-key (kbd "C-v"))          ; unset default page down key
+  (global-unset-key (kbd "M-v"))          ; unset default page up key
+  (global-set-key (kbd "C-v") 'scroll-up-window-half)
+  (global-set-key (kbd "M-v") 'scroll-down-window-half)
+#+end_src
+
+
 ** Whitespace Cleanup on Save
 #+begin_src emacs-lisp
   (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -425,13 +443,22 @@ This is a mode for the sclang language for SuperCollider
    "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
   (require 'sclang)
 #+end_src
-
+**** Ubuntu
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
+  (require 'sclang)
+#+end_src
 ** Python
 #+begin_src emacs-lisp
-  (use-package python-mode
+  (use-package python
     :config
     ;; (setq py-python-command "python3")
-    (setq py-shell-name "python3"))
+    ;; (setq py-shell-name "python3")
+    (setq python-shell-interpreter "python"))
+#+end_src
+*** Pyvenv
+#+begin_src emacs-lisp
+  (use-package pyvenv)
 #+end_src
 ** Javascript
 Install js2-mode
