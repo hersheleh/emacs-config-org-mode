@@ -1,3 +1,14 @@
+;; Set Garbage collection threshold very high at startup
+(setq gc-cons-threshold (* 50 1000 1000))
+
+(defun gsh/display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                    (time-subtract after-init-time before-init-time)))
+           gcs-done))
+(add-hook 'emacs-startup-hook #'gsh/display-startup-time)
+
 (require 'package)
 (setq package-archives
       '(("melpa" . "https://melpa.org/packages/")
@@ -12,6 +23,7 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 (setq use-package-always-defer t)
+;; (setq use-package-verbose t)
 
 ;; Set Dired default directory
 (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
@@ -30,7 +42,7 @@
       `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
 
 (use-package no-littering
-  :defer nil)
+  :demand t)
 
 ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
 (global-unset-key (kbd "C-x  C-c")) ; i always accidentilly press this key
@@ -52,7 +64,7 @@
 (global-set-key (kbd "C-c <right>") 'windmove-right)
 
 ;; add C-c o binding to other-window
-(global-set-key (kbd "C-c o") 'other-window) ; (o)ther
+;; (global-set-key (kbd "C-c o") 'other-window) ; (o)ther
 
 ;; split buffer with v and h keys
 (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
@@ -88,7 +100,7 @@
 (setq-default indent-tabs-mode nil)
 
 (use-package doom-themes
-  :defer nil
+  :demand t
   :custom
   (doom-monokai-classic-brighter-comments t)
   :config
@@ -105,21 +117,22 @@
    '(show-paren-match ((t (:background "#FD971F" :foreground "black" :weight ultra-bold))))))
 
 (use-package doom-modeline
+  ;; :demand t
   :init (doom-modeline-mode 1))
 
 (use-package all-the-icons
   :if (display-graphic-p))
 
 (use-package all-the-icons-dired
-  :after all-the-icons
-  :init
-  (setq all-the-icons-dired-monochrome nil)
-  :hook (dired-mode . all-the-icons-dired-mode))
+  ;; :after all-the-icons
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  (setq all-the-icons-dired-monochrome nil))
 
-(recentf-mode 1)
+;; (recentf-mode 1)
 
 (use-package ivy
-  :diminish
+  ;; :diminish
   :bind (("C-s" . swiper)
          ;; ("C-c C-r" . ivy-resume)
          ;; ("<f6>" . ivy-resume)
@@ -149,30 +162,45 @@
   :config
   (ivy-mode 1))
 
-(use-package all-the-icons-ivy-rich
-  :init (all-the-icons-ivy-rich-mode 1))
-
 (use-package ivy-rich
+  :after counsel
   :init
-  (ivy-rich-mode 1)
-  :config
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+  (ivy-rich-mode 1))
+  ;; (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+
+(use-package all-the-icons-ivy-rich
+  :after ivy
+  :init (all-the-icons-ivy-rich-mode 1))
 
 (use-package counsel
   :config
   (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
 
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :custom ((dired-listing-switches "-ghoa --group-directories-first"))
+  :bind (:map
+         dired-mode-map
+         ("h" . dired-up-directory)
+         ("l" . dired-find-file)
+         ("j" . dired-next-line)
+         ("k" . dired-previous-line))
+  :config
+  (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+  (setq ls-lisp-use-insert-directory-program t))
+
 (use-package magit
-  :defer t)
+  :commands magit-status)
 
 (use-package which-key
-  :init
-  (setq which-key-idle-delay 0.3)
-  (which-key-mode)
-  :diminish
+  :defer 0
   :bind
   (("C-c w w" . which-key-show-major-mode)
-   ("C-c w i" . which-key-show-minor-mode-keymap)))
+   ("C-c w i" . which-key-show-minor-mode-keymap))
+  :config
+  (setq which-key-idle-delay 0.8)
+  (which-key-mode))
 
 (use-package ivy-prescient
   :after ivy
@@ -189,13 +217,13 @@
 (use-package rotate)
 
 (use-package hydra
-  :bind ("C-x w" . hydra-windows/body)
+  :bind (("C-x w" . hydra-windows/body)
+         ("C-c o" . hydra-other-window/body))
   )
-(defhydra hydra-text-scale (global-map "<f2>")
-  "scale text"
-  ("j" text-scale-increase "in")
-  ("k" text-scale-decrease "out")
-  ("f" nil "finished" :exit t))
+(defhydra hydra-other-window ()
+  "other window commands"
+  ("f" find-file-other-window "find file")
+  ("b" switch-buffer-other-window "switch buffer"))
 (defhydra hydra-windows (:hint nil)
   "
 ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
@@ -225,8 +253,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ("q" nil "quit"))
 
 (use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "C-x l")
+  ;; :init
+  ;; (setq lsp-keymap-prefix "C-x l")
   :commands (lsp lsp-deferred)
   ;; :init
   ;; (setq lsp-keymap-prefix "C-c l")
@@ -241,6 +269,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
    "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
    )
   :config
+  (setq lsp-keymap-prefix "C-x l")
   ;; (setq lsp-disabled-clients '(tfls))
   (lsp-enable-which-key-integration t)
   (setq lsp-diagnostics-provider :none)
@@ -263,9 +292,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 ;;   (setq sideline-backends-right '(sideline-lsp)))
 
 (use-package dap-mode
-  :ensure t
-  :after lsp-mode
-
+  ;; :ensure t
+  :commands dap-debug
   :config
   (require 'dap-ui)
   ;; (dap-auto-configure-mode 1)
@@ -414,8 +442,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
                                               #'g/org-babel-tangle-config)))
 
 (use-package org
-  :init
-  (setq org-startup-indented t)
+  ;; :init
+  ;; (setq org-startup-indented t)
   ;; (setq org-hide-emphasis-markers t)
   ;; increase Header heights for each org level
 
@@ -423,6 +451,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;; (org-mode . (lambda () (add-hook 'after-save-hook
   ;;                                  #'g/org-babel-tangle-config)))
   :config
+  (setq org-startup-indented t)
   (custom-set-faces
    '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
    '(org-level-2 ((t (:inherit outline-2 :height 1.10))))
@@ -437,6 +466,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :hook (org-mode . org-superstar-mode))
 
 (use-package org-roam
+  :after org
   :custom
   (org-roam-directory "~/hub/org-roam")
   :bind (("C-c n l" . org-roam-buffer-toggle)
@@ -473,14 +503,12 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
          ("C-c b i" . buf-move-up)
          ("C-c b k" . buf-move-down)))
 
-(use-package project
-  :defer nil)
-
 (use-package dashboard
-  :defer nil
+  :demand t
   :after (;; org
           page-break-lines)
-  :init
+  ;; :init
+  :config
   (setq dashboard-startup-banner 'logo)
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
@@ -493,15 +521,21 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq dashboard-page-separator "\n\f\n")
   (setq dashboard-agenda-sort-strategy '(time-up))
   (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
-  :config
   (dashboard-setup-startup-hook))
 
 (use-package page-break-lines
-  :defer nil
+  :demand t
   :config (page-break-lines-mode))
 
 (use-package savehist
-  :defer nil
+  :after counsel
   :init
   (savehist-mode 1)
   (setq history-length 25))
+
+;; Set Garbage collection threshold back down after startup completes
+;; (defun gsh/lower-gc-threshold()
+;;   (setq gc-cons-threshold (* 2 1000 1000))
+;;     )
+;; (add-hook 'after-init-hook 'gsh/lower-gc-threshold)
+(setq gc-cons-threshold (* 2 1000 1000))
