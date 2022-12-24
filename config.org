@@ -300,7 +300,9 @@ Provides function documentation and key binding info in ivy buffer
            ("h" . dired-up-directory)
            ("l" . dired-find-file)
            ("j" . dired-next-line)
-           ("k" . dired-previous-line))
+           ("k" . dired-previous-line)
+           ("J" . dired-goto-file)
+           ("K" . kill-current-buffer))
     :config
     (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
     (setq ls-lisp-use-insert-directory-program t))
