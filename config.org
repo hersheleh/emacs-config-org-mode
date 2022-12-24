@@ -108,7 +108,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (global-set-key (kbd "C-c <right>") 'windmove-right)
 
   ;; add C-c o binding to other-window
-  (global-set-key (kbd "C-c o") 'other-window) ; (o)ther
+  ;; (global-set-key (kbd "C-c o") 'other-window) ; (o)ther
 
   ;; split buffer with v and h keys
   (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
@@ -209,8 +209,7 @@ Other good themes:
 #+begin_src emacs-lisp
   (use-package doom-modeline
     ;; :demand t
-    :init (doom-modeline-mode 1)
-    )
+    :init (doom-modeline-mode 1))
 #+end_src
 ** ICONS
 #+begin_src emacs-lisp
@@ -220,10 +219,10 @@ Other good themes:
 *** Icons dired
 #+begin_src emacs-lisp
   (use-package all-the-icons-dired
-    :after all-the-icons
+    ;; :after all-the-icons
+    :hook (dired-mode . all-the-icons-dired-mode)
     :config
-    (setq all-the-icons-dired-monochrome nil)
-    :hook (dired-mode . all-the-icons-dired-mode))
+    (setq all-the-icons-dired-monochrome nil))
 #+end_src
  Smart Navigation
 These are packages which assist in navigating emacs
@@ -290,6 +289,22 @@ Provides function documentation and key binding info in ivy buffer
     (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
 #+end_src
 
+* Dired
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :custom ((dired-listing-switches "-ghoa --group-directories-first"))
+    :bind (:map
+           dired-mode-map
+           ("h" . dired-up-directory)
+           ("l" . dired-find-file)
+           ("j" . dired-next-line)
+           ("k" . dired-previous-line))
+    :config
+    (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+    (setq ls-lisp-use-insert-directory-program t))
+#+end_src
 * MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
     (use-package magit
@@ -334,13 +349,13 @@ possible key presses along with documentation for that key press.
 * Hydra
 #+begin_src emacs-lisp
   (use-package hydra
-    :bind ("C-x w" . hydra-windows/body)
+    :bind (("C-x w" . hydra-windows/body)
+           ("C-c o" . hydra-other-window/body))
     )
-  (defhydra hydra-text-scale (global-map "<f2>")
-    "scale text"
-    ("j" text-scale-increase "in")
-    ("k" text-scale-decrease "out")
-    ("f" nil "finished" :exit t))
+  (defhydra hydra-other-window ()
+    "other window commands"
+    ("f" find-file-other-window "find file")
+    ("b" switch-buffer-other-window "switch buffer"))
   (defhydra hydra-windows (:hint nil)
     "
   ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
