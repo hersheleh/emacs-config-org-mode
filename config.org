@@ -197,6 +197,11 @@ Sets font for MacOS X emacs
   (setq-default indent-tabs-mode nil)
 #+end_src
 
+* Whitespace Butler
+#+begin_src emacs-lisp
+  (use-package ws-butler
+    :hook (prog-mode . ws-butler-mode))
+#+end_src
 * THEME
 # Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
 Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
@@ -206,6 +211,8 @@ Other good themes:
  * doom-outrun-electric
  * doom-fairy-floss (nice light/dark theme)
  * doom-acario-light (good light theme)
+ * doom-pine
+ * doom-old-hope
 #+begin_src emacs-lisp
   (use-package doom-themes
     :demand t
@@ -284,15 +291,20 @@ possible inputs
         :config
         (ivy-mode 1))
 #+end_src
+*** Ivy Hydra
+#+begin_src emacs-lisp
+(use-package ivy-hydra)
+#+end_src
 
 *** Ivy Rich
 Provides function documentation and key binding info in ivy buffer
 #+begin_src emacs-lisp
-  (use-package ivy-rich
-    :after counsel
-    :init
-    (ivy-rich-mode 1))
-    ;; (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+    (use-package ivy-rich
+      :after counsel
+      :init
+      (ivy-rich-mode 1)
+      (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+
 #+end_src
 
 *** All the Icons Ivy Rich
@@ -348,8 +360,7 @@ possible key presses along with documentation for that key press.
 * Precient
 #+begin_src emacs-lisp
   (use-package ivy-prescient
-    :after ivy
-    :config (ivy-prescient-mode))
+    :hook (ivy-mode . ivy-prescient-mode))
 #+end_src
 * Treemacs
 #+begin_src emacs-lisp
@@ -373,10 +384,12 @@ possible key presses along with documentation for that key press.
     :bind (("C-x w" . hydra-windows/body)
            ("C-c o" . hydra-other-window/body))
     )
+  ;; hydra to condense other window commands
   (defhydra hydra-other-window ()
     "other window commands"
     ("f" find-file-other-window "find file")
-    ("b" switch-buffer-other-window "switch buffer"))
+    ("b" counsel-switch-buffer-other-window "switch buffer"))
+  ;; Hydra for managing buffers
   (defhydra hydra-windows (:hint nil)
     "
   ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
@@ -749,15 +762,30 @@ Color delimiters like parens and braces according to their depth
 ** Org Customizations
 #+begin_src emacs-lisp
   (use-package org
-    ;; :init
-    ;; (setq org-startup-indented t)
-    ;; (setq org-hide-emphasis-markers t)
-    ;; increase Header heights for each org level
-
-    ;; :hook
-    ;; (org-mode . (lambda () (add-hook 'after-save-hook
-    ;;                                  #'g/org-babel-tangle-config)))
+    :defer t
+    :bind (:map org-mode-map
+                ;; ("C-c C-p" . hydra-org/body)
+                ;; ("C-c C-n" . hydra-org/body)
+                ("M-n" . org-metadown)
+                ("M-p" . org-metaup))
+    :custom
+    (org-priority-highest 65)
+    (org-priority-lowest 68)
+    (org-priority-default 67)
     :config
+    ;; Org Agenda
+    (setq org-agenda-files
+          '("~/hub/ripl/orgs/tickets.org"
+            ;; "~/hub/new_projects/orgi/orgi_plan.org"
+            ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
+            ;; "~/.emacs.d/config.org"
+            ))
+    (setq org-todo-keywords
+          '((sequence "BACKLOG" "TODO(t)" "NEXT(n)" "TEST(s)" "|" "DONE(d!)")))
+    (setq org-agenda-start-with-log-mode t)
+    (setq org-log-done 'time)
+    (setq org-log-into-drawer t)
+
     (setq org-startup-indented t)
     (custom-set-faces
      '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
@@ -766,17 +794,17 @@ Color delimiters like parens and braces according to their depth
      '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
      '(org-level-5 ((t (:inherit outline-5 :height 1.00))))
      )
-    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
-#+end_src
 
-** COMMENT Org Agenda Files
-#+begin_src emacs-lisp
-  (setq org-agenda-files
-        '("~/hub/new_projects/orgi/orgi_plan.org"
-          "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
-          "~/.emacs.d/config.org"))
-  (setq org-agenda-start-with-log-mode t)
-  (setq org-log-done 'time)
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+
+    (defhydra hydra-org (org-mode-map "C-c")
+      "org hydra"
+      ("C-n" org-next-visible-heading "next heading")
+      ("C-p" org-previous-visible-heading "prev heading")
+      ("M-j" org-metadown "move down")
+      ("M-k" org-metaup "move up")
+      ("q" nil "quit"))
+    )
 #+end_src
 
 ** ORG SUPERSTAR
@@ -791,7 +819,6 @@ Adds nice looking bullets to org mode
 Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (use-package org-roam
-    :after org
     :custom
     (org-roam-directory "~/hub/org-roam")
     :bind (("C-c n l" . org-roam-buffer-toggle)
@@ -812,6 +839,17 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           org-roam-ui-open-on-start t))
 #+end_src
 
+** Org Pomodoro
+#+begin_src emacs-lisp
+    (use-package org-pomodoro
+      :after org
+      :config
+      (setq org-pomodoro-ticking-sound-p nil))
+
+  ;; The following fixes sounds not working on windows
+  (use-package sound-wav)
+  (use-package powershell)
+#+end_src
 * Helpful (better help documentation)
 #+begin_src emacs-lisp
     (use-package helpful
@@ -849,19 +887,19 @@ Simplify Swapping buffers
 #+begin_src emacs-lisp
   (use-package dashboard
     :demand t
-    :after (;; org
-            page-break-lines)
-    ;; :init
+    ;; :after page-break-lines
     :config
+    (setq line-move-visual nil)
     (setq dashboard-startup-banner 'logo)
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
     (setq dashboard-center-content nil)
     (setq dashboard-projects-backend 'project-el)
-    (setq dashboard-items '((agenda . 3)
+    (setq dashboard-items '((agenda . 6)
                             (projects . 7)
                             (recents . 7)
-                            (bookmarks . 3)))
+                            ;; (bookmarks . 3)
+                            ))
     (setq dashboard-page-separator "\n\f\n")
     (setq dashboard-agenda-sort-strategy '(time-up))
     (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
