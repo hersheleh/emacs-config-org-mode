@@ -83,7 +83,9 @@ Define function to time Emacs startup and determine # of garbage collections
 ** EXITING EMACS
 #+begin_src emacs-lisp
   ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
-  (global-unset-key (kbd "C-x  C-c")) ; i always accidentilly press this key
+  (if (not (daemonp))
+      (global-unset-key (kbd "C-x  C-c"))) ; i always accidentilly press this
+
   (global-set-key (kbd "C-x q") 'save-buffers-kill-emacs)
 #+end_src
 
@@ -183,6 +185,20 @@ Sets font for MacOS X emacs
 ** COMMENT Set Default Font for Windows
 #+begin_src emacs-lisp
   (set-frame-font "Consolas-11:bold" nil t)
+#+end_src
+
+** set Default Font for Ubuntu
+#+begin_src emacs-lisp
+  (defun gsh/set-font ()
+    (message "Setting font")
+    (set-frame-font "Ubuntu Mono-12:bold" nil t))
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda(frame)
+                  (with-selected-frame frame
+                    (gsh/set-font))))
+    (gsh/set-font))
 #+end_src
 
 * COMMENT Beacon (Flash the Cursor)
@@ -711,7 +727,7 @@ Install js2-mode
 #+begin_src emacs-lisp
   (use-package markdown-preview-mode)
 #+end_src
-* COMMENT VTERM
+* VTERM
 A very good shell in emacs
 Notes: need to find a way to execute bash profile.
        current way interferes with dap-mode terminal input
@@ -828,7 +844,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (org-roam-setup))
 #+end_src
 
-** Org-Roam-UI
+** COMMENT Org-Roam-UI
 #+begin_src emacs-lisp
   (use-package org-roam-ui
     :after org-roam
@@ -847,8 +863,8 @@ Slip Card system for organizing thoughts. Zettelkasten Method
       (setq org-pomodoro-ticking-sound-p nil))
 
   ;; The following fixes sounds not working on windows
-  (use-package sound-wav)
-  (use-package powershell)
+  ;; (use-package sound-wav)
+  ;; (use-package powershell)
 #+end_src
 * Helpful (better help documentation)
 #+begin_src emacs-lisp
@@ -887,7 +903,7 @@ Simplify Swapping buffers
 #+begin_src emacs-lisp
   (use-package dashboard
     :demand t
-    ;; :after page-break-lines
+    :after (page-break-lines)
     :config
     (setq line-move-visual nil)
     (setq dashboard-startup-banner 'logo)
@@ -903,7 +919,16 @@ Simplify Swapping buffers
     (setq dashboard-page-separator "\n\f\n")
     (setq dashboard-agenda-sort-strategy '(time-up))
     (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
-    (dashboard-setup-startup-hook))
+
+    (setq initial-buffer-choice
+          (lambda () (get-buffer-create "*dashboard*")))
+    (dashboard-setup-startup-hook)
+    ;; dashboard icons don't quite load.
+    ;; buffer needs to be reverted
+    ;; (add-hook 'server-after-make-frame-hook
+    ;;           'revert-buffer)
+    )
+
 #+end_src
 
 ** PAGE BREAK LINES
@@ -927,6 +952,7 @@ Simplify Swapping buffers
   (add-hook 'emacs-startup-hook
             (lambda ()
               (setq gc-cons-threshold (* 2 1000 1000))
-              (setq file-name-handler-alist default-file-name-handler-alist)))
+              (setq file-name-handler-alist default-file-name-handler-alist)
+              ))
   ;; (setq gc-cons-threshold (* 2 1000 1000))
 #+end_src
