@@ -220,31 +220,37 @@ Sets font for MacOS X emacs
 * THEME
 # Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
 Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
-Other good themes:
- * doom-ir-black
+:themes_I_like:
+ * doom-ir-black (black theme)
  * doom-moonlight
  * doom-outrun-electric
  * doom-fairy-floss (nice light/dark theme)
  * doom-acario-light (good light theme)
+ * doom-acario-dark (black theme)
  * doom-pine
  * doom-old-hope
+ * wombat
+:END:
 #+begin_src emacs-lisp
   (use-package doom-themes
     :demand t
-    :custom
-    (doom-monokai-classic-brighter-comments t)
+    ;; :custom
+    ;; (doom-monokai-classic-brighter-comments t)
+    ;; (doom-acario-dark-brighter-comments t)
     :config
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
           doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
     ;; (custom-set-variables
      ;; '(doom-molokai-brighter-comments t))
-    (load-theme 'doom-monokai-classic t)
+    ;; (load-theme 'doom-monokai-classic t)
+    (load-theme 'doom-acario-dark t)
 
     ;; customize the doom monkai theme
     (custom-set-faces
      '(counsel--mark-ring-highlight ((t (:inherit highlight))))
-     '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
-     '(show-paren-match ((t (:background "#FD971F" :foreground "black" :weight ultra-bold))))))
+     ;; '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
+     '(show-paren-match ((t (:background "#FD971F" :foreground "black"
+                                         :weight ultra-bold))))))
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -267,11 +273,11 @@ Other good themes:
 #+end_src
  Smart Navigation
 These are packages which assist in navigating emacs
-** Find Recent Files
+* Find Recent Files
 #+begin_src emacs-lisp
   ;; (recentf-mode 1)
 #+end_src
-** IVY MODE
+* IVY MODE
 Ivy Mode speeds up navigation by perfoming text matching against
 possible inputs
 #+begin_src emacs-lisp
@@ -779,6 +785,7 @@ Color delimiters like parens and braces according to their depth
 #+begin_src emacs-lisp
   (use-package org
     :defer t
+    ;; :after (org-timeline)
     :bind (:map org-mode-map
                 ;; ("C-c C-p" . hydra-org/body)
                 ;; ("C-c C-n" . hydra-org/body)
@@ -790,14 +797,19 @@ Color delimiters like parens and braces according to their depth
     (org-priority-default 67)
     :config
     ;; Org Agenda
+    (setq org-agenda-span 'day)
+    (setq org-agenda-include-diary t)
+    ;; Add graphical timeline to org agenda
+    (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
     (setq org-agenda-files
           '("~/hub/ripl/orgs/tickets.org"
+            "~/hub/ripl/orgs/my_tasks.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
             ;; "~/.emacs.d/config.org"
             ))
     (setq org-todo-keywords
-          '((sequence "BACKLOG" "TODO(t)" "NEXT(n)" "TEST(s)" "|" "DONE(d!)")))
+          '((sequence "BACKLOG" "TODO(t)" "NEXT(n)" "RECUR(r)" "TEST(s)" "|" "DONE(d!)")))
     (setq org-agenda-start-with-log-mode t)
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
@@ -821,6 +833,7 @@ Color delimiters like parens and braces according to their depth
       ("M-k" org-metaup "move up")
       ("q" nil "quit"))
     )
+  (use-package org-timeline)
 #+end_src
 
 ** ORG SUPERSTAR
@@ -857,15 +870,17 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 
 ** Org Pomodoro
 #+begin_src emacs-lisp
-    (use-package org-pomodoro
-      :after org
-      :config
-      (setq org-pomodoro-ticking-sound-p nil))
+  (use-package org-pomodoro
+    :after org
+    :config
+    (setq org-pomodoro-short-break-length 7)
+    (setq org-pomodoro-ticking-sound-p nil)
+    (setq org-pomodoro-manual-break t))
 
   ;; The following fixes sounds not working on windows
-  ;; (use-package sound-wav)
-  ;; (use-package powershell)
-#+end_src
+  (use-package sound-wav)
+  (use-package powershell)
+  #+end_src
 * Helpful (better help documentation)
 #+begin_src emacs-lisp
     (use-package helpful
