@@ -239,7 +239,12 @@
   (which-key-mode))
 
 (use-package ivy-prescient
-  :hook (ivy-mode . ivy-prescient-mode))
+  :after counsel
+  :init
+  (ivy-prescient-mode 1)
+  :config
+  (setq ivy-prescient-retain-classic-highlighting t)
+  (prescient-persist-mode))
 
 (use-package treemacs
   :defer t
@@ -310,7 +315,9 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;; (setq lsp-disabled-clients '(tfls))
   (lsp-enable-which-key-integration t)
   (setq lsp-diagnostics-provider :none)
-  (setq lsp-modeline-diagnostics-enable nil))
+  (setq lsp-modeline-diagnostics-enable nil)
+  (with-eval-after-load 'lsp-mode
+    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.env*\\'")))
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
