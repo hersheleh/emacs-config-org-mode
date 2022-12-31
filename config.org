@@ -385,7 +385,11 @@ possible key presses along with documentation for that key press.
 * Precient
 #+begin_src emacs-lisp
   (use-package ivy-prescient
-    :hook (ivy-mode . ivy-prescient-mode))
+    :after counsel
+    :config
+    (setq ivy-prescient-retain-classic-highlighting t)
+    (prescient-persist-mode)
+    (ivy-prescient-mode 1))
 #+end_src
 * Treemacs
 #+begin_src emacs-lisp
@@ -483,7 +487,9 @@ and jump to definition functionality for a particular language
     ;; (setq lsp-disabled-clients '(tfls))
     (lsp-enable-which-key-integration t)
     (setq lsp-diagnostics-provider :none)
-    (setq lsp-modeline-diagnostics-enable nil))
+    (setq lsp-modeline-diagnostics-enable nil)
+    (with-eval-after-load 'lsp-mode
+      (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.env*\\'")))
 
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
