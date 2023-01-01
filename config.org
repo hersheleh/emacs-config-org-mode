@@ -383,10 +383,11 @@ possible key presses along with documentation for that key press.
 #+begin_src emacs-lisp
   (use-package ivy-prescient
     :after counsel
+    :init
+    (ivy-prescient-mode 1)
     :config
     (setq ivy-prescient-retain-classic-highlighting t)
-    (prescient-persist-mode)
-    (ivy-prescient-mode 1))
+    (prescient-persist-mode))
 #+end_src
 * Treemacs
 #+begin_src emacs-lisp
