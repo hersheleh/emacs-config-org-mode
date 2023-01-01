@@ -341,6 +341,7 @@ Provides function documentation and key binding info in ivy buffer
            ("J" . dired-goto-file)
            ("K" . kill-current-buffer))
     :config
+    ;; on windows use git bash ls
     (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
     (setq ls-lisp-use-insert-directory-program t))
 #+end_src
@@ -450,7 +451,6 @@ and jump to definition functionality for a particular language
     ;; :init
     ;; (setq lsp-keymap-prefix "C-c l")
     :hook
-
     (js-mode . lsp-deferred)
     (terraform-mode . lsp-deferred)
 
@@ -459,8 +459,9 @@ and jump to definition functionality for a particular language
     (lsp-terraform-ls-server
      "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
      )
-    :config
+    :init
     (setq lsp-keymap-prefix "C-x l")
+    :config
     ;; (setq lsp-disabled-clients '(tfls))
     (lsp-enable-which-key-integration t)
     (setq lsp-diagnostics-provider :none)
@@ -652,27 +653,27 @@ This is a mode for the sclang language for SuperCollider
     ;; (setq py-python-command "python3")
     ;; (setq py-shell-name "python")
     (setq python-shell-interpreter "python")
-        ;; Debug Configuration for python unittest
-  (dap-register-debug-template
-   "Python :: Run unittest (buffer)"
-   (list :type "python"
-         :args ""
-         :cwd nil
-         :program nil
-         :module "unittest"
-         :request "launch"
-         :name "Python :: Run unittest (buffer)"))
-  ;; Debug Configuration for python file which reads from stdin
-  (dap-register-debug-template
-   "Python :: Run file User Input (buffer)"
-   (list :type "python"
-         :args ""
-         :cwd nil
-         :module nil
-         :program nil
-         :console "integratedTerminal"  ; launches vterm
-         :request "launch"
-         :name "Python :: Run file User Input (buffer)")))
+    ;; Debug Configuration for python unittest
+    (dap-register-debug-template
+     "Python :: Run unittest (buffer)"
+     (list :type "python"
+           :args ""
+           :cwd nil
+           :program nil
+           :module "unittest"
+           :request "launch"
+           :name "Python :: Run unittest (buffer)"))
+    ;; Debug Configuration for python file which reads from stdin
+    (dap-register-debug-template
+     "Python :: Run file User Input (buffer)"
+     (list :type "python"
+           :args ""
+           :cwd nil
+           :module nil
+           :program nil
+           :console "integratedterminal"  ; launches vterm
+           :request "launch"
+           :name "Python :: Run file User Input (buffer)")))
 #+end_src
 Was getting encoding errors in run-python buffer on windows
 This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-executing-python-in-emacs-not-in-terminal][stackexchange]] answer suggested the following fix
