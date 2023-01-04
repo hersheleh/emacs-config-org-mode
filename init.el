@@ -1,6 +1,3 @@
-;; Set Garbage collection threshold very high at startup
-(setq gc-cons-threshold (* 50 1000 1000))
-
 (defun gsh/display-startup-time ()
   (message "Emacs loaded in %s with %d garbage collections."
            (format "%.2f seconds"
@@ -81,6 +78,20 @@
 
 ;; (add-hook 'before-save-hook 'whitespace-cleanup)
 
+(defun scroll-up-window-half ()
+  "Scroll the buffer window up by half the length of the window."
+  (interactive)
+  (scroll-up (/ (window-total-height) 2)))
+(defun scroll-down-window-half ()
+  "Scroll the buffer window down by half the length of the window."
+  (interactive)
+  (scroll-down (/ (window-total-height) 2)))
+
+(global-unset-key (kbd "C-v"))          ; unset default page down key
+(global-unset-key (kbd "M-v"))          ; unset default page up key
+(global-set-key (kbd "C-v") 'scroll-up-window-half)
+(global-set-key (kbd "M-v") 'scroll-down-window-half)
+
 (global-unset-key (kbd "M-SPC"))
 (defun insert-underscore ()
   "Inserting an underscore '_' character"
@@ -95,26 +106,32 @@
 (setq inhibit-startup-message t)     ; No splash screen
 (global-visual-line-mode t)
 
-(set-frame-font "Consolas-11:bold" nil t)
+(set-frame-font "Consolas-10:bold" nil t)
 
 (setq-default indent-tabs-mode nil)
 
+(use-package ws-butler
+  :hook (prog-mode . ws-butler-mode))
+
 (use-package doom-themes
   :demand t
-  :custom
-  (doom-monokai-classic-brighter-comments t)
+  ;; :custom
+  ;; (doom-monokai-classic-brighter-comments t)
+  ;; (doom-acario-dark-brighter-comments t)
   :config
   (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
         doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
   ;; (custom-set-variables
    ;; '(doom-molokai-brighter-comments t))
-  (load-theme 'doom-monokai-classic t)
+  ;; (load-theme 'doom-monokai-classic t)
+  (load-theme 'doom-acario-dark t)
 
   ;; customize the doom monkai theme
   (custom-set-faces
    '(counsel--mark-ring-highlight ((t (:inherit highlight))))
-   '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
-   '(show-paren-match ((t (:background "#FD971F" :foreground "black" :weight ultra-bold))))))
+   ;; '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
+   '(show-paren-match ((t (:background "#FD971F" :foreground "black"
+                                       :weight ultra-bold))))))
 
 (use-package doom-modeline
   ;; :demand t
@@ -162,11 +179,13 @@
   :config
   (ivy-mode 1))
 
+(use-package ivy-hydra)
+
 (use-package ivy-rich
   :after counsel
   :init
-  (ivy-rich-mode 1))
-  ;; (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  (ivy-rich-mode 1)
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
 (use-package all-the-icons-ivy-rich
   :after ivy
@@ -185,8 +204,11 @@
          ("h" . dired-up-directory)
          ("l" . dired-find-file)
          ("j" . dired-next-line)
-         ("k" . dired-previous-line))
+         ("k" . dired-previous-line)
+         ("J" . dired-goto-file)
+         ("K" . kill-current-buffer))
   :config
+  ;; on windows use git bash ls
   (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
   (setq ls-lisp-use-insert-directory-program t))
 
@@ -203,8 +225,7 @@
   (which-key-mode))
 
 (use-package ivy-prescient
-  :after ivy
-  :config (ivy-prescient-mode))
+  :hook (ivy-mode . ivy-prescient-mode))
 
 (use-package treemacs
   :defer t
@@ -220,10 +241,12 @@
   :bind (("C-x w" . hydra-windows/body)
          ("C-c o" . hydra-other-window/body))
   )
+;; hydra to condense other window commands
 (defhydra hydra-other-window ()
   "other window commands"
   ("f" find-file-other-window "find file")
-  ("b" switch-buffer-other-window "switch buffer"))
+  ("b" counsel-switch-buffer-other-window "switch buffer"))
+;; Hydra for managing buffers
 (defhydra hydra-windows (:hint nil)
   "
 ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
@@ -259,7 +282,6 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;; :init
   ;; (setq lsp-keymap-prefix "C-c l")
   :hook
-
   (js-mode . lsp-deferred)
   (terraform-mode . lsp-deferred)
 
@@ -268,8 +290,9 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (lsp-terraform-ls-server
    "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
    )
-  :config
+  :init
   (setq lsp-keymap-prefix "C-x l")
+  :config
   ;; (setq lsp-disabled-clients '(tfls))
   (lsp-enable-which-key-integration t)
   (setq lsp-diagnostics-provider :none)
@@ -396,27 +419,27 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;; (setq py-python-command "python3")
   ;; (setq py-shell-name "python")
   (setq python-shell-interpreter "python")
-      ;; Debug Configuration for python unittest
-(dap-register-debug-template
- "Python :: Run unittest (buffer)"
- (list :type "python"
-       :args ""
-       :cwd nil
-       :program nil
-       :module "unittest"
-       :request "launch"
-       :name "Python :: Run unittest (buffer)"))
-;; Debug Configuration for python file which reads from stdin
-(dap-register-debug-template
- "Python :: Run file User Input (buffer)"
- (list :type "python"
-       :args ""
-       :cwd nil
-       :module nil
-       :program nil
-       :console "integratedTerminal"  ; launches vterm
-       :request "launch"
-       :name "Python :: Run file User Input (buffer)")))
+  ;; Debug Configuration for python unittest
+  (dap-register-debug-template
+   "Python :: Run unittest (buffer)"
+   (list :type "python"
+         :args ""
+         :cwd nil
+         :program nil
+         :module "unittest"
+         :request "launch"
+         :name "Python :: Run unittest (buffer)"))
+  ;; Debug Configuration for python file which reads from stdin
+  (dap-register-debug-template
+   "Python :: Run file User Input (buffer)"
+   (list :type "python"
+         :args ""
+         :cwd nil
+         :module nil
+         :program nil
+         :console "integratedterminal"  ; launches vterm
+         :request "launch"
+         :name "Python :: Run file User Input (buffer)")))
 
 ;; fix run-python codec errors on windows
 (setenv "LANG" "en_US.UTF-8")
@@ -442,15 +465,36 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
                                               #'g/org-babel-tangle-config)))
 
 (use-package org
-  ;; :init
-  ;; (setq org-startup-indented t)
-  ;; (setq org-hide-emphasis-markers t)
-  ;; increase Header heights for each org level
-
-  ;; :hook
-  ;; (org-mode . (lambda () (add-hook 'after-save-hook
-  ;;                                  #'g/org-babel-tangle-config)))
+  :defer t
+  ;; :after (org-timeline)
+  :bind (:map org-mode-map
+              ;; ("C-c C-p" . hydra-org/body)
+              ;; ("C-c C-n" . hydra-org/body)
+              ("M-n" . org-metadown)
+              ("M-p" . org-metaup))
+  :custom
+  (org-priority-highest 65)
+  (org-priority-lowest 68)
+  (org-priority-default 67)
   :config
+  ;; Org Agenda
+  (setq org-agenda-span 'day)
+  (setq org-agenda-include-diary t)
+  ;; Add graphical timeline to org agenda
+  (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
+  (setq org-agenda-files
+        '("~/hub/ripl/orgs/tickets.org"
+          "~/hub/ripl/orgs/my_tasks.org"
+          ;; "~/hub/new_projects/orgi/orgi_plan.org"
+          ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
+          ;; "~/.emacs.d/config.org"
+          ))
+  (setq org-todo-keywords
+        '((sequence "BACKLOG" "TODO(t)" "NEXT(n)" "RECUR(r)" "TEST(s)" "|" "DONE(d!)")))
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+
   (setq org-startup-indented t)
   (custom-set-faces
    '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
@@ -459,14 +503,24 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
    '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
    '(org-level-5 ((t (:inherit outline-5 :height 1.00))))
    )
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+
+  (defhydra hydra-org (org-mode-map "C-c")
+    "org hydra"
+    ("C-n" org-next-visible-heading "next heading")
+    ("C-p" org-previous-visible-heading "prev heading")
+    ("M-j" org-metadown "move down")
+    ("M-k" org-metaup "move up")
+    ("q" nil "quit"))
+  )
+(use-package org-timeline)
 
 (use-package org-superstar
   :after org
   :hook (org-mode . org-superstar-mode))
 
 (use-package org-roam
-  :after org
   :custom
   (org-roam-directory "~/hub/org-roam")
   :bind (("C-c n l" . org-roam-buffer-toggle)
@@ -475,6 +529,10 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :config
   (org-roam-setup))
 
+(use-package visual-fill-column
+  :hook
+  (visual-fill-column-mode . (lambda () (setq visual-fill-column-width 80))))
+
 (use-package org-roam-ui
   :after org-roam
   :config
@@ -482,6 +540,17 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
+
+(use-package org-pomodoro
+    :after org
+    :config
+    (setq org-pomodoro-short-break-length 7)
+    (setq org-pomodoro-ticking-sound-p nil)
+    (setq org-pomodoro-manual-break t))
+
+;; The following fixes sounds not working on windows
+(use-package sound-wav)
+(use-package powershell)
 
 (use-package helpful
   :custom
@@ -505,19 +574,19 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package dashboard
   :demand t
-  :after (;; org
-          page-break-lines)
-  ;; :init
+  ;; :after page-break-lines
   :config
+  (setq line-move-visual nil)
   (setq dashboard-startup-banner 'logo)
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-center-content nil)
   (setq dashboard-projects-backend 'project-el)
-  (setq dashboard-items '((agenda . 3)
+  (setq dashboard-items '((agenda . 6)
                           (projects . 7)
                           (recents . 7)
-                          (bookmarks . 3)))
+                          ;; (bookmarks . 3)
+                          ))
   (setq dashboard-page-separator "\n\f\n")
   (setq dashboard-agenda-sort-strategy '(time-up))
   (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
@@ -534,8 +603,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq history-length 25))
 
 ;; Set Garbage collection threshold back down after startup completes
-;; (defun gsh/lower-gc-threshold()
-;;   (setq gc-cons-threshold (* 2 1000 1000))
-;;     )
-;; (add-hook 'after-init-hook 'gsh/lower-gc-threshold)
-(setq gc-cons-threshold (* 2 1000 1000))
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 2 1000 1000))
+            (setq file-name-handler-alist default-file-name-handler-alist)))
+;; (setq gc-cons-threshold (* 2 1000 1000))
