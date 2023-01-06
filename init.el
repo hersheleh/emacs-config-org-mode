@@ -109,11 +109,11 @@
 ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (setq inhibit-startup-message t)     ; No splash screen
-(global-visual-line-mode t)
+;; (global-visual-line-mode t)
 
 (defun gsh/set-font ()
   (message "Setting font")
-  (set-frame-font "Ubuntu Mono-11:bold" nil t))
+  (set-frame-font "Ubuntu Mono-12:bold" nil t))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions
@@ -295,11 +295,9 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ("q" nil "quit"))
 
 (use-package lsp-mode
-  ;; :init
-  ;; (setq lsp-keymap-prefix "C-x l")
   :commands (lsp lsp-deferred)
-  ;; :init
-  ;; (setq lsp-keymap-prefix "C-c l")
+  :init
+  (setq lsp-keymap-prefix "C-x l")
   :hook
 
   (js-mode . lsp-deferred)
@@ -311,13 +309,12 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;;  "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
   ;;  )
   :config
-  (setq lsp-keymap-prefix "C-x l")
   ;; (setq lsp-disabled-clients '(tfls))
   (lsp-enable-which-key-integration t)
   (setq lsp-diagnostics-provider :none)
   (setq lsp-modeline-diagnostics-enable nil)
   (with-eval-after-load 'lsp-mode
-    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.env*\\'")))
+    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\\.env.*\\'")))
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
@@ -509,6 +506,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (org-priority-lowest 68)
   (org-priority-default 67)
   :config
+  ;; Org Capture Configuration
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
   ;; Org Agenda
   (setq org-agenda-span 'day)
   (setq org-agenda-include-diary t)
