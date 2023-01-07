@@ -567,14 +567,17 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package org-pomodoro
   :after org
+  :custom
+  (org-pomodoro-audio-player (executable-find "play"))
+  (org-pomodoro-ticking-sound-p t)
   :config
   (setq org-pomodoro-short-break-length 7)
   (setq org-pomodoro-ticking-sound-p nil)
   (setq org-pomodoro-manual-break t))
 
 ;; The following fixes sounds not working on windows
-(use-package sound-wav)
-(use-package powershell)
+;; (use-package sound-wav)
+;; (use-package powershell)
 
 (use-package helpful
   :custom
@@ -641,3 +644,22 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
             (setq file-name-handler-alist default-file-name-handler-alist)
             ))
 ;; (setq gc-cons-threshold (* 2 1000 1000))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(ws-butler which-key vterm visual-fill-column use-package tree-sitter-langs terraform-mode rotate realgud rainbow-delimiters pyvenv page-break-lines org-timeline org-superstar org-roam org-pomodoro no-littering markdown-preview-mode magit lsp-ui ivy-prescient ivy-hydra iedit helpful flycheck doom-themes doom-modeline dockerfile-mode docker dashboard dap-mode counsel company-box buffer-move all-the-icons-ivy-rich all-the-icons-dired)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(counsel--mark-ring-highlight ((t (:inherit highlight))))
+ '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+ '(show-paren-match ((t (:background "#FD971F" :foreground "black" :weight ultra-bold)))))

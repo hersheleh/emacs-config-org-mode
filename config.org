@@ -890,14 +890,17 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
+    :custom
+    (org-pomodoro-audio-player (executable-find "play"))
+    (org-pomodoro-ticking-sound-p t)
     :config
     (setq org-pomodoro-short-break-length 7)
     (setq org-pomodoro-ticking-sound-p nil)
     (setq org-pomodoro-manual-break t))
 
   ;; The following fixes sounds not working on windows
-  (use-package sound-wav)
-  (use-package powershell)
+  ;; (use-package sound-wav)
+  ;; (use-package powershell)
   #+end_src
 * Helpful (better help documentation)
 #+begin_src emacs-lisp
