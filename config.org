@@ -82,6 +82,14 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; Disable lock files. They are interfering with terraform-ls on linux
   (setq create-lockfiles nil)
 #+end_src
+
+* Electricity
+#+begin_src emacs-lisp
+  (electric-indent-mode)
+  (electric-pair-mode)
+  (electric-quote-mode)
+#+end_src
+
 * MY KEY BINDINGS
 ** EXITING EMACS
 #+begin_src emacs-lisp
@@ -117,12 +125,12 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; (global-set-key (kbd "C-c o") 'other-window) ; (o)ther
 
   ;; split buffer with v and h keys
-  (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
-  (global-set-key (kbd "C-c b v") 'split-window-below) ;(v)ertical
+  ;; (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
+  ;; (global-set-key (kbd "C-c b v") 'split-window-below) ;(v)ertical
 
   ;; delete other windows
-  (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
-  (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
+  ;; (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
+  ;; (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
 
 #+end_src
 
@@ -173,6 +181,7 @@ Supress splash screen.
 #+begin_src emacs-lisp
   (scroll-bar-mode -1)          ; remove scroll bar
   (column-number-mode)          ; show column number in modline
+  (tool-bar-mode -1)
   ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (setq inhibit-startup-message t)     ; No splash screen
@@ -284,36 +293,39 @@ These are packages which assist in navigating emacs
 Ivy Mode speeds up navigation by perfoming text matching against
 possible inputs
 #+begin_src emacs-lisp
-      (use-package ivy
-        ;; :diminish
-        :bind (("C-s" . swiper)
-               ;; ("C-c C-r" . ivy-resume)
-               ;; ("<f6>" . ivy-resume)
-               ("M-x" . counsel-M-x)
-               ("C-x C-f" . counsel-find-file)
-               ("C-x f" . counsel-find-file)
-               ("C-c r" . counsel-recentf)    ; open recent file
-               ("C-c f" . counsel-recentf)    ; open recent file
-               ("C-c C-f" .  counsel-recentf)
-               ("C-h d" . counsel-describe-function)
-               ("C-h v" . counsel-describe-variable)
-               ("C-h o" . counsel-describe-symbol)
-               ("C-h l" . counsel-find-library)
-               ("C-h i" . counsel-info-lookup-symbol)
-               ("C-h u" . counsel-unicode-char)
-               ("C-h b" . counsel-descbinds)
-               ("C-x b" . counsel-switch-buffer)
-               ("C-c t" . counsel-load-theme)
-               :map minibuffer-local-map
-               ("C-r" . counsel-minibuffer-history)
-               ;; ("C-c g" . counsel-git)
-               ;; ("C-c j" . counsel-git-grep)
-               ;; ("C-c k" . counsel-ag)
-               ;; ("C-x l" . counsel-locate)
-               ;; ("C-S-o" . counsel-rhythmbox)
-               )
-        :config
-        (ivy-mode 1))
+  (use-package ivy
+    ;; :diminish
+    :bind (("C-s" . swiper)
+           ("C-M-s" . swiper-isearch)
+           ("C-r" . swiper-backward)
+           ;; ("C-c C-r" . ivy-resume)
+           ;; ("<f6>" . ivy-resume)
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("C-x f" . counsel-find-file)
+           ("C-c r" . counsel-recentf)    ; open recent file
+           ("C-c f" . counsel-recentf)    ; open recent file
+           ("C-c C-f" .  counsel-recentf)
+           ("C-h a" . counsel-apropos)
+           ("C-h d" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-h o" . counsel-describe-symbol)
+           ("C-h l" . counsel-find-library)
+           ("C-h i" . counsel-info-lookup-symbol)
+           ("C-h u" . counsel-unicode-char)
+           ("C-h b" . counsel-descbinds)
+           ("C-x b" . counsel-switch-buffer)
+           ("C-c t" . counsel-load-theme)
+           :map minibuffer-local-map
+           ("C-r" . counsel-minibuffer-history)
+           ;; ("C-c g" . counsel-git)
+           ;; ("C-c j" . counsel-git-grep)
+           ;; ("C-c k" . counsel-ag)
+           ;; ("C-x l" . counsel-locate)
+           ;; ("C-S-o" . counsel-rhythmbox)
+           )
+    :config
+    (ivy-mode 1))
 #+end_src
 *** Ivy Hydra
 #+begin_src emacs-lisp
@@ -411,7 +423,9 @@ possible key presses along with documentation for that key press.
 * Hydra
 #+begin_src emacs-lisp
   (use-package hydra
-    :bind (("C-x w" . hydra-windows/body)
+    :init
+    (global-unset-key (kbd "C-c b l"))
+    :bind (("C-c b" . hydra-windows/body)
            ("C-c o" . hydra-other-window/body))
     )
   ;; hydra to condense other window commands
@@ -799,11 +813,15 @@ Color delimiters like parens and braces according to their depth
                 ;; ("C-c C-n" . hydra-org/body)
                 ("M-n" . org-metadown)
                 ("M-p" . org-metaup))
+    :hook
+    (org-mode . visual-line-mode)
+    (org-mode . visual-fill-column-mode)
     :custom
     (org-priority-highest 65)
     (org-priority-lowest 68)
     (org-priority-default 67)
     :config
+
     ;; Org Capture Configuration
     (setq org-default-notes-file (concat org-directory "/notes.org"))
     ;; Org Agenda
@@ -819,7 +837,7 @@ Color delimiters like parens and braces according to their depth
             ;; "~/.emacs.d/config.org"
             ))
     (setq org-todo-keywords
-          '((sequence "BACKLOG" "TODO(t)" "NEXT(n)" "RECUR(r)" "TEST(s)" "|" "DONE(d!)")))
+          '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)")))
     (setq org-agenda-start-with-log-mode t)
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
@@ -843,6 +861,7 @@ Color delimiters like parens and braces according to their depth
       ("M-k" org-metaup "move up")
       ("q" nil "quit"))
     )
+  ;; org-agenda timeline view
   (use-package org-timeline)
 #+end_src
 
@@ -925,7 +944,7 @@ Installed this to browse Help documentation for SuperCollider
   (use-package w3m)
 #+end_src
 
-* Buffer Move
+* COMMENT Buffer Move
 Simplify Swapping buffers
 #+begin_src emacs-lisp
   (use-package buffer-move
@@ -948,14 +967,19 @@ Simplify Swapping buffers
     (setq dashboard-center-content nil)
     (setq dashboard-projects-backend 'project-el)
     (setq dashboard-items '((agenda . 6)
-                            (projects . 7)
-                            (recents . 7)
+                            (projects . 5)
+                            (recents . 5)
                             ;; (bookmarks . 3)
                             ))
     (setq dashboard-page-separator "\n\f\n")
-    (setq dashboard-agenda-sort-strategy '(time-up))
+    (setq dashboard-agenda-sort-strategy
+          '(todo-state-down
+            priority-up
+            time-down))
     (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
-
+    ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
+    (setq dashboard-agenda-prefix-format " %i %s ")
+    (setq dashboard-agenda-release-buffers 't)
     (setq initial-buffer-choice
           (lambda () (get-buffer-create "*dashboard*")))
     (dashboard-setup-startup-hook)

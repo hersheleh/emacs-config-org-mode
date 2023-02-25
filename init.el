@@ -44,6 +44,10 @@
 ;; Disable lock files. They are interfering with terraform-ls on linux
 (setq create-lockfiles nil)
 
+(electric-indent-mode)
+(electric-pair-mode)
+(electric-quote-mode)
+
 ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
 (if (not (daemonp))
     (global-unset-key (kbd "C-x  C-c"))) ; i always accidentilly press this
@@ -69,12 +73,12 @@
 ;; (global-set-key (kbd "C-c o") 'other-window) ; (o)ther
 
 ;; split buffer with v and h keys
-(global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
-(global-set-key (kbd "C-c b v") 'split-window-below) ;(v)ertical
+;; (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
+;; (global-set-key (kbd "C-c b v") 'split-window-below) ;(v)ertical
 
 ;; delete other windows
-(global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
-(global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
+;; (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
+;; (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
 
 (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
 (global-unset-key (kbd "M-k"))       ; was kill-sentence
@@ -106,6 +110,7 @@
 
 (scroll-bar-mode -1)          ; remove scroll bar
 (column-number-mode)          ; show column number in modline
+(tool-bar-mode -1)
 ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (setq inhibit-startup-message t)     ; No splash screen
@@ -165,6 +170,8 @@
 (use-package ivy
   ;; :diminish
   :bind (("C-s" . swiper)
+         ("C-M-s" . swiper-isearch)
+         ("C-r" . swiper-backward)
          ;; ("C-c C-r" . ivy-resume)
          ;; ("<f6>" . ivy-resume)
          ("M-x" . counsel-M-x)
@@ -173,6 +180,7 @@
          ("C-c r" . counsel-recentf)    ; open recent file
          ("C-c f" . counsel-recentf)    ; open recent file
          ("C-c C-f" .  counsel-recentf)
+         ("C-h a" . counsel-apropos)
          ("C-h d" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable)
          ("C-h o" . counsel-describe-symbol)
@@ -257,7 +265,9 @@
 (use-package rotate)
 
 (use-package hydra
-  :bind (("C-x w" . hydra-windows/body)
+  :init
+  (global-unset-key (kbd "C-c b l"))
+  :bind (("C-c b" . hydra-windows/body)
          ("C-c o" . hydra-other-window/body))
   )
 ;; hydra to condense other window commands
@@ -501,11 +511,15 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
               ;; ("C-c C-n" . hydra-org/body)
               ("M-n" . org-metadown)
               ("M-p" . org-metaup))
+  :hook
+  (org-mode . visual-line-mode)
+  (org-mode . visual-fill-column-mode)
   :custom
   (org-priority-highest 65)
   (org-priority-lowest 68)
   (org-priority-default 67)
   :config
+
   ;; Org Capture Configuration
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   ;; Org Agenda
@@ -521,7 +535,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
           ;; "~/.emacs.d/config.org"
           ))
   (setq org-todo-keywords
-        '((sequence "BACKLOG" "TODO(t)" "NEXT(n)" "RECUR(r)" "TEST(s)" "|" "DONE(d!)")))
+        '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)")))
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
@@ -545,6 +559,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
     ("M-k" org-metaup "move up")
     ("q" nil "quit"))
   )
+;; org-agenda timeline view
 (use-package org-timeline)
 
 (use-package org-superstar
@@ -593,12 +608,6 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
    :map helpful-mode-map
    ("k" . kill-current-buffer)))
 
-(use-package buffer-move
-  :bind (("C-c b l" . buf-move-right)
-         ("C-c b j" . buf-move-left)
-         ("C-c b i" . buf-move-up)
-         ("C-c b k" . buf-move-down)))
-
 (use-package dashboard
   :demand t
   :after (page-break-lines)
@@ -610,14 +619,19 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq dashboard-center-content nil)
   (setq dashboard-projects-backend 'project-el)
   (setq dashboard-items '((agenda . 6)
-                          (projects . 7)
-                          (recents . 7)
+                          (projects . 5)
+                          (recents . 5)
                           ;; (bookmarks . 3)
                           ))
   (setq dashboard-page-separator "\n\f\n")
-  (setq dashboard-agenda-sort-strategy '(time-up))
+  (setq dashboard-agenda-sort-strategy
+        '(todo-state-down
+          priority-up
+          time-down))
   (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
-
+  ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
+  (setq dashboard-agenda-prefix-format " %i %s ")
+  (setq dashboard-agenda-release-buffers 't)
   (setq initial-buffer-choice
         (lambda () (get-buffer-create "*dashboard*")))
   (dashboard-setup-startup-hook)
@@ -644,22 +658,3 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
             (setq file-name-handler-alist default-file-name-handler-alist)
             ))
 ;; (setq gc-cons-threshold (* 2 1000 1000))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ws-butler which-key vterm visual-fill-column use-package tree-sitter-langs terraform-mode rotate realgud rainbow-delimiters pyvenv page-break-lines org-timeline org-superstar org-roam org-pomodoro no-littering markdown-preview-mode magit lsp-ui ivy-prescient ivy-hydra iedit helpful flycheck doom-themes doom-modeline dockerfile-mode docker dashboard dap-mode counsel company-box buffer-move all-the-icons-ivy-rich all-the-icons-dired)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(counsel--mark-ring-highlight ((t (:inherit highlight))))
- '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
- '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
- '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
- '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
- '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
- '(show-paren-match ((t (:background "#FD971F" :foreground "black" :weight ultra-bold)))))
