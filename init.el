@@ -48,6 +48,20 @@
 (electric-pair-mode)
 (electric-quote-mode)
 
+(defun move-line-up ()
+  (interactive)
+  (transpose-lines 1)
+  (forward-line -2))
+
+(defun move-line-down ()
+  (interactive)
+  (forward-line 1)
+  (transpose-lines 1)
+  (forward-line -1))
+
+(global-set-key (kbd "M-<up>") 'move-line-up)
+(global-set-key (kbd "M-<down>") 'move-line-down)
+
 ;; remap save-buffers-kill-terminal from C-x C-c to C-x q
 (if (not (daemonp))
     (global-unset-key (kbd "C-x  C-c"))) ; i always accidentilly press this
@@ -58,10 +72,10 @@
 (global-unset-key (kbd "C-x C-z"))
 
 ;; switch buffers directionally using ijkl keys similar to right hand wasd
-(global-set-key (kbd "C-c i") 'windmove-up)
-(global-set-key (kbd "C-c k") 'windmove-down)
-(global-set-key (kbd "C-c j") 'windmove-left)
-(global-set-key (kbd "C-c l") 'windmove-right)
+;; (global-set-key (kbd "C-c i") 'windmove-up)
+;; (global-set-key (kbd "C-c k") 'windmove-down)
+;; (global-set-key (kbd "C-c j") 'windmove-left)
+;; (global-set-key (kbd "C-c l") 'windmove-right)
 
 ;; switch buffers directionally using arrow keys
 (global-set-key (kbd "C-c <up>") 'windmove-up)
@@ -111,21 +125,25 @@
 (scroll-bar-mode -1)          ; remove scroll bar
 (column-number-mode)          ; show column number in modline
 (tool-bar-mode -1)
+(menu-bar-mode -1)
 ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (setq inhibit-startup-message t)     ; No splash screen
 ;; (global-visual-line-mode t)
 
-(defun gsh/set-font ()
-  (message "Setting font")
-  (set-frame-font "Ubuntu Mono-12:bold" nil t))
+(setq visible-bell 1)
 
-(if (daemonp)
-    (add-hook 'after-make-frame-functions
-              (lambda(frame)
-                (with-selected-frame frame
-                  (gsh/set-font))))
-  (gsh/set-font))
+(defun gsh/set-font ()
+    (message "Setting font")
+    (set-frame-font "Ubuntu Mono-11:bold" nil t)
+)
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda(frame)
+                  (with-selected-frame frame
+                    (gsh/set-font))))
+    (gsh/set-font))
 
 (setq-default indent-tabs-mode nil)
 
@@ -153,7 +171,6 @@
                                        :weight ultra-bold))))))
 
 (use-package doom-modeline
-  ;; :demand t
   :init (doom-modeline-mode 1))
 
 (use-package all-the-icons
@@ -168,8 +185,7 @@
 ;; (recentf-mode 1)
 
 (use-package ivy
-  ;; :diminish
-  :bind (("C-s" . swiper)
+  :bind (("C-s" . counsel-grep-or-swiper)
          ("C-M-s" . swiper-isearch)
          ("C-r" . swiper-backward)
          ;; ("C-c C-r" . ivy-resume)
@@ -204,7 +220,7 @@
 (use-package ivy-hydra)
 
 (use-package ivy-rich
-  :after counsel
+  ;; :after counsel
   :init
   (ivy-rich-mode 1)
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
@@ -276,13 +292,13 @@
   ("f" find-file-other-window "find file")
   ("b" counsel-switch-buffer-other-window "switch buffer"))
 ;; Hydra for managing buffers
-(defhydra hydra-windows (:hint nil)
+(defhydra hydra-windows (global-map "C-c" :hint nil)
   "
 ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
 ^^^^^^^^----------------------------------------------------------------------------------
 _i_: up      _v_: vertical     _o_: other windows   _I_: up      _r_: rotate layout  _g_: refresh
 _k_: down    _h_: horizontal   _d_: this window     _K_: down    _b_: switch buffer
-_j_: left    ^ ^               ^ ^                  _J_: left    _f_: find file
+_j_: left    ^ ^               ^ ^                  _J_: left    ^_^: find file
 _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch project
 "
   ("l" windmove-right)
@@ -299,20 +315,19 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ("L" buf-move-right)
   ("r" rotate-layout)
   ("b" counsel-switch-buffer)
-  ("f" counsel-find-file)
+  ;; ("f" counsel-find-file)
   ("p" project-switch-project)
   ("g" revert-buffer-quick)
   ("q" nil "quit"))
 
 (use-package lsp-mode
+  ;; :after flycheck
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-x l")
   :hook
-
   (js-mode . lsp-deferred)
   (terraform-mode . lsp-deferred)
-
   ;; :custom
   ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
   ;; (lsp-terraform-ls-server
@@ -321,10 +336,10 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :config
   ;; (setq lsp-disabled-clients '(tfls))
   (lsp-enable-which-key-integration t)
-  (setq lsp-diagnostics-provider :none)
-  (setq lsp-modeline-diagnostics-enable nil)
+  ;; (setq lsp-modeline-diagnostics-enable nil)
   (with-eval-after-load 'lsp-mode
-    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\\.env.*\\'")))
+    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\\.env.*\\'"))
+  )
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
@@ -341,6 +356,14 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 ;;   :init
 ;;   (setq sideline-backends-right '(sideline-lsp)))
+
+(use-package lsp-ivy
+  :init
+  (defun ivy-update-candidates-dynamic-collection-workaround-a (old-fun &rest args)
+    (cl-letf (((symbol-function #'completion-metadata) #'ignore))
+      (apply old-fun args)))
+  (advice-add #'ivy-update-candidates :around #'ivy-update-candidates-dynamic-collection-workaround-a)
+  )
 
 (use-package dap-mode
   ;; :ensure t
@@ -372,18 +395,17 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 ;; :config
 ;; (add-hook 'after-init-hook 'global-company-mode)
 
-(use-package company-box          ; Show icons in company complettions
-  :hook (company-mode . company-box-mode))
+;; (use-package company-box          ; Show icons in company complettions
+;;   :hook (company-mode . company-box-mode))
 
 (use-package flycheck
   :custom
-  (flycheck-python-pycompile-executable "python")
-  (flycheck-python-pylint-executable "python")
-  (flycheck-python-pyright-executable "python")
-  (flycheck-python-mypy-executable "python")
-  (flycheck-python-flake8-executable "python")
-  :config
-  ;; (global-flycheck-mode)
+  ;; (flycheck-python-pycompile-executable "python")
+  (flycheck-python-pylint-executable "pylint")
+  ;; (flycheck-python-pyright-executable "python")
+  ;; (flycheck-python-mypy-executable "python")
+  ;; (flycheck-python-flake8-executable "python")
+
   )
 
 (use-package iedit)
@@ -442,6 +464,16 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;;         ("C-c r" . nil))
   :hook
   (python-mode . lsp-deferred)
+  (lsp-diagnostics-mode . (lambda ()
+                            ;; (flycheck-add-next-checker
+                            ;;  'lsp 'python-pylint)
+                            ;; (flycheck-disable-checker 'lsp)
+                            (flycheck-select-checker 'python-pylint)
+                            ))
+
+
+
+
   :config
   (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
   ;; (setq py-python-command "python3")
@@ -468,7 +500,19 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
          :program nil
          :console "integratedTerminal"  ; launches vterm
          :request "launch"
-         :name "Python :: Run file User Input (buffer)")))
+         :name "Python :: Run file User Input (buffer)"))
+  (dap-register-debug-template
+   "Python :: Debug PDF args"
+   (list :type "python"
+         :cwd nil
+         :module nil
+         :program nil
+         :console "integratedTerminal"  ; launches vterm
+         :request "launch"
+         :name "Python :: Run file User Input (buffer)"
+         :args "~/hub/ripl/pw-backend/src/pw_backend_app/parser/MW-562withoutfein_filled_out2.pdf"))
+
+  )
 
 ;; fix run-python codec errors on windows
 (setenv "LANG" "en_US.UTF-8")
@@ -516,7 +560,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (org-mode . visual-fill-column-mode)
   :custom
   (org-priority-highest 65)
-  (org-priority-lowest 68)
+  (org-priority-lowest 69)
   (org-priority-default 67)
   :config
 
@@ -621,7 +665,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq dashboard-items '((agenda . 6)
                           (projects . 5)
                           (recents . 5)
-                          ;; (bookmarks . 3)
+                          (bookmarks . 3)
                           ))
   (setq dashboard-page-separator "\n\f\n")
   (setq dashboard-agenda-sort-strategy
@@ -658,3 +702,22 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
             (setq file-name-handler-alist default-file-name-handler-alist)
             ))
 ;; (setq gc-cons-threshold (* 2 1000 1000))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(ws-butler which-key vterm visual-fill-column use-package tree-sitter-langs terraform-mode rotate realgud rainbow-delimiters pyvenv page-break-lines org-timeline org-superstar org-roam org-pomodoro no-littering markdown-preview-mode magit lsp-ui lsp-ivy ivy-prescient ivy-hydra iedit helpful frame-local flycheck emacsql-sqlite doom-themes doom-modeline dockerfile-mode docker deferred dashboard dap-mode counsel company buffer-move all-the-icons-ivy-rich all-the-icons-dired)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(counsel--mark-ring-highlight ((t (:inherit highlight))))
+ '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+ '(show-paren-match ((t (:background "#FD971F" :foreground "black" :weight ultra-bold)))))
