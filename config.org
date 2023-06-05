@@ -60,25 +60,53 @@ Define function to time Emacs startup and determine # of garbage collections
 
 * Emacs System configs
 #+begin_src emacs-lisp
-  ;; Set Dired default directory
-  ;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
-  ;; set re-builder sytax to string
-  (setq reb-re-syntax 'string)
-  ;; keep folders clean
-  (setq backup-directory-alist
-	`(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
-  ;; create path for auto save mode
-  (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
+    ;; Set Dired default directory
+    ;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
+    ;; set re-builder sytax to string
+    (setq reb-re-syntax 'string)
+    ;; keep folders clean
+    (setq backup-directory-alist
+          `(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
+    ;; create path for auto save mode
+    (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
 
-  (setq auto-save-list-file-prefix (expand-file-name
-				    "tmp/auto-saves/sessions/"
-				    user-emacs-directory)
-	auto-save-file-name-transforms
-	`((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+    (setq auto-save-list-file-prefix (expand-file-name
+                                      "tmp/auto-saves/sessions/"
+                                      user-emacs-directory)
+          auto-save-file-name-transforms
+          `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
 
-  (use-package no-littering
-    :demand t)
+    (use-package no-littering
+      :demand t)
+
+  ;; Disable lock files. They are interfering with terraform-ls on linux
+  (setq create-lockfiles nil)
 #+end_src
+
+* Electricity
+#+begin_src emacs-lisp
+  (electric-indent-mode)
+  (electric-pair-mode)
+  (electric-quote-mode)
+#+end_src
+
+* Move Lines Up/Down
+#+begin_src emacs-lisp
+  (defun move-line-up ()
+    (interactive)
+    (transpose-lines 1)
+    (forward-line -2))
+
+  (defun move-line-down ()
+    (interactive)
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1))
+
+  (global-set-key (kbd "M-<up>") 'move-line-up)
+  (global-set-key (kbd "M-<down>") 'move-line-down)
+#+end_src
+
 * MY KEY BINDINGS
 ** EXITING EMACS
 #+begin_src emacs-lisp
@@ -99,10 +127,10 @@ Define function to time Emacs startup and determine # of garbage collections
 
 #+begin_src emacs-lisp
   ;; switch buffers directionally using ijkl keys similar to right hand wasd
-  (global-set-key (kbd "C-c i") 'windmove-up)
-  (global-set-key (kbd "C-c k") 'windmove-down)
-  (global-set-key (kbd "C-c j") 'windmove-left)
-  (global-set-key (kbd "C-c l") 'windmove-right)
+  ;; (global-set-key (kbd "C-c i") 'windmove-up)
+  ;; (global-set-key (kbd "C-c k") 'windmove-down)
+  ;; (global-set-key (kbd "C-c j") 'windmove-left)
+  ;; (global-set-key (kbd "C-c l") 'windmove-right)
 
   ;; switch buffers directionally using arrow keys
   (global-set-key (kbd "C-c <up>") 'windmove-up)
@@ -114,13 +142,12 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; (global-set-key (kbd "C-c o") 'other-window) ; (o)ther
 
   ;; split buffer with v and h keys
-  (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
-  (global-set-key (kbd "C-c b v") 'split-window-below) ;(v)ertical
+  ;; (global-set-key (kbd "C-c b h") 'split-window-right) ;(h)orizontal
+  ;; (global-set-key (kbd "C-c b v") 'split-window-below) ;(v)ertical
 
   ;; delete other windows
-  (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
-  (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
-
+  ;; (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
+  ;; (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
 #+end_src
 
 ** SCROLL UP/DOWN LINES WITH: M-j M-k
@@ -170,12 +197,17 @@ Supress splash screen.
 #+begin_src emacs-lisp
   (scroll-bar-mode -1)          ; remove scroll bar
   (column-number-mode)          ; show column number in modline
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
   ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (setq inhibit-startup-message t)     ; No splash screen
-  (global-visual-line-mode t)
+  ;; (global-visual-line-mode t)
 #+end_src
-
+** Visible Bell to turn off chime
+#+begin_src emacs-lisp
+  (setq visible-bell 1)
+#+end_src
 ** COMMENT Set Default Font
 Sets font for MacOS X emacs
 #+begin_src emacs-lisp
@@ -191,7 +223,8 @@ Sets font for MacOS X emacs
 #+begin_src emacs-lisp
   (defun gsh/set-font ()
     (message "Setting font")
-    (set-frame-font "Ubuntu Mono-12:bold" nil t))
+    (set-frame-font "Ubuntu Mono-11:bold" nil t)
+)
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions
@@ -230,6 +263,7 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
  * doom-pine
  * doom-old-hope
  * wombat
+ * doom-badger
 :END:
 #+begin_src emacs-lisp
   (use-package doom-themes
@@ -255,7 +289,6 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
 ** MODE LINE
 #+begin_src emacs-lisp
   (use-package doom-modeline
-    ;; :demand t
     :init (doom-modeline-mode 1))
 #+end_src
 ** ICONS
@@ -281,36 +314,38 @@ These are packages which assist in navigating emacs
 Ivy Mode speeds up navigation by perfoming text matching against
 possible inputs
 #+begin_src emacs-lisp
-      (use-package ivy
-        ;; :diminish
-        :bind (("C-s" . swiper)
-               ;; ("C-c C-r" . ivy-resume)
-               ;; ("<f6>" . ivy-resume)
-               ("M-x" . counsel-M-x)
-               ("C-x C-f" . counsel-find-file)
-               ("C-x f" . counsel-find-file)
-               ("C-c r" . counsel-recentf)    ; open recent file
-               ("C-c f" . counsel-recentf)    ; open recent file
-               ("C-c C-f" .  counsel-recentf)
-               ("C-h d" . counsel-describe-function)
-               ("C-h v" . counsel-describe-variable)
-               ("C-h o" . counsel-describe-symbol)
-               ("C-h l" . counsel-find-library)
-               ("C-h i" . counsel-info-lookup-symbol)
-               ("C-h u" . counsel-unicode-char)
-               ("C-h b" . counsel-descbinds)
-               ("C-x b" . counsel-switch-buffer)
-               ("C-c t" . counsel-load-theme)
-               :map minibuffer-local-map
-               ("C-r" . counsel-minibuffer-history)
-               ;; ("C-c g" . counsel-git)
-               ;; ("C-c j" . counsel-git-grep)
-               ;; ("C-c k" . counsel-ag)
-               ;; ("C-x l" . counsel-locate)
-               ;; ("C-S-o" . counsel-rhythmbox)
-               )
-        :config
-        (ivy-mode 1))
+  (use-package ivy
+    :bind (("C-s" . counsel-grep-or-swiper)
+           ("C-M-s" . swiper-isearch)
+           ("C-r" . swiper-backward)
+           ;; ("C-c C-r" . ivy-resume)
+           ;; ("<f6>" . ivy-resume)
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("C-x f" . counsel-find-file)
+           ("C-c r" . counsel-recentf)    ; open recent file
+           ("C-c f" . counsel-recentf)    ; open recent file
+           ("C-c C-f" .  counsel-recentf)
+           ("C-h a" . counsel-apropos)
+           ("C-h d" . counsel-describe-function)
+           ("C-h v" . counsel-describe-variable)
+           ("C-h o" . counsel-describe-symbol)
+           ("C-h l" . counsel-find-library)
+           ("C-h i" . counsel-info-lookup-symbol)
+           ("C-h u" . counsel-unicode-char)
+           ("C-h b" . counsel-descbinds)
+           ("C-x b" . counsel-switch-buffer)
+           ("C-c t" . counsel-load-theme)
+           :map minibuffer-local-map
+           ("C-r" . counsel-minibuffer-history)
+           ;; ("C-c g" . counsel-git)
+           ;; ("C-c j" . counsel-git-grep)
+           ;; ("C-c k" . counsel-ag)
+           ;; ("C-x l" . counsel-locate)
+           ;; ("C-S-o" . counsel-rhythmbox)
+           )
+    :config
+    (ivy-mode 1))
 #+end_src
 *** Ivy Hydra
 #+begin_src emacs-lisp
@@ -320,11 +355,11 @@ possible inputs
 *** Ivy Rich
 Provides function documentation and key binding info in ivy buffer
 #+begin_src emacs-lisp
-    (use-package ivy-rich
-      :after counsel
-      :init
-      (ivy-rich-mode 1)
-      (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+  (use-package ivy-rich
+    ;; :after counsel
+    :init
+    (ivy-rich-mode 1)
+    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
 #+end_src
 
@@ -408,7 +443,9 @@ possible key presses along with documentation for that key press.
 * Hydra
 #+begin_src emacs-lisp
   (use-package hydra
-    :bind (("C-x w" . hydra-windows/body)
+    :init
+    (global-unset-key (kbd "C-c b l"))
+    :bind (("C-c b" . hydra-windows/body)
            ("C-c o" . hydra-other-window/body))
     )
   ;; hydra to condense other window commands
@@ -417,13 +454,13 @@ possible key presses along with documentation for that key press.
     ("f" find-file-other-window "find file")
     ("b" counsel-switch-buffer-other-window "switch buffer"))
   ;; Hydra for managing buffers
-  (defhydra hydra-windows (:hint nil)
+  (defhydra hydra-windows (global-map "C-c" :hint nil)
     "
   ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
   ^^^^^^^^----------------------------------------------------------------------------------
   _i_: up      _v_: vertical     _o_: other windows   _I_: up      _r_: rotate layout  _g_: refresh
   _k_: down    _h_: horizontal   _d_: this window     _K_: down    _b_: switch buffer
-  _j_: left    ^ ^               ^ ^                  _J_: left    _f_: find file
+  _j_: left    ^ ^               ^ ^                  _J_: left    ^_^: find file
   _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch project
   "
     ("l" windmove-right)
@@ -440,7 +477,7 @@ possible key presses along with documentation for that key press.
     ("L" buf-move-right)
     ("r" rotate-layout)
     ("b" counsel-switch-buffer)
-    ("f" counsel-find-file)
+    ;; ("f" counsel-find-file)
     ("p" project-switch-project)
     ("g" revert-buffer-quick)
     ("q" nil "quit"))
@@ -462,32 +499,29 @@ and jump to definition functionality for a particular language
 #+end_src
 *** DONE make alias for clangd -> clangd-10
 
+
 *** LSP MODE (Enabled)
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    ;; :init
-    ;; (setq lsp-keymap-prefix "C-x l")
+    ;; :after flycheck
     :commands (lsp lsp-deferred)
-    ;; :init
-    ;; (setq lsp-keymap-prefix "C-c l")
+    :init
+    (setq lsp-keymap-prefix "C-x l")
     :hook
-
     (js-mode . lsp-deferred)
     (terraform-mode . lsp-deferred)
-
     ;; :custom
     ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
     ;; (lsp-terraform-ls-server
     ;;  "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
     ;;  )
     :config
-    (setq lsp-keymap-prefix "C-x l")
     ;; (setq lsp-disabled-clients '(tfls))
     (lsp-enable-which-key-integration t)
-    (setq lsp-diagnostics-provider :none)
-    (setq lsp-modeline-diagnostics-enable nil)
+    ;; (setq lsp-modeline-diagnostics-enable nil)
     (with-eval-after-load 'lsp-mode
-      (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.env*\\'")))
+      (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\\.env.*\\'"))
+    )
 
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
@@ -507,6 +541,18 @@ and jump to definition functionality for a particular language
 
   ;;   :init
   ;;   (setq sideline-backends-right '(sideline-lsp)))
+#+end_src
+
+*** LSP-Ivy integration
+#+begin_src emacs-lisp
+  (use-package lsp-ivy
+    :init
+    (defun ivy-update-candidates-dynamic-collection-workaround-a (old-fun &rest args)
+      (cl-letf (((symbol-function #'completion-metadata) #'ignore))
+        (apply old-fun args)))
+    (advice-add #'ivy-update-candidates :around #'ivy-update-candidates-dynamic-collection-workaround-a)
+    )
+
 #+end_src
 
 ** Debuggers
@@ -560,24 +606,24 @@ COMplete ANYthing: Code completion framework.
   ;; :config
   ;; (add-hook 'after-init-hook 'global-company-mode)
 
-  (use-package company-box          ; Show icons in company complettions
-    :hook (company-mode . company-box-mode))
+  ;; (use-package company-box          ; Show icons in company complettions
+  ;;   :hook (company-mode . company-box-mode))
 #+end_src
 
 ** Flycheck (better sytax checker)
 Syntax checking and linting.
 #+begin_src emacs-lisp
+
   (use-package flycheck
     :custom
-    (flycheck-python-pycompile-executable "python")
-    (flycheck-python-pylint-executable "python")
-    (flycheck-python-pyright-executable "python")
-    (flycheck-python-mypy-executable "python")
-    (flycheck-python-flake8-executable "python")
-    :config
-    ;; (global-flycheck-mode)
+    ;; (flycheck-python-pycompile-executable "python")
+    (flycheck-python-pylint-executable "pylint")
+    ;; (flycheck-python-pyright-executable "python")
+    ;; (flycheck-python-mypy-executable "python")
+    ;; (flycheck-python-flake8-executable "python")
+
     )
-#+end_src
+  #+end_src
 
 ** iEdit(edit multiple lines simulatneously)
 #+begin_src emacs-lisp
@@ -670,6 +716,16 @@ This is a mode for the sclang language for SuperCollider
     ;;         ("C-c r" . nil))
     :hook
     (python-mode . lsp-deferred)
+    (lsp-diagnostics-mode . (lambda ()
+                              ;; (flycheck-add-next-checker
+                              ;;  'lsp 'python-pylint)
+                              ;; (flycheck-disable-checker 'lsp)
+                              (flycheck-select-checker 'python-pylint)
+                              ))
+
+
+
+
     :config
     (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
     ;; (setq py-python-command "python3")
@@ -696,7 +752,21 @@ This is a mode for the sclang language for SuperCollider
            :program nil
            :console "integratedTerminal"  ; launches vterm
            :request "launch"
-           :name "Python :: Run file User Input (buffer)")))
+           :name "Python :: Run file User Input (buffer)"))
+    (dap-register-debug-template
+     "Python :: Debug PDF args"
+     (list :type "python"
+           :cwd nil
+           :module nil
+           :program nil
+           :console "integratedTerminal"  ; launches vterm
+           :request "launch"
+           :name "Python :: Run file User Input (buffer)"
+           :args "~/hub/ripl/pw-backend/src/pw_backend_app/parser/MW-562withoutfein_filled_out2.pdf"))
+
+    )
+
+
 #+end_src
 Was getting encoding errors in run-python buffer on windows
 This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-executing-python-in-emacs-not-in-terminal][stackexchange]] answer suggested the following fix
@@ -771,10 +841,10 @@ Color delimiters like parens and braces according to their depth
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :init
-    (when (file-directory-p "~/hub")
-      (setq projectile-project-search-path
-            '("~/hub/new_projects"
-              "~/hub/recording_bullet_journal/super_collider_projects")))
+    ;; (when (file-directory-p "~/hub")
+    ;;   (setq projectile-project-search-path
+    ;;         '("~/hub/new_projects"
+    ;;           "~/hub/recording_bullet_journal/super_collider_projects")))
     (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
 * ORG MODE ADDONS & CONFIGS
@@ -799,11 +869,17 @@ Color delimiters like parens and braces according to their depth
                 ;; ("C-c C-n" . hydra-org/body)
                 ("M-n" . org-metadown)
                 ("M-p" . org-metaup))
+    :hook
+    (org-mode . visual-line-mode)
+    (org-mode . visual-fill-column-mode)
     :custom
     (org-priority-highest 65)
-    (org-priority-lowest 68)
+    (org-priority-lowest 69)
     (org-priority-default 67)
     :config
+
+    ;; Org Capture Configuration
+    (setq org-default-notes-file (concat org-directory "/notes.org"))
     ;; Org Agenda
     (setq org-agenda-span 'day)
     (setq org-agenda-include-diary t)
@@ -817,7 +893,7 @@ Color delimiters like parens and braces according to their depth
             ;; "~/.emacs.d/config.org"
             ))
     (setq org-todo-keywords
-          '((sequence "BACKLOG" "TODO(t)" "NEXT(n)" "RECUR(r)" "TEST(s)" "|" "DONE(d!)")))
+          '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)")))
     (setq org-agenda-start-with-log-mode t)
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
@@ -841,7 +917,9 @@ Color delimiters like parens and braces according to their depth
       ("M-k" org-metaup "move up")
       ("q" nil "quit"))
     )
+  ;; org-agenda timeline view
   (use-package org-timeline)
+
 #+end_src
 
 ** ORG SUPERSTAR
@@ -857,12 +935,20 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (use-package org-roam
     :custom
-    (org-roam-directory "~/hub/org-roam")
+    (org-roam-directory "~/hub/ripl/ripl-wiki-roam")
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n i" . org-roam-node-insert))
     :config
+    (org-roam-db-autosync-mode)
     (org-roam-setup))
+#+end_src
+
+** Visual Fill Column
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :hook
+    (visual-fill-column-mode . (lambda () (setq visual-fill-column-width 80))))
 #+end_src
 
 ** COMMENT Org-Roam-UI
@@ -880,14 +966,17 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
+    :custom
+    (org-pomodoro-audio-player (executable-find "play"))
+    (org-pomodoro-ticking-sound-p t)
     :config
     (setq org-pomodoro-short-break-length 7)
     (setq org-pomodoro-ticking-sound-p nil)
     (setq org-pomodoro-manual-break t))
 
   ;; The following fixes sounds not working on windows
-  (use-package sound-wav)
-  (use-package powershell)
+  ;; (use-package sound-wav)
+  ;; (use-package powershell)
   #+end_src
 * Helpful (better help documentation)
 #+begin_src emacs-lisp
@@ -912,7 +1001,7 @@ Installed this to browse Help documentation for SuperCollider
   (use-package w3m)
 #+end_src
 
-* Buffer Move
+* COMMENT Buffer Move
 Simplify Swapping buffers
 #+begin_src emacs-lisp
   (use-package buffer-move
@@ -935,14 +1024,19 @@ Simplify Swapping buffers
     (setq dashboard-center-content nil)
     (setq dashboard-projects-backend 'project-el)
     (setq dashboard-items '((agenda . 6)
-                            (projects . 7)
-                            (recents . 7)
-                            ;; (bookmarks . 3)
+                            (projects . 5)
+                            (recents . 5)
+                            (bookmarks . 3)
                             ))
     (setq dashboard-page-separator "\n\f\n")
-    (setq dashboard-agenda-sort-strategy '(time-up))
+    (setq dashboard-agenda-sort-strategy
+          '(todo-state-down
+            priority-up
+            time-down))
     (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
-
+    ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
+    (setq dashboard-agenda-prefix-format " %i %s ")
+    (setq dashboard-agenda-release-buffers 't)
     (setq initial-buffer-choice
           (lambda () (get-buffer-create "*dashboard*")))
     (dashboard-setup-startup-hook)
