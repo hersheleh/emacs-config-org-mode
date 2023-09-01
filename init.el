@@ -115,6 +115,8 @@
 (global-set-key (kbd "C-v") 'scroll-up-window-half)
 (global-set-key (kbd "M-v") 'scroll-down-window-half)
 
+(global-set-key (kbd "M-z") 'zap-up-to-char)
+
 (global-unset-key (kbd "M-SPC"))
 (defun insert-underscore ()
   "Inserting an underscore '_' character"
@@ -161,7 +163,8 @@
   ;; (custom-set-variables
    ;; '(doom-molokai-brighter-comments t))
   ;; (load-theme 'doom-monokai-classic t)
-  (load-theme 'doom-acario-dark t)
+  ;; (load-theme 'doom-acario-dark t)
+  (load-theme 'doom-moonlight t)
 
   ;; customize the doom monkai theme
   (custom-set-faces
@@ -453,6 +456,18 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 ;; (use-package sclang-extensions)
 
+;; in ~/.emacs
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
+(require 'sclang)
+(defun sclang-keys ()
+  (define-key sclang-mode-map (kbd "C-c C-l") 'sclang-eval-line)
+  (define-key sclang-mode-map (kbd "C-<return>") 'sclang-eval-defun)
+  (define-key sclang-mode-map (kbd "C-.") 'sclang-main-stop)
+  (local-unset-key (kbd "C-c h"))
+  (define-key sclang-mode-map (kbd "C-c C-h") 'sclang-find-help-in-gui))
+(add-hook 'sclang-mode-hook 'sclang-keys)
+;; (eval-after-load 'sclang '(sclang-keys))
+
 (use-package python
   :ensure nil
   :custom
@@ -562,8 +577,9 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (org-priority-highest 65)
   (org-priority-lowest 69)
   (org-priority-default 67)
+  (org-agenda-start-with-clockreport-mode t)
+  (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
   :config
-
   ;; Org Capture Configuration
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   ;; Org Agenda
@@ -572,8 +588,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;; Add graphical timeline to org agenda
   (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
   (setq org-agenda-files
-        '("~/hub/ripl/orgs/tickets.org"
-          "~/hub/ripl/orgs/my_tasks.org"
+        '("~/hub/orgs/my_todos.org"
+          "~/hub/orgs/music_todos.org"
           ;; "~/hub/new_projects/orgi/orgi_plan.org"
           ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
           ;; "~/.emacs.d/config.org"
@@ -587,10 +603,10 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq org-startup-indented t)
   (custom-set-faces
    '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
-   '(org-level-2 ((t (:inherit outline-2 :height 1.10))))
-   '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
-   '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
-   '(org-level-5 ((t (:inherit outline-5 :height 1.00))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.17))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.15))))
+   '(org-level-4 ((t (:inherit outline-4 :height 1.12))))
+   '(org-level-5 ((t (:inherit outline-5 :height 1.10))))
    )
 
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -612,7 +628,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package org-roam
   :custom
-  (org-roam-directory "~/hub/ripl/ripl-wiki-roam")
+  (org-roam-directory "~/hub/org-roam")
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert))
@@ -627,7 +643,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 (use-package org-pomodoro
   :after org
   :custom
-  (org-pomodoro-audio-player (executable-find "play"))
+  ;; (org-pomodoro-audio-player (executable-find "play"))
   (org-pomodoro-ticking-sound-p t)
   :config
   (setq org-pomodoro-short-break-length 7)
@@ -702,22 +718,3 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
             (setq file-name-handler-alist default-file-name-handler-alist)
             ))
 ;; (setq gc-cons-threshold (* 2 1000 1000))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ws-butler which-key vterm visual-fill-column use-package tree-sitter-langs terraform-mode rotate realgud rainbow-delimiters pyvenv page-break-lines org-timeline org-superstar org-roam org-pomodoro no-littering markdown-preview-mode magit lsp-ui lsp-ivy ivy-prescient ivy-hydra iedit helpful frame-local flycheck emacsql-sqlite doom-themes doom-modeline dockerfile-mode docker deferred dashboard dap-mode counsel company buffer-move all-the-icons-ivy-rich all-the-icons-dired)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(counsel--mark-ring-highlight ((t (:inherit highlight))))
- '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
- '(org-level-2 ((t (:inherit outline-2 :height 1.1))))
- '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
- '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
- '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
- '(show-paren-match ((t (:background "#FD971F" :foreground "black" :weight ultra-bold)))))

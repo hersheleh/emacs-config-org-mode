@@ -178,6 +178,10 @@ Define function to time Emacs startup and determine # of garbage collections
   (global-set-key (kbd "C-v") 'scroll-up-window-half)
   (global-set-key (kbd "M-v") 'scroll-down-window-half)
 #+end_src
+** Change Zap to char
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-z") 'zap-up-to-char)
+#+end_src
 
 * My Functions
 ** Easy Insert Underscore (M-SPC)
@@ -211,7 +215,7 @@ Supress splash screen.
 ** COMMENT Set Default Font
 Sets font for MacOS X emacs
 #+begin_src emacs-lisp
-  (set-frame-font "Menlo 14" nil t)
+  (set-frame-font "Menlo 11" nil t)
 #+end_src
 
 ** COMMENT Set Default Font for Windows
@@ -277,7 +281,8 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
     ;; (custom-set-variables
      ;; '(doom-molokai-brighter-comments t))
     ;; (load-theme 'doom-monokai-classic t)
-    (load-theme 'doom-acario-dark t)
+    ;; (load-theme 'doom-acario-dark t)
+    (load-theme 'doom-moonlight t)
 
     ;; customize the doom monkai theme
     (custom-set-faces
@@ -687,6 +692,21 @@ for 7 years as of Oct 2022.
 #+begin_src emacs-lisp
   ;; (use-package sclang-extensions)
 #+end_src
+*** scel ubuntu compiled from source install
+#+begin_src emacs-lisp
+  ;; in ~/.emacs
+  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
+  (require 'sclang)
+  (defun sclang-keys ()
+    (define-key sclang-mode-map (kbd "C-c C-l") 'sclang-eval-line)
+    (define-key sclang-mode-map (kbd "C-<return>") 'sclang-eval-defun)
+    (define-key sclang-mode-map (kbd "C-.") 'sclang-main-stop)
+    (local-unset-key (kbd "C-c h"))
+    (define-key sclang-mode-map (kbd "C-c C-h") 'sclang-find-help-in-gui))
+  (add-hook 'sclang-mode-hook 'sclang-keys)
+  ;; (eval-after-load 'sclang '(sclang-keys))
+
+#+end_src
 
 *** COMMENT scel (sclang' mode for emacs)
 This is a mode for the sclang language for SuperCollider
@@ -876,8 +896,9 @@ Color delimiters like parens and braces according to their depth
     (org-priority-highest 65)
     (org-priority-lowest 69)
     (org-priority-default 67)
+    (org-agenda-start-with-clockreport-mode t)
+    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
     :config
-
     ;; Org Capture Configuration
     (setq org-default-notes-file (concat org-directory "/notes.org"))
     ;; Org Agenda
@@ -886,8 +907,8 @@ Color delimiters like parens and braces according to their depth
     ;; Add graphical timeline to org agenda
     (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
     (setq org-agenda-files
-          '("~/hub/ripl/orgs/tickets.org"
-            "~/hub/ripl/orgs/my_tasks.org"
+          '("~/hub/orgs/my_todos.org"
+            "~/hub/orgs/music_todos.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
             ;; "~/.emacs.d/config.org"
@@ -901,10 +922,10 @@ Color delimiters like parens and braces according to their depth
     (setq org-startup-indented t)
     (custom-set-faces
      '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
-     '(org-level-2 ((t (:inherit outline-2 :height 1.10))))
-     '(org-level-3 ((t (:inherit outline-3 :height 1.07))))
-     '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
-     '(org-level-5 ((t (:inherit outline-5 :height 1.00))))
+     '(org-level-2 ((t (:inherit outline-2 :height 1.17))))
+     '(org-level-3 ((t (:inherit outline-3 :height 1.15))))
+     '(org-level-4 ((t (:inherit outline-4 :height 1.12))))
+     '(org-level-5 ((t (:inherit outline-5 :height 1.10))))
      )
 
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -935,7 +956,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (use-package org-roam
     :custom
-    (org-roam-directory "~/hub/ripl/ripl-wiki-roam")
+    (org-roam-directory "~/hub/org-roam")
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n i" . org-roam-node-insert))
@@ -967,7 +988,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
   (use-package org-pomodoro
     :after org
     :custom
-    (org-pomodoro-audio-player (executable-find "play"))
+    ;; (org-pomodoro-audio-player (executable-find "play"))
     (org-pomodoro-ticking-sound-p t)
     :config
     (setq org-pomodoro-short-break-length 7)
