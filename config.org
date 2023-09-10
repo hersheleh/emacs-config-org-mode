@@ -58,6 +58,15 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; (setq use-package-verbose t)
 #+end_src
 
+* Emacs display settings
+#+begin_src emacs-lisp
+  (use-package frame
+    :ensure nil
+    :config
+    (setq initial-frame-alist '((fullscreen . maximized))))
+
+#+end_src
+
 * Emacs System configs
 #+begin_src emacs-lisp
     ;; Set Dired default directory
@@ -87,8 +96,10 @@ Define function to time Emacs startup and determine # of garbage collections
 #+begin_src emacs-lisp
   (electric-indent-mode)
   (electric-pair-mode)
-  (electric-quote-mode)
+  ;; (electric-quote-mode)
 #+end_src
+
+
 
 * Move Lines Up/Down
 #+begin_src emacs-lisp
@@ -227,7 +238,7 @@ Sets font for MacOS X emacs
 #+begin_src emacs-lisp
   (defun gsh/set-font ()
     (message "Setting font")
-    (set-frame-font "Ubuntu Mono-11:bold" nil t)
+    (set-frame-font "Ubuntu Mono-13:bold" nil t) 
 )
 
   (if (daemonp)
@@ -656,6 +667,7 @@ Syntax checking and linting.
 #+begin_src emacs-lisp
   (use-package cc
     :ensure nil
+    :mode ("\\.keymap\\'" . c-mode)
     :hook
         (c++-mode . lsp-deferred)
     :config
@@ -680,6 +692,7 @@ Syntax checking and linting.
          :program "${workspaceFolder}cpp/reverse_string"
          :name "LLDB::Run reverse_string")))
 #+end_src
+
 ** Docker
 #+begin_src emacs-lisp
   (use-package dockerfile-mode)

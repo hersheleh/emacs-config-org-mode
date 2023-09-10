@@ -22,6 +22,11 @@
 (setq use-package-always-defer t)
 ;; (setq use-package-verbose t)
 
+(use-package frame
+  :ensure nil
+  :config
+  (setq initial-frame-alist '((fullscreen . maximized))))
+
 ;; Set Dired default directory
   ;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
   ;; set re-builder sytax to string
@@ -46,7 +51,7 @@
 
 (electric-indent-mode)
 (electric-pair-mode)
-(electric-quote-mode)
+;; (electric-quote-mode)
 
 (defun move-line-up ()
   (interactive)
@@ -137,7 +142,7 @@
 
 (defun gsh/set-font ()
     (message "Setting font")
-    (set-frame-font "Ubuntu Mono-11:bold" nil t)
+    (set-frame-font "Ubuntu Mono-13:bold" nil t) 
 )
 
   (if (daemonp)
@@ -427,6 +432,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package cc
   :ensure nil
+  :mode ("\\.keymap\\'" . c-mode)
   :hook
       (c++-mode . lsp-deferred)
   :config
