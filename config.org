@@ -8,18 +8,16 @@
 **** TODO TRY ergomacs or god-mode or evil mode.
 **** TODO TRY [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] mode. video: [[https://youtu.be/VcgjTEa0kU4?list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&t=2495][here]]
 *** TODOS: URGENT | For Work
-**** DONE Create Shortcut for lsp-find-references
-**** DONE Setup Hydra
 **** TODO Learn to configure Company Mode
-**** DONE Setup Tree-Sitter
 **** TODO Customize faces per theme
 **** TODO 'C-c c b' command to create comment block
-
-
+**** DONE Create Shortcut for lsp-find-references
+**** DONE Setup Hydra
+**** DONE Setup Tree-Sitter
 * Emacs Performace
 
 #+begin_src emacs-lisp :tangle ./early-init.el
-    ;; Set Garbage collection threshold very high at startup
+  ;; Set Garbage collection threshold very high at startup
   (setq gc-cons-threshold (* 50 1000 1000))
   (defvar default-file-name-handler-alist file-name-handler-alist)
   (setq file-name-handler-alist nil)
@@ -50,12 +48,12 @@ Define function to time Emacs startup and determine # of garbage collections
 
 ** Installing use-package
 #+begin_src emacs-lisp
-  (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
-  (require 'use-package)
+  ;; (unless (package-installed-p 'use-package)
+  ;;   (package-install 'use-package))
+  ;; (require 'use-package)
   (setq use-package-always-ensure t)
   (setq use-package-always-defer t)
-  ;; (setq use-package-verbose t)
+  (setq use-package-verbose t)
 #+end_src
 
 * Emacs display settings
@@ -69,24 +67,26 @@ Define function to time Emacs startup and determine # of garbage collections
 
 * Emacs System configs
 #+begin_src emacs-lisp
-    ;; Set Dired default directory
-    ;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
-    ;; set re-builder sytax to string
-    (setq reb-re-syntax 'string)
-    ;; keep folders clean
-    (setq backup-directory-alist
-          `(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
-    ;; create path for auto save mode
-    (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
+  ;; Set Dired default directory
+  ;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
+  ;; Disable warning spam
+  (setq warning-minimum-level :emergency)
+  ;; set re-builder sytax to string
+  (setq reb-re-syntax 'string)
+  ;; keep folders clean
+  (setq backup-directory-alist
+        `(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
+  ;; create path for auto save mode
+  (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
 
-    (setq auto-save-list-file-prefix (expand-file-name
-                                      "tmp/auto-saves/sessions/"
-                                      user-emacs-directory)
-          auto-save-file-name-transforms
-          `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+  (setq auto-save-list-file-prefix (expand-file-name
+                                    "tmp/auto-saves/sessions/"
+                                    user-emacs-directory)
+        auto-save-file-name-transforms
+        `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
 
-    (use-package no-littering
-      :demand t)
+  (use-package no-littering
+    :demand t)
 
   ;; Disable lock files. They are interfering with terraform-ls on linux
   (setq create-lockfiles nil)
@@ -98,7 +98,6 @@ Define function to time Emacs startup and determine # of garbage collections
   (electric-pair-mode)
   ;; (electric-quote-mode)
 #+end_src
-
 
 
 * Move Lines Up/Down
@@ -239,7 +238,7 @@ Sets font for MacOS X emacs
   (defun gsh/set-font ()
     (message "Setting font")
     (set-frame-font "Ubuntu Mono-13:bold" nil t) 
-)
+    )
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions
@@ -248,11 +247,20 @@ Sets font for MacOS X emacs
                     (gsh/set-font))))
     (gsh/set-font))
 #+end_src
+* Exec Path From Shell
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :demand t
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)
+      ))
+#+end_src
 
 * COMMENT Beacon (Flash the Cursor)
 #+begin_src emacs-lisp
-    (use-package beacon
-      :config (beacon-mode 1))
+  (use-package beacon
+    :config (beacon-mode 1))
 #+end_src
 
 * Spaces OVER TABS
@@ -290,7 +298,7 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
           doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
     ;; (custom-set-variables
-     ;; '(doom-molokai-brighter-comments t))
+    ;; '(doom-molokai-brighter-comments t))
     ;; (load-theme 'doom-monokai-classic t)
     ;; (load-theme 'doom-acario-dark t)
     (load-theme 'doom-moonlight t)
@@ -310,6 +318,7 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
 ** ICONS
 #+begin_src emacs-lisp
   (use-package all-the-icons
+    :demand t
     :if (display-graphic-p))
 #+end_src
 *** Icons dired
@@ -320,7 +329,7 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
     :config
     (setq all-the-icons-dired-monochrome nil))
 #+end_src
- Smart Navigation
+Smart Navigation
 These are packages which assist in navigating emacs
 * Find Recent Files
 #+begin_src emacs-lisp
@@ -365,7 +374,7 @@ possible inputs
 #+end_src
 *** Ivy Hydra
 #+begin_src emacs-lisp
-(use-package ivy-hydra)
+  (use-package ivy-hydra)
 #+end_src
 
 *** Ivy Rich
@@ -384,7 +393,7 @@ Provides function documentation and key binding info in ivy buffer
   (use-package all-the-icons-ivy-rich
     :after ivy
     :init (all-the-icons-ivy-rich-mode 1))
-  #+end_src
+#+end_src
 ** COUNSEL
 #+begin_src emacs-lisp
   (use-package counsel
@@ -394,27 +403,27 @@ Provides function documentation and key binding info in ivy buffer
 
 * Dired
 #+begin_src emacs-lisp
-    (use-package dired
-      :ensure nil
-      :commands (dired dired-jump)
-      :custom ((dired-listing-switches "-ghoa --group-directories-first"))
-      :bind (:map
-             dired-mode-map
-             ("h" . dired-up-directory)
-             ("l" . dired-find-file)
-             ("j" . dired-next-line)
-             ("k" . dired-previous-line)
-             ("J" . dired-goto-file)
-             ("K" . kill-current-buffer))
-      :config
-      ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
-      ;; (setq ls-lisp-use-insert-directory-program t)
-  )
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :custom ((dired-listing-switches "-ghoa --group-directories-first"))
+    :bind (:map
+           dired-mode-map
+           ("h" . dired-up-directory)
+           ("l" . dired-find-file)
+           ("j" . dired-next-line)
+           ("k" . dired-previous-line)
+           ("J" . dired-goto-file)
+           ("K" . kill-current-buffer))
+    :config
+    ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+    ;; (setq ls-lisp-use-insert-directory-program t)
+    )
 #+end_src
 * MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
-    (use-package magit
-      :commands magit-status)
+  (use-package magit
+    :commands magit-status)
 #+end_src
 * WHICH KEY
 Given an initial key sequence Which Key provides hints about the next
@@ -442,18 +451,18 @@ possible key presses along with documentation for that key press.
 #+end_src
 * Treemacs
 #+begin_src emacs-lisp
-    (use-package treemacs
-      :defer t
-      :custom (treemacs-python-executable "python")
-      :config (treemacs-project-follow-mode))
-    ;; (use-package treemacs-icons-dired
-    ;;   :after dired
-    ;;   :config (treemacs-icons-dired-mode))
+  (use-package treemacs
+    :defer t
+    :custom (treemacs-python-executable "python")
+    :config (treemacs-project-follow-mode))
+  ;; (use-package treemacs-icons-dired
+  ;;   :after dired
+  ;;   :config (treemacs-icons-dired-mode))
 #+end_src
 
 * Rotate Buffers
 #+begin_src emacs-lisp
-(use-package rotate)
+  (use-package rotate)
 
 #+end_src
 * Hydra
@@ -524,7 +533,7 @@ and jump to definition functionality for a particular language
     :init
     (setq lsp-keymap-prefix "C-x l")
     :hook
-    (js-mode . lsp-deferred)
+    ;; (js-mode . lsp-deferred)
     (terraform-mode . lsp-deferred)
     ;; :custom
     ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
@@ -631,15 +640,15 @@ Syntax checking and linting.
 #+begin_src emacs-lisp
 
   (use-package flycheck
-    :custom
+    ;; :custom
     ;; (flycheck-python-pycompile-executable "python")
-    (flycheck-python-pylint-executable "pylint")
+    ;; (flycheck-python-pylint-executable "pylint")
     ;; (flycheck-python-pyright-executable "python")
     ;; (flycheck-python-mypy-executable "python")
     ;; (flycheck-python-flake8-executable "python")
 
     )
-  #+end_src
+#+end_src
 
 ** iEdit(edit multiple lines simulatneously)
 #+begin_src emacs-lisp
@@ -653,14 +662,14 @@ Syntax checking and linting.
 #+end_src
 * Treesitter
 #+begin_src emacs-lisp
-  (use-package tree-sitter
-    :config
-    (require 'tree-sitter))
+  ;; (use-package tree-sitter
+  ;;   :config
+  ;;   (require 'tree-sitter))
 
-  (use-package tree-sitter-langs
-    :config
-    (require 'tree-sitter)
-    :hook ('python-mode . tree-sitter-hl-mode))
+  ;; (use-package tree-sitter-langs
+  ;;   :config
+  ;;   (require 'tree-sitter)
+  ;;   :hook ('python-mode . tree-sitter-hl-mode))
 #+end_src
 * Programming Languages
 ** C/C++
@@ -669,7 +678,7 @@ Syntax checking and linting.
     :ensure nil
     :mode ("\\.keymap\\'" . c-mode)
     :hook
-        (c++-mode . lsp-deferred)
+    (c++-mode . lsp-deferred)
     :config
     (require 'dap-cpptools)
     (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
@@ -683,14 +692,14 @@ Syntax checking and linting.
            :MIMode "gdb"
            :program "${workspaceFolder}/cpp/reverse_string"
            :cwd "${workspaceFolder}/cpp"))
-        ;; Debug Configuration for reverse_string.cpp
-  (dap-register-debug-template
-   "LLDB::Run reverse_string"
-   (list :type "lldb-vscode"
-         :request "launch"
-         :cwd "${workspaceFolder}cpp/"
-         :program "${workspaceFolder}cpp/reverse_string"
-         :name "LLDB::Run reverse_string")))
+    ;; Debug Configuration for reverse_string.cpp
+    (dap-register-debug-template
+     "LLDB::Run reverse_string"
+     (list :type "lldb-vscode"
+           :request "launch"
+           :cwd "${workspaceFolder}cpp/"
+           :program "${workspaceFolder}cpp/reverse_string"
+           :name "LLDB::Run reverse_string")))
 #+end_src
 
 ** Docker
@@ -753,7 +762,7 @@ This is a mode for the sclang language for SuperCollider
                               ;; (flycheck-add-next-checker
                               ;;  'lsp 'python-pylint)
                               ;; (flycheck-disable-checker 'lsp)
-                              (flycheck-select-checker 'python-pylint)
+                              ;; (flycheck-select-checker 'python-pylint) 
                               ))
 
 
@@ -813,24 +822,39 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
   (use-package pyvenv)
 #+end_src
 ** COMMENT Javascript
-Install js2-mode
 #+begin_src emacs-lisp
-  (use-package js2-mode
+  (use-package js-mode
     :defer t
     :mode "\\.js\\'"
     :config
     (require 'js2-mode)
-  )
+    )
 #+end_src
 *** PUG templates for Express framework
 #+begin_src emacs-lisp
   (use-package pug-mode)
 #+end_src
+** Typescript
+#+begin_src emacs-lisp
+
+  (use-package tsx-ts-mode
+    :ensure nil
+    :mode "\\.tsx\\'"
+    :hook
+    (tsx-ts-mode . lsp-deferred)
+    (lsp-diagnostics-mode . (lambda ()
+                              (if (eq major-mode 'tsx-ts-mode)
+                                  (flycheck-select-checker 'javascript-eslint)))))
+
+  ;; (use-package typescript-mode
+  ;;   :hook
+  ;;   (typescript-mode . lsp-deferred))
+#+end_src
 
 ** Terraform
 #+begin_src emacs-lisp
-    (use-package terraform-mode
-      :defer t)
+  (use-package terraform-mode
+    :defer t)
 #+end_src
 ** COMMENT Yaml
 #+begin_src emacs-lisp
@@ -838,6 +862,12 @@ Install js2-mode
     :config
     (require 'yaml-mode)
     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+#+end_src
+** COMMENT Web Mode
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :mode
+    ("\\.html"))
 #+end_src
 
 * Markdown
@@ -847,7 +877,7 @@ Install js2-mode
 * VTERM
 A very good shell in emacs
 Notes: need to find a way to execute bash profile.
-       current way interferes with dap-mode terminal input
+current way interferes with dap-mode terminal input
 #+begin_src emacs-lisp
   (use-package vterm
     :commands vterm
@@ -1011,22 +1041,22 @@ Slip Card system for organizing thoughts. Zettelkasten Method
   ;; The following fixes sounds not working on windows
   ;; (use-package sound-wav)
   ;; (use-package powershell)
-  #+end_src
+#+end_src
 * Helpful (better help documentation)
 #+begin_src emacs-lisp
-    (use-package helpful
-      :custom
-      (counsel-describe-function-function #'helpful-callable)
-      (counsel-describe-variable-function #'helpful-variable)
-      :bind
-      (("C-h ." . helpful-at-point)    ; show help docs for current symbol
-       ("C-h j" . helpful-at-point)
-       ([remap describe-function] . counsel-describe-function)
-       ([remap describe-command] . helpful-command)
-       ([remap describe-variable] . counsel-describe-variable)
-       ([remap describe-key] . helpful-key)
-       :map helpful-mode-map
-       ("k" . kill-current-buffer)))
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    (("C-h ." . helpful-at-point)    ; show help docs for current symbol
+     ("C-h j" . helpful-at-point)
+     ([remap describe-function] . counsel-describe-function)
+     ([remap describe-command] . helpful-command)
+     ([remap describe-variable] . counsel-describe-variable)
+     ([remap describe-key] . helpful-key)
+     :map helpful-mode-map
+     ("k" . kill-current-buffer)))
 #+end_src
 
 * COMMENT w3m (Web Browser for emacs)
@@ -1049,18 +1079,21 @@ Simplify Swapping buffers
 #+begin_src emacs-lisp
   (use-package dashboard
     :demand t
-    :after (page-break-lines)
-    :config
-    (setq line-move-visual nil)
-    (setq dashboard-startup-banner 'logo)
+    :after (page-break-lines all-the-icons)
+    :init
+    (setq dashboard-display-icons-p t)
+    (setq dashboard-icon-type 'nerd-icons)
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
+    :config
+    (setq line-move-visual nil)
+    (setq dashboard-set-navigator nil)
+    (setq dashboard-startup-banner 'logo)
     (setq dashboard-center-content nil)
     (setq dashboard-projects-backend 'project-el)
     (setq dashboard-items '((agenda . 6)
                             (projects . 5)
                             (recents . 5)
-                            (bookmarks . 3)
                             ))
     (setq dashboard-page-separator "\n\f\n")
     (setq dashboard-agenda-sort-strategy
@@ -1071,8 +1104,8 @@ Simplify Swapping buffers
     ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
     (setq dashboard-agenda-prefix-format " %i %s ")
     (setq dashboard-agenda-release-buffers 't)
-    (setq initial-buffer-choice
-          (lambda () (get-buffer-create "*dashboard*")))
+    ;; (setq initial-buffer-choice
+    ;;       (lambda () (get-buffer-create "*dashboard*")))
     (dashboard-setup-startup-hook)
     ;; dashboard icons don't quite load.
     ;; buffer needs to be reverted
@@ -1088,6 +1121,12 @@ Simplify Swapping buffers
     :demand t
     :config (page-break-lines-mode))
 #+End_src
+
+** DASHBOARD LS
+#+begin_src emacs-lisp
+  (use-package dashboard-ls
+    :demand t)
+#+end_src
 
 * Save History
 #+begin_src emacs-lisp

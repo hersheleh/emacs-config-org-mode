@@ -15,12 +15,12 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(require 'use-package)
+;; (unless (package-installed-p 'use-package)
+;;   (package-install 'use-package))
+;; (require 'use-package)
 (setq use-package-always-ensure t)
 (setq use-package-always-defer t)
-;; (setq use-package-verbose t)
+(setq use-package-verbose t)
 
 (use-package frame
   :ensure nil
@@ -28,23 +28,25 @@
   (setq initial-frame-alist '((fullscreen . maximized))))
 
 ;; Set Dired default directory
-  ;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
-  ;; set re-builder sytax to string
-  (setq reb-re-syntax 'string)
-  ;; keep folders clean
-  (setq backup-directory-alist
-        `(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
-  ;; create path for auto save mode
-  (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
+;; (setq default-directory "C:/Users/GrishaKhachaturyan/hub/")
+;; Disable warning spam
+(setq warning-minimum-level :emergency)
+;; set re-builder sytax to string
+(setq reb-re-syntax 'string)
+;; keep folders clean
+(setq backup-directory-alist
+      `(("." . ,(expand-file-name "tmp/backups" user-emacs-directory))))
+;; create path for auto save mode
+(make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
 
-  (setq auto-save-list-file-prefix (expand-file-name
-                                    "tmp/auto-saves/sessions/"
-                                    user-emacs-directory)
-        auto-save-file-name-transforms
-        `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+(setq auto-save-list-file-prefix (expand-file-name
+                                  "tmp/auto-saves/sessions/"
+                                  user-emacs-directory)
+      auto-save-file-name-transforms
+      `((".*",(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
 
-  (use-package no-littering
-    :demand t)
+(use-package no-littering
+  :demand t)
 
 ;; Disable lock files. They are interfering with terraform-ls on linux
 (setq create-lockfiles nil)
@@ -141,16 +143,23 @@
 (setq visible-bell 1)
 
 (defun gsh/set-font ()
-    (message "Setting font")
-    (set-frame-font "Ubuntu Mono-13:bold" nil t) 
-)
+  (message "Setting font")
+  (set-frame-font "Ubuntu Mono-13:bold" nil t) 
+  )
 
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions
-                (lambda(frame)
-                  (with-selected-frame frame
-                    (gsh/set-font))))
-    (gsh/set-font))
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda(frame)
+                (with-selected-frame frame
+                  (gsh/set-font))))
+  (gsh/set-font))
+
+(use-package exec-path-from-shell
+  :demand t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)
+    ))
 
 (setq-default indent-tabs-mode nil)
 
@@ -166,7 +175,7 @@
   (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
         doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
   ;; (custom-set-variables
-   ;; '(doom-molokai-brighter-comments t))
+  ;; '(doom-molokai-brighter-comments t))
   ;; (load-theme 'doom-monokai-classic t)
   ;; (load-theme 'doom-acario-dark t)
   (load-theme 'doom-moonlight t)
@@ -182,6 +191,7 @@
   :init (doom-modeline-mode 1))
 
 (use-package all-the-icons
+  :demand t
   :if (display-graphic-p))
 
 (use-package all-the-icons-dired
@@ -242,21 +252,21 @@
   (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
 
 (use-package dired
-    :ensure nil
-    :commands (dired dired-jump)
-    :custom ((dired-listing-switches "-ghoa --group-directories-first"))
-    :bind (:map
-           dired-mode-map
-           ("h" . dired-up-directory)
-           ("l" . dired-find-file)
-           ("j" . dired-next-line)
-           ("k" . dired-previous-line)
-           ("J" . dired-goto-file)
-           ("K" . kill-current-buffer))
-    :config
-    ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
-    ;; (setq ls-lisp-use-insert-directory-program t)
-)
+  :ensure nil
+  :commands (dired dired-jump)
+  :custom ((dired-listing-switches "-ghoa --group-directories-first"))
+  :bind (:map
+         dired-mode-map
+         ("h" . dired-up-directory)
+         ("l" . dired-find-file)
+         ("j" . dired-next-line)
+         ("k" . dired-previous-line)
+         ("J" . dired-goto-file)
+         ("K" . kill-current-buffer))
+  :config
+  ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+  ;; (setq ls-lisp-use-insert-directory-program t)
+  )
 
 (use-package magit
   :commands magit-status)
@@ -334,7 +344,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :init
   (setq lsp-keymap-prefix "C-x l")
   :hook
-  (js-mode . lsp-deferred)
+  ;; (js-mode . lsp-deferred)
   (terraform-mode . lsp-deferred)
   ;; :custom
   ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
@@ -407,9 +417,9 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 ;;   :hook (company-mode . company-box-mode))
 
 (use-package flycheck
-  :custom
+  ;; :custom
   ;; (flycheck-python-pycompile-executable "python")
-  (flycheck-python-pylint-executable "pylint")
+  ;; (flycheck-python-pylint-executable "pylint")
   ;; (flycheck-python-pyright-executable "python")
   ;; (flycheck-python-mypy-executable "python")
   ;; (flycheck-python-flake8-executable "python")
@@ -421,20 +431,20 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 ;; (use-package yasnippet
 ;;   :config (yas-global-mode 1))
 
-(use-package tree-sitter
-  :config
-  (require 'tree-sitter))
+;; (use-package tree-sitter
+;;   :config
+;;   (require 'tree-sitter))
 
-(use-package tree-sitter-langs
-  :config
-  (require 'tree-sitter)
-  :hook ('python-mode . tree-sitter-hl-mode))
+;; (use-package tree-sitter-langs
+;;   :config
+;;   (require 'tree-sitter)
+;;   :hook ('python-mode . tree-sitter-hl-mode))
 
 (use-package cc
   :ensure nil
   :mode ("\\.keymap\\'" . c-mode)
   :hook
-      (c++-mode . lsp-deferred)
+  (c++-mode . lsp-deferred)
   :config
   (require 'dap-cpptools)
   (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
@@ -448,14 +458,14 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
          :MIMode "gdb"
          :program "${workspaceFolder}/cpp/reverse_string"
          :cwd "${workspaceFolder}/cpp"))
-      ;; Debug Configuration for reverse_string.cpp
-(dap-register-debug-template
- "LLDB::Run reverse_string"
- (list :type "lldb-vscode"
-       :request "launch"
-       :cwd "${workspaceFolder}cpp/"
-       :program "${workspaceFolder}cpp/reverse_string"
-       :name "LLDB::Run reverse_string")))
+  ;; Debug Configuration for reverse_string.cpp
+  (dap-register-debug-template
+   "LLDB::Run reverse_string"
+   (list :type "lldb-vscode"
+         :request "launch"
+         :cwd "${workspaceFolder}cpp/"
+         :program "${workspaceFolder}cpp/reverse_string"
+         :name "LLDB::Run reverse_string")))
 
 (use-package dockerfile-mode)
 (use-package docker)
@@ -489,7 +499,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
                             ;; (flycheck-add-next-checker
                             ;;  'lsp 'python-pylint)
                             ;; (flycheck-disable-checker 'lsp)
-                            (flycheck-select-checker 'python-pylint)
+                            ;; (flycheck-select-checker 'python-pylint) 
                             ))
 
 
@@ -540,6 +550,19 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 (setenv "PYTHONIOENCODING" "utf-8")
 
 (use-package pyvenv)
+
+(use-package tsx-ts-mode
+  :ensure nil
+  :mode "\\.tsx\\'"
+  :hook
+  (tsx-ts-mode . lsp-deferred)
+  (lsp-diagnostics-mode . (lambda ()
+                            (if (eq major-mode 'tsx-ts-mode)
+                                (flycheck-select-checker 'javascript-eslint)))))
+
+;; (use-package typescript-mode
+;;   :hook
+;;   (typescript-mode . lsp-deferred))
 
 (use-package terraform-mode
   :defer t)
@@ -676,18 +699,21 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package dashboard
   :demand t
-  :after (page-break-lines)
-  :config
-  (setq line-move-visual nil)
-  (setq dashboard-startup-banner 'logo)
+  :after (page-break-lines all-the-icons)
+  :init
+  (setq dashboard-display-icons-p t)
+  (setq dashboard-icon-type 'nerd-icons)
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
+  :config
+  (setq line-move-visual nil)
+  (setq dashboard-set-navigator nil)
+  (setq dashboard-startup-banner 'logo)
   (setq dashboard-center-content nil)
   (setq dashboard-projects-backend 'project-el)
   (setq dashboard-items '((agenda . 6)
                           (projects . 5)
                           (recents . 5)
-                          (bookmarks . 3)
                           ))
   (setq dashboard-page-separator "\n\f\n")
   (setq dashboard-agenda-sort-strategy
@@ -698,8 +724,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
   (setq dashboard-agenda-prefix-format " %i %s ")
   (setq dashboard-agenda-release-buffers 't)
-  (setq initial-buffer-choice
-        (lambda () (get-buffer-create "*dashboard*")))
+  ;; (setq initial-buffer-choice
+  ;;       (lambda () (get-buffer-create "*dashboard*")))
   (dashboard-setup-startup-hook)
   ;; dashboard icons don't quite load.
   ;; buffer needs to be reverted
@@ -710,6 +736,9 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 (use-package page-break-lines
   :demand t
   :config (page-break-lines-mode))
+
+(use-package dashboard-ls
+  :demand t)
 
 (use-package savehist
   :after counsel
