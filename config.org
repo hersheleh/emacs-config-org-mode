@@ -275,8 +275,10 @@ Set the default font for different systems
 * Whitespace Butler
 #+begin_src emacs-lisp
   (use-package ws-butler
-    :hook (prog-mode . ws-butler-mode))
-#+end_src
+    :hook
+    (prog-mode . ws-butler-mode)
+    (org-mode . ws-butler-mode))
+  #+end_src
 * THEME
 # Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
 Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme

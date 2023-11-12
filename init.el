@@ -173,7 +173,9 @@
 (setq-default indent-tabs-mode nil)
 
 (use-package ws-butler
-  :hook (prog-mode . ws-butler-mode))
+  :hook
+  (prog-mode . ws-butler-mode)
+  (org-mode . ws-butler-mode))
 
 (use-package doom-themes
   :demand t
