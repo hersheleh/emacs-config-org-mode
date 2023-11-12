@@ -409,24 +409,25 @@ Provides function documentation and key binding info in ivy buffer
 
 * Dired
 #+begin_src emacs-lisp
-  (use-package dired
-    :ensure nil
-    :commands (dired dired-jump)
-    :custom ((dired-listing-switches "-ghoa --group-directories-first"))
-    :bind (:map
-           dired-mode-map
-           ("h" . dired-up-directory)
-           ("l" . dired-find-file)
-           ("j" . dired-next-line)
-           ("k" . dired-previous-line)
-           ("J" . dired-goto-file)
-           ("K" . kill-current-buffer))
-    :config
-    (setq insert-directory-program "gls" dired-use-ls-dired t)
-    (setq dired-listing-switches "-ghoa --group-directories-first")
-    ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
-    ;; (setq ls-lisp-use-insert-directory-program t)
-    )
+    (use-package dired
+      :ensure nil
+      :commands (dired dired-jump)
+      :custom ((dired-listing-switches "-ghoa --group-directories-first"))
+      :bind (:map
+             dired-mode-map
+             ("h" . dired-up-directory)
+             ("l" . dired-find-file)
+             ("j" . dired-next-line)
+             ("k" . dired-previous-line)
+             ("J" . dired-goto-file)
+             ("K" . kill-current-buffer))
+      :config
+      (when my-macbook-p
+        (setq insert-directory-program "gls" dired-use-ls-dired t))
+      (setq dired-listing-switches "-ghoa --group-directories-first")
+      ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+      ;; (setq ls-lisp-use-insert-directory-program t)
+      )
 #+end_src
 * MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
@@ -730,7 +731,7 @@ This is a mode for the sclang language for SuperCollider
     (lambda ()
       (cond
        (my-macbook-p "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
-       (my-sc-laptop-p "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
+       (my-sc-thinkpad-p "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
     :mode ("\\.scd\\'" . sclang-mode)
     :bind(:map sclang-mode-map
                ("C-c C-l"    . sclang-eval-line)

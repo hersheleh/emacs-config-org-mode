@@ -275,7 +275,8 @@
          ("J" . dired-goto-file)
          ("K" . kill-current-buffer))
   :config
-  (setq insert-directory-program "gls" dired-use-ls-dired t)
+  (when my-macbook-p
+    (setq insert-directory-program "gls" dired-use-ls-dired t))
   (setq dired-listing-switches "-ghoa --group-directories-first")
   ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
   ;; (setq ls-lisp-use-insert-directory-program t)
@@ -486,7 +487,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (lambda ()
     (cond
      (my-macbook-p "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
-     (my-sc-laptop-p "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
+     (my-sc-thinkpad-p "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
   :mode ("\\.scd\\'" . sclang-mode)
   :bind(:map sclang-mode-map
              ("C-c C-l"    . sclang-eval-line)
