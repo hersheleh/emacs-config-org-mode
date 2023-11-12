@@ -472,6 +472,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (local-unset-key (kbd "C-c h"))
   (define-key sclang-mode-map (kbd "C-c C-h") 'sclang-find-help-in-gui))
 (add-hook 'sclang-mode-hook 'sclang-keys)
+(setq sclang-eval-line-forward nil)
 ;; (eval-after-load 'sclang '(sclang-keys))
 
 (use-package python
