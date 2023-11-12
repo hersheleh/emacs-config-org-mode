@@ -708,11 +708,19 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :after org
   :custom
   ;; (org-pomodoro-audio-player (executable-find "play"))
-  (org-pomodoro-ticking-sound-p t)
-  :config
-  (setq org-pomodoro-short-break-length 7)
-  (setq org-pomodoro-ticking-sound-p nil)
-  (setq org-pomodoro-manual-break t))
+  (org-pomodoro-overtime-sound
+   "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+  (org-pomodoro-start-sound
+   "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+  (org-pomodoro-finished-sound
+   "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+  (org-pomodoro-short-break-sound
+   "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+  (org-pomodoro-long-break-sound
+   "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+  (org-pomodoro-short-break-length 7)
+  (org-pomodoro-ticking-sound-p nil)
+  (org-pomodoro-manual-break t))
 
 ;; The following fixes sounds not working on windows
 ;; (use-package sound-wav)
