@@ -20,7 +20,7 @@
 ;; (require 'use-package)
 (setq use-package-always-ensure t)
 (setq use-package-always-defer t)
-(setq use-package-verbose t)
+(setq use-package-verbose nil)
 
 (use-package frame
   :ensure nil
@@ -135,24 +135,15 @@
 (column-number-mode)          ; show column number in modline
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+(setq ring-bell-function 'ignore)
 ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (setq inhibit-startup-message t)     ; No splash screen
 ;; (global-visual-line-mode t)
+;; Remove title bar in emacs-plus version on Mac
+;; (add-to-list 'default-frame-alist '(undecorated . t))
 
-(setq visible-bell 1)
-
-(defun gsh/set-font ()
-  (message "Setting font")
-  (set-frame-font "Ubuntu Mono-13:bold" nil t) 
-  )
-
-(if (daemonp)
-    (add-hook 'after-make-frame-functions
-              (lambda(frame)
-                (with-selected-frame frame
-                  (gsh/set-font))))
-  (gsh/set-font))
+;;(set-frame-font "Menlo 14" nil t)
 
 (use-package exec-path-from-shell
   :demand t
@@ -177,8 +168,8 @@
   ;; (custom-set-variables
   ;; '(doom-molokai-brighter-comments t))
   ;; (load-theme 'doom-monokai-classic t)
-  ;; (load-theme 'doom-acario-dark t)
-  (load-theme 'doom-moonlight t)
+  (load-theme 'doom-acario-dark t)
+  ;; (load-theme 'doom-moonlight t)
 
   ;; customize the doom monkai theme
   (custom-set-faces
@@ -254,7 +245,6 @@
 (use-package dired
   :ensure nil
   :commands (dired dired-jump)
-  :custom ((dired-listing-switches "-ghoa --group-directories-first"))
   :bind (:map
          dired-mode-map
          ("h" . dired-up-directory)
@@ -500,7 +490,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
                             ;; (flycheck-add-next-checker
                             ;;  'lsp 'python-pylint)
                             ;; (flycheck-disable-checker 'lsp)
-                            ;; (flycheck-select-checker 'python-pylint) 
+                            ;; (flycheck-select-checker 'python-pylint)
                             ))
 
 
@@ -554,16 +544,24 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package tsx-ts-mode
   :ensure nil
-  :mode "\\.tsx\\'"
+  :mode ("\\.tsx\\'" "\\.ts\\'")
   :hook
   (tsx-ts-mode . lsp-deferred)
   (lsp-diagnostics-mode . (lambda ()
                             (if (eq major-mode 'tsx-ts-mode)
-                                (flycheck-select-checker 'javascript-eslint)))))
+                                (flycheck-select-checker 'javascript-eslint))))
+  )
 
 ;; (use-package typescript-mode
 ;;   :hook
 ;;   (typescript-mode . lsp-deferred))
+
+(use-package csharp-mode
+  :ensure nil
+  :hook
+  (c-sharp-mode . lsp-deferred))
+
+(use-package shader-mode)
 
 (use-package terraform-mode
   :defer t)
@@ -596,8 +594,10 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :defer t
   ;; :after (org-timeline)
   :bind (:map org-mode-map
-              ;; ("C-c C-p" . hydra-org/body)
-              ;; ("C-c C-n" . hydra-org/body)
+              ("C-c C-f" . hydra-org/org-forward-heading-same-level)
+              ("C-c C-b" . hydra-org/org-backward-heading-same-level)
+              ("C-c C-p" . hydra-org/org-previous-visible-heading)
+              ("C-c C-n" . hydra-org/org-next-visible-heading)
               ("M-n" . org-metadown)
               ("M-p" . org-metaup))
   :hook
@@ -620,6 +620,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq org-agenda-files
         '("~/hub/orgs/my_todos.org"
           "~/hub/orgs/music_todos.org"
+          "~/hub/orgs/house_todos.org"
+          "~/hub/orgs/mental_todos.org"
           ;; "~/hub/new_projects/orgi/orgi_plan.org"
           ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
           ;; "~/.emacs.d/config.org"
@@ -641,14 +643,17 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 
-  (defhydra hydra-org (org-mode-map "C-c")
+  (defhydra hydra-org ()
     "org hydra"
-    ("C-n" org-next-visible-heading "next heading")
-    ("C-p" org-previous-visible-heading "prev heading")
-    ("M-j" org-metadown "move down")
-    ("M-k" org-metaup "move up")
+    ("n" org-next-visible-heading "next visible")
+    ("p" org-previous-visible-heading "prev visible")
+    ("f" org-forward-heading-same-level "forward level")
+    ("b" org-backward-heading-same-level "backward level")
+    ;; ("M-j" org-metadown "move down")
+    ;; ("M-k" org-metaup "move up")
     ("q" nil "quit"))
   )
+()
 ;; org-agenda timeline view
 (use-package org-timeline)
 

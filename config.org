@@ -53,7 +53,7 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; (require 'use-package)
   (setq use-package-always-ensure t)
   (setq use-package-always-defer t)
-  (setq use-package-verbose t)
+  (setq use-package-verbose nil)
 #+end_src
 
 * Emacs display settings
@@ -98,7 +98,6 @@ Define function to time Emacs startup and determine # of garbage collections
   (electric-pair-mode)
   ;; (electric-quote-mode)
 #+end_src
-
 
 * Move Lines Up/Down
 #+begin_src emacs-lisp
@@ -213,19 +212,22 @@ Supress splash screen.
   (column-number-mode)          ; show column number in modline
   (tool-bar-mode -1)
   (menu-bar-mode -1)
+  (setq ring-bell-function 'ignore)
   ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (setq inhibit-startup-message t)     ; No splash screen
   ;; (global-visual-line-mode t)
+  ;; Remove title bar in emacs-plus version on Mac
+  ;; (add-to-list 'default-frame-alist '(undecorated . t))
 #+end_src
-** Visible Bell to turn off chime
+** COMMENT Visible Bell to turn off chime
 #+begin_src emacs-lisp
   (setq visible-bell 1)
 #+end_src
-** COMMENT Set Default Font
+** Set Default Font
 Sets font for MacOS X emacs
 #+begin_src emacs-lisp
-  (set-frame-font "Menlo 11" nil t)
+  (set-frame-font "Menlo 14" nil t)
 #+end_src
 
 ** COMMENT Set Default Font for Windows
@@ -300,8 +302,8 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
     ;; (custom-set-variables
     ;; '(doom-molokai-brighter-comments t))
     ;; (load-theme 'doom-monokai-classic t)
-    ;; (load-theme 'doom-acario-dark t)
-    (load-theme 'doom-moonlight t)
+    (load-theme 'doom-acario-dark t)
+    ;; (load-theme 'doom-moonlight t)
 
     ;; customize the doom monkai theme
     (custom-set-faces
@@ -416,6 +418,8 @@ Provides function documentation and key binding info in ivy buffer
            ("J" . dired-goto-file)
            ("K" . kill-current-buffer))
     :config
+    (setq insert-directory-program "gls" dired-use-ls-dired t)
+    (setq dired-listing-switches "-ghoa --group-directories-first")
     ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
     ;; (setq ls-lisp-use-insert-directory-program t)
     )
@@ -662,14 +666,10 @@ Syntax checking and linting.
 #+end_src
 * Treesitter
 #+begin_src emacs-lisp
-  ;; (use-package tree-sitter
-  ;;   :config
-  ;;   (require 'tree-sitter))
-
-  ;; (use-package tree-sitter-langs
-  ;;   :config
-  ;;   (require 'tree-sitter)
-  ;;   :hook ('python-mode . tree-sitter-hl-mode))
+  (use-package treesit
+    :ensure nil
+    :config
+    (setq treesit-extra-load-path '("/usr/local/lib")))
 #+end_src
 * Programming Languages
 ** C/C++
@@ -708,13 +708,13 @@ Syntax checking and linting.
   (use-package docker)
 #+end_src
 ** SuperCollider
-*** sclang-extensions (unmaintained package)
+*** COMMENT sclang-extensions (unmaintained package)
 Uses AutoComplete which is not as good as Company. Hasn't been updated
 for 7 years as of Oct 2022.
 #+begin_src emacs-lisp
   ;; (use-package sclang-extensions)
 #+end_src
-*** scel ubuntu compiled from source install
+*** COMMENT scel ubuntu compiled from source install
 #+begin_src emacs-lisp
   ;; in ~/.emacs
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
@@ -731,7 +731,7 @@ for 7 years as of Oct 2022.
 
 #+end_src
 
-*** COMMENT scel (sclang' mode for emacs)
+*** scel (sclang' mode for emacs)
 This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
   (setq exec-path
@@ -763,7 +763,7 @@ This is a mode for the sclang language for SuperCollider
                               ;; (flycheck-add-next-checker
                               ;;  'lsp 'python-pylint)
                               ;; (flycheck-disable-checker 'lsp)
-                              ;; (flycheck-select-checker 'python-pylint) 
+                              ;; (flycheck-select-checker 'python-pylint)
                               ))
 
 
@@ -837,26 +837,38 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
 #+end_src
 ** Typescript
 #+begin_src emacs-lisp
-
   (use-package tsx-ts-mode
     :ensure nil
-    :mode "\\.tsx\\'"
+    :mode ("\\.tsx\\'" "\\.ts\\'")
     :hook
     (tsx-ts-mode . lsp-deferred)
     (lsp-diagnostics-mode . (lambda ()
                               (if (eq major-mode 'tsx-ts-mode)
-                                  (flycheck-select-checker 'javascript-eslint)))))
+                                  (flycheck-select-checker 'javascript-eslint))))
+    )
 
   ;; (use-package typescript-mode
   ;;   :hook
   ;;   (typescript-mode . lsp-deferred))
 #+end_src
+** CSharp
+#+begin_src emacs-lisp
+  (use-package csharp-mode
+    :ensure nil
+    :hook
+    (c-sharp-mode . lsp-deferred))
+#+end_src
 
+** Shader
+#+begin_src emacs-lisp
+(use-package shader-mode)
+#+end_src
 ** Terraform
 #+begin_src emacs-lisp
   (use-package terraform-mode
     :defer t)
 #+end_src
+
 ** COMMENT Yaml
 #+begin_src emacs-lisp
   (use-package yaml-mode
@@ -929,8 +941,10 @@ Color delimiters like parens and braces according to their depth
     :defer t
     ;; :after (org-timeline)
     :bind (:map org-mode-map
-                ;; ("C-c C-p" . hydra-org/body)
-                ;; ("C-c C-n" . hydra-org/body)
+                ("C-c C-f" . hydra-org/org-forward-heading-same-level)
+                ("C-c C-b" . hydra-org/org-backward-heading-same-level)
+                ("C-c C-p" . hydra-org/org-previous-visible-heading)
+                ("C-c C-n" . hydra-org/org-next-visible-heading)
                 ("M-n" . org-metadown)
                 ("M-p" . org-metaup))
     :hook
@@ -953,6 +967,8 @@ Color delimiters like parens and braces according to their depth
     (setq org-agenda-files
           '("~/hub/orgs/my_todos.org"
             "~/hub/orgs/music_todos.org"
+            "~/hub/orgs/house_todos.org"
+            "~/hub/orgs/mental_todos.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
             ;; "~/.emacs.d/config.org"
@@ -974,14 +990,17 @@ Color delimiters like parens and braces according to their depth
 
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 
-    (defhydra hydra-org (org-mode-map "C-c")
+    (defhydra hydra-org ()
       "org hydra"
-      ("C-n" org-next-visible-heading "next heading")
-      ("C-p" org-previous-visible-heading "prev heading")
-      ("M-j" org-metadown "move down")
-      ("M-k" org-metaup "move up")
+      ("n" org-next-visible-heading "next visible")
+      ("p" org-previous-visible-heading "prev visible")
+      ("f" org-forward-heading-same-level "forward level")
+      ("b" org-backward-heading-same-level "backward level")
+      ;; ("M-j" org-metadown "move down")
+      ;; ("M-k" org-metaup "move up")
       ("q" nil "quit"))
     )
+  ()
   ;; org-agenda timeline view
   (use-package org-timeline)
 
