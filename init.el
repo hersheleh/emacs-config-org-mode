@@ -22,6 +22,9 @@
 (setq use-package-always-defer t)
 (setq use-package-verbose nil)
 
+(defvar my-macbook-p (equal (system-name) "Grishs-MBP-13.lan"))
+(defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
+
 (use-package frame
   :ensure nil
   :config
@@ -143,7 +146,22 @@
 ;; Remove title bar in emacs-plus version on Mac
 ;; (add-to-list 'default-frame-alist '(undecorated . t))
 
-;;(set-frame-font "Menlo 14" nil t)
+(defun gsh/set-font ()
+  (message "Setting font")
+  (set-frame-font "Ubuntu Mono-13:bold" nil t))
+
+(when my-macbook-p (set-frame-font "Menlo 14" nil t))
+
+;; Set font for windows when you have it
+;; (set-frame-font "Consolas-11:bold" nil t)
+
+(when my-sc-thinkpad-p
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda(frame)
+                  (with-selected-frame frame
+                    (gsh/set-font))))
+    (gsh/set-font)))
 
 (use-package exec-path-from-shell
   :demand t
@@ -245,6 +263,7 @@
 (use-package dired
   :ensure nil
   :commands (dired dired-jump)
+  :custom ((dired-listing-switches "-ghoa --group-directories-first"))
   :bind (:map
          dired-mode-map
          ("h" . dired-up-directory)
@@ -254,6 +273,8 @@
          ("J" . dired-goto-file)
          ("K" . kill-current-buffer))
   :config
+  (setq insert-directory-program "gls" dired-use-ls-dired t)
+  (setq dired-listing-switches "-ghoa --group-directories-first")
   ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
   ;; (setq ls-lisp-use-insert-directory-program t)
   )
@@ -421,14 +442,10 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 ;; (use-package yasnippet
 ;;   :config (yas-global-mode 1))
 
-;; (use-package tree-sitter
-;;   :config
-;;   (require 'tree-sitter))
-
-;; (use-package tree-sitter-langs
-;;   :config
-;;   (require 'tree-sitter)
-;;   :hook ('python-mode . tree-sitter-hl-mode))
+(use-package treesit
+  :ensure nil
+  :config
+  (setq treesit-extra-load-path '("/usr/local/lib")))
 
 (use-package cc
   :ensure nil
@@ -460,20 +477,29 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 (use-package dockerfile-mode)
 (use-package docker)
 
-;; (use-package sclang-extensions)
-
-;; in ~/.emacs
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
-(require 'sclang)
-(defun sclang-keys ()
-  (define-key sclang-mode-map (kbd "C-c C-l") 'sclang-eval-line)
-  (define-key sclang-mode-map (kbd "C-<return>") 'sclang-eval-defun)
-  (define-key sclang-mode-map (kbd "C-.") 'sclang-main-stop)
-  (local-unset-key (kbd "C-c h"))
-  (define-key sclang-mode-map (kbd "C-c C-h") 'sclang-find-help-in-gui))
-(add-hook 'sclang-mode-hook 'sclang-keys)
-(setq sclang-eval-line-forward nil)
-;; (eval-after-load 'sclang '(sclang-keys))
+(use-package sclang
+  :ensure nil
+  :demand t
+  :load-path
+  (lambda ()
+    (cond
+     (my-macbook-p "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
+     (my-sc-laptop-p "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
+  :mode ("\\.scd\\'" . sclang-mode)
+  :bind(:map sclang-mode-map
+             ("C-c C-l"    . sclang-eval-line)
+             ("C-<return>" . sclang-eval-defunsclang)
+             ("C-." . sclang-main-stop)
+             ("C-c C-h" . sclang-find-help-in-gui))
+  :custom
+  (sclang-eval-line-forward nil)
+  :config
+  (unbind-key "C-c h" sclang-mode-map)
+  (when my-macbook-p
+    (setq exec-path
+          (append
+           exec-path
+           '("/Applications/SuperCollider.app/Contents/MacOS/")))))
 
 (use-package python
   :ensure nil

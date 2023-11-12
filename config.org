@@ -56,6 +56,12 @@ Define function to time Emacs startup and determine # of garbage collections
   (setq use-package-verbose nil)
 #+end_src
 
+* System information
+#+begin_src emacs-lisp
+  (defvar my-macbook-p (equal (system-name) "Grishs-MBP-13.lan"))
+  (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
+#+end_src
+
 * Emacs display settings
 #+begin_src emacs-lisp
   (use-package frame
@@ -225,29 +231,25 @@ Supress splash screen.
   (setq visible-bell 1)
 #+end_src
 ** Set Default Font
-Sets font for MacOS X emacs
+Set the default font for different systems
 #+begin_src emacs-lisp
-  (set-frame-font "Menlo 14" nil t)
-#+end_src
 
-** COMMENT Set Default Font for Windows
-#+begin_src emacs-lisp
-  (set-frame-font "Consolas-11:bold" nil t)
-#+end_src
-
-** set Default Font for Ubuntu
-#+begin_src emacs-lisp
   (defun gsh/set-font ()
     (message "Setting font")
-    (set-frame-font "Ubuntu Mono-13:bold" nil t) 
-    )
+    (set-frame-font "Ubuntu Mono-13:bold" nil t))
 
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions
-                (lambda(frame)
-                  (with-selected-frame frame
-                    (gsh/set-font))))
-    (gsh/set-font))
+  (when my-macbook-p (set-frame-font "Menlo 14" nil t))
+
+  ;; Set font for windows when you have it
+  ;; (set-frame-font "Consolas-11:bold" nil t)
+
+  (when my-sc-thinkpad-p
+    (if (daemonp)
+        (add-hook 'after-make-frame-functions
+                  (lambda(frame)
+                    (with-selected-frame frame
+                      (gsh/set-font))))
+      (gsh/set-font)))
 #+end_src
 * Exec Path From Shell
 #+begin_src emacs-lisp
@@ -708,42 +710,40 @@ Syntax checking and linting.
   (use-package docker)
 #+end_src
 ** SuperCollider
-*** COMMENT sclang-extensions (unmaintained package)
-Uses AutoComplete which is not as good as Company. Hasn't been updated
-for 7 years as of Oct 2022.
-#+begin_src emacs-lisp
-  ;; (use-package sclang-extensions)
-#+end_src
 *** COMMENT scel ubuntu compiled from source install
 #+begin_src emacs-lisp
   ;; in ~/.emacs
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
   (require 'sclang)
-  (defun sclang-keys ()
-    (define-key sclang-mode-map (kbd "C-c C-l") 'sclang-eval-line)
-    (define-key sclang-mode-map (kbd "C-<return>") 'sclang-eval-defun)
-    (define-key sclang-mode-map (kbd "C-.") 'sclang-main-stop)
-    (local-unset-key (kbd "C-c h"))
-    (define-key sclang-mode-map (kbd "C-c C-h") 'sclang-find-help-in-gui))
-  (add-hook 'sclang-mode-hook 'sclang-keys)
-  (setq sclang-eval-line-forward nil)
-  ;; (eval-after-load 'sclang '(sclang-keys))
 
 #+end_src
 
-*** scel (sclang' mode for emacs)
+*** SuperCollider scel (sclang mode for emacs)
 This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
-  (setq exec-path
-        (append exec-path
-                '("/Applications/SuperCollider.app/Contents/MacOS/")))
-  (add-to-list
-   'load-path
-   "~/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
-  (add-to-list
-   'load-path
-   "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
-  (require 'sclang)
+  (use-package sclang
+    :ensure nil
+    :demand t
+    :load-path
+    (lambda ()
+      (cond
+       (my-macbook-p "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
+       (my-sc-laptop-p "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
+    :mode ("\\.scd\\'" . sclang-mode)
+    :bind(:map sclang-mode-map
+               ("C-c C-l"    . sclang-eval-line)
+               ("C-<return>" . sclang-eval-defunsclang)
+               ("C-." . sclang-main-stop)
+               ("C-c C-h" . sclang-find-help-in-gui))
+    :custom
+    (sclang-eval-line-forward nil)
+    :config
+    (unbind-key "C-c h" sclang-mode-map)
+    (when my-macbook-p
+      (setq exec-path
+            (append
+             exec-path
+             '("/Applications/SuperCollider.app/Contents/MacOS/")))))
 #+end_src
 
 ** Python
