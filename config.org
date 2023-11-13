@@ -58,7 +58,7 @@ Define function to time Emacs startup and determine # of garbage collections
 
 * System information
 #+begin_src emacs-lisp
-  (defvar my-macbook-p (equal (system-name) "Grishs-MBP-13.lan"))
+  (defvar my-macbook-p (equal system-type 'darwin))
   (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
 #+end_src
 
@@ -409,25 +409,29 @@ Provides function documentation and key binding info in ivy buffer
 
 * Dired
 #+begin_src emacs-lisp
-    (use-package dired
-      :ensure nil
-      :commands (dired dired-jump)
-      :custom ((dired-listing-switches "-ghoa --group-directories-first"))
-      :bind (:map
-             dired-mode-map
-             ("h" . dired-up-directory)
-             ("l" . dired-find-file)
-             ("j" . dired-next-line)
-             ("k" . dired-previous-line)
-             ("J" . dired-goto-file)
-             ("K" . kill-current-buffer))
-      :config
-      (when my-macbook-p
-        (setq insert-directory-program "gls" dired-use-ls-dired t))
-      (setq dired-listing-switches "-ghoa --group-directories-first")
-      ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
-      ;; (setq ls-lisp-use-insert-directory-program t)
-      )
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :custom ((dired-listing-switches "-ghoa --group-directories-first"))
+    :init
+    (put 'dired-find-alternate-file 'disabled nil)
+    (defun dired-up-alternate-directory ()
+      (interactive) (find-alternate-file ".."))
+    :bind (:map
+           dired-mode-map
+           ("h" . dired-up-alternate-directory)
+           ("l" . dired-find-alternate-file)
+           ("j" . dired-next-line)
+           ("k" . dired-previous-line)
+           ("J" . dired-goto-file)
+           ("K" . kill-buffer-and-window))
+    :config
+    (when my-macbook-p
+      (setq insert-directory-program "gls" dired-use-ls-dired t))
+    (setq dired-listing-switches "-ghoa --group-directories-first")
+    ;; (setq insert-directory-program "C:\\Program Files\\Git\\usr\\bin\\ls")
+    ;; (setq ls-lisp-use-insert-directory-program t)
+    )
 #+end_src
 * MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
@@ -726,7 +730,6 @@ This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
   (use-package sclang
     :ensure nil
-    :demand t
     :load-path
     (lambda ()
       (cond

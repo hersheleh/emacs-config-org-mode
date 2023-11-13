@@ -22,7 +22,7 @@
 (setq use-package-always-defer t)
 (setq use-package-verbose nil)
 
-(defvar my-macbook-p (equal (system-name) "Grishs-MBP-13.lan"))
+(defvar my-macbook-p (equal system-type 'darwin))
 (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
 
 (use-package frame
@@ -266,14 +266,18 @@
   :ensure nil
   :commands (dired dired-jump)
   :custom ((dired-listing-switches "-ghoa --group-directories-first"))
+  :init
+  (put 'dired-find-alternate-file 'disabled nil)
+  (defun dired-up-alternate-directory ()
+    (interactive) (find-alternate-file ".."))
   :bind (:map
          dired-mode-map
-         ("h" . dired-up-directory)
-         ("l" . dired-find-file)
+         ("h" . dired-up-alternate-directory)
+         ("l" . dired-find-alternate-file)
          ("j" . dired-next-line)
          ("k" . dired-previous-line)
          ("J" . dired-goto-file)
-         ("K" . kill-current-buffer))
+         ("K" . kill-buffer-and-window))
   :config
   (when my-macbook-p
     (setq insert-directory-program "gls" dired-use-ls-dired t))
@@ -482,7 +486,6 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package sclang
   :ensure nil
-  :demand t
   :load-path
   (lambda ()
     (cond
