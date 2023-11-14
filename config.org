@@ -60,6 +60,7 @@ Define function to time Emacs startup and determine # of garbage collections
 #+begin_src emacs-lisp
   (defvar my-macbook-p (equal system-type 'darwin))
   (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
+  (global-auto-revert-mode)        ; revert buffers when changed on disk
 #+end_src
 
 * Emacs display settings
@@ -517,7 +518,7 @@ possible key presses along with documentation for that key press.
     ("b" counsel-switch-buffer)
     ;; ("f" counsel-find-file)
     ("p" project-switch-project)
-    ("g" revert-buffer-quick)
+    ;; ("g" revert-buffer-quick)
     ("q" nil "quit"))
 #+end_src
 * IDE LIKE PACKAGES

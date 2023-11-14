@@ -24,6 +24,7 @@
 
 (defvar my-macbook-p (equal system-type 'darwin))
 (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
+(global-auto-revert-mode)        ; revert buffers when changed on disk
 
 (use-package frame
   :ensure nil
@@ -353,7 +354,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ("b" counsel-switch-buffer)
   ;; ("f" counsel-find-file)
   ("p" project-switch-project)
-  ("g" revert-buffer-quick)
+  ;; ("g" revert-buffer-quick)
   ("q" nil "quit"))
 
 (use-package lsp-mode
