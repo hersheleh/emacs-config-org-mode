@@ -497,9 +497,9 @@ possible key presses along with documentation for that key press.
     "
   ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
   ^^^^^^^^----------------------------------------------------------------------------------
-  _i_: up      _v_: vertical     _o_: other windows   _I_: up      _r_: rotate layout  _g_: refresh
+  _i_: up      _v_: vertical     _o_: other windows   _I_: up      _r_: rotate layout
   _k_: down    _h_: horizontal   _d_: this window     _K_: down    _b_: switch buffer
-  _j_: left    ^ ^               ^ ^                  _J_: left    ^_^: find file
+  _j_: left    ^ ^               ^ ^                  _J_: left    _F_: find file
   _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch project
   "
     ("l" windmove-right)
@@ -516,7 +516,7 @@ possible key presses along with documentation for that key press.
     ("L" buf-move-right)
     ("r" rotate-layout)
     ("b" counsel-switch-buffer)
-    ;; ("f" counsel-find-file)
+    ("F" counsel-find-file)
     ("p" project-switch-project)
     ;; ("g" revert-buffer-quick)
     ("q" nil "quit"))
