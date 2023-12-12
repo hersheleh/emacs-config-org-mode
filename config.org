@@ -1,7 +1,7 @@
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
-This is my my personal emacs config file. It is a literate config. Org mode will tangle this config into the colocated init.el file. This config uses lsp-mode and ivy as the primary convenience features. It is a bit disorganized as I've put together over time piece by piece and should refactor it to be more sane. I was primarily inspired by System Crafter's [[https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs From Scratch]] youtube series.
+This is my my personal emacs config file. It is a literate config. Org mode will tangle this config into the co-located init.el file. This config uses lsp-mode and ivy-mode as the primary convenience features. It is a bit disorganized as I've assembled it sporadically over time piece by piece. I'm planning to refactor this config to be more organized so other's could for reference or inspiration. I was primarily inspired by System Crafter's [[https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs From Scratch]] youtube series.
 * Emacs Performace
 
 #+begin_src emacs-lisp :tangle ./early-init.el
