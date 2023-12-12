@@ -189,8 +189,9 @@
   ;; (custom-set-variables
   ;; '(doom-molokai-brighter-comments t))
   ;; (load-theme 'doom-monokai-classic t)
-  (load-theme 'doom-acario-dark t)
+  ;; (load-theme 'doom-acario-dark t)
   ;; (load-theme 'doom-moonlight t)
+  (load-theme 'doom-badger t)
 
   ;; customize the doom monkai theme
   (custom-set-faces
@@ -235,7 +236,7 @@
          ("C-h u" . counsel-unicode-char)
          ("C-h b" . counsel-descbinds)
          ("C-x b" . counsel-switch-buffer)
-         ("C-c t" . counsel-load-theme)
+         ("C-c T" . counsel-load-theme)
          :map minibuffer-local-map
          ("C-r" . counsel-minibuffer-history)
          ;; ("C-c g" . counsel-git)
@@ -309,8 +310,14 @@
 
 (use-package treemacs
   :defer t
-  :custom (treemacs-python-executable "python")
-  :config (treemacs-project-follow-mode))
+  :custom
+  (treemacs-python-executable "python")
+
+  :config
+  (treemacs-project-follow-mode)
+  (setq treemacs-git-mode nil)
+  :hook (treemacs-select . windmove-right)
+  )
 ;; (use-package treemacs-icons-dired
 ;;   :after dired
 ;;   :config (treemacs-icons-dired-mode))
@@ -333,9 +340,9 @@
   "
 ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
 ^^^^^^^^----------------------------------------------------------------------------------
-_i_: up      _v_: vertical     _o_: other windows   _I_: up      _r_: rotate layout  _g_: refresh
+_i_: up      _v_: vertical     _o_: other windows   _I_: up      _r_: rotate layout
 _k_: down    _h_: horizontal   _d_: this window     _K_: down    _b_: switch buffer
-_j_: left    ^ ^               ^ ^                  _J_: left    ^_^: find file
+_j_: left    ^ ^               ^ ^                  _J_: left    _F_: find file
 _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch project
 "
   ("l" windmove-right)
@@ -352,7 +359,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ("L" buf-move-right)
   ("r" rotate-layout)
   ("b" counsel-switch-buffer)
-  ;; ("f" counsel-find-file)
+  ("F" counsel-find-file)
   ("p" project-switch-project)
   ;; ("g" revert-buffer-quick)
   ("q" nil "quit"))
@@ -362,9 +369,12 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-x l")
+  (lsp-treemacs-sync-mode 1)
   :hook
   ;; (js-mode . lsp-deferred)
   (terraform-mode . lsp-deferred)
+  (lsp-mode . lsp-treemacs-symbols)
+  (lsp-mode . treemacs-select-window)
   ;; :custom
   ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
   ;; (lsp-terraform-ls-server
@@ -373,6 +383,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :config
   ;; (setq lsp-disabled-clients '(tfls))
   (lsp-enable-which-key-integration t)
+  (setq lsp-modeline-code-actions-mode nil)
   ;; (setq lsp-modeline-diagnostics-enable nil)
   (with-eval-after-load 'lsp-mode
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\\.env.*\\'"))
@@ -577,12 +588,14 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package tsx-ts-mode
   :ensure nil
-  :mode ("\\.tsx\\'" "\\.ts\\'")
+  :mode ("\\.tsx\\'" "\\.ts\\'" "\\.jsx\\'")
   :hook
   (tsx-ts-mode . lsp-deferred)
-  (lsp-diagnostics-mode . (lambda ()
-                            (if (eq major-mode 'tsx-ts-mode)
-                                (flycheck-select-checker 'javascript-eslint))))
+
+  ;;                           (if (eq major-mode 'tsx-ts-mode)
+  ;;                               (flycheck-select-checker
+  ;;                                'javascript-eslint))))
+
   )
 
 ;; (use-package typescript-mode
@@ -632,7 +645,9 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
               ("C-c C-p" . hydra-org/org-previous-visible-heading)
               ("C-c C-n" . hydra-org/org-next-visible-heading)
               ("M-n" . org-metadown)
-              ("M-p" . org-metaup))
+              ("M-p" . org-metaup)
+              ("C-c C-j" . counsel-org-goto)
+              ("C-c t" . org-todo))
   :hook
   (org-mode . visual-line-mode)
   (org-mode . visual-fill-column-mode)
@@ -647,7 +662,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   ;; Org Agenda
   (setq org-agenda-span 'day)
-  (setq org-agenda-include-diary t)
+  (setq org-agenda-include-diary nil)
   ;; Add graphical timeline to org agenda
   (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
   (setq org-agenda-files
@@ -660,8 +675,12 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
           ;; "~/.emacs.d/config.org"
           ))
   (setq org-todo-keywords
-        '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)")))
+        ;; '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)"))
+        '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)"))
+        ;; '((sequence "RECUR" "TODO" "CHOOSE" "|" "DONE"))
+        )
   (setq org-agenda-start-with-log-mode t)
+  (setq org-agenda-log-mode-items '(clock state))
   (setq org-log-done 'time)
   (setq org-log-into-drawer t)
 
@@ -682,6 +701,11 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
     ("p" org-previous-visible-heading "prev visible")
     ("f" org-forward-heading-same-level "forward level")
     ("b" org-backward-heading-same-level "backward level")
+    ("C-n" org-next-visible-heading)
+    ("C-p" org-previous-visible-heading)
+    ("C-f" org-forward-heading-same-level)
+    ("C-b" org-backward-heading-same-level)
+    ("TAB" org-cycle "cycle")
     ;; ("M-j" org-metadown "move down")
     ;; ("M-k" org-metaup "move up")
     ("q" nil "quit"))
@@ -742,7 +766,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
    ([remap describe-variable] . counsel-describe-variable)
    ([remap describe-key] . helpful-key)
    :map helpful-mode-map
-   ("k" . kill-current-buffer)))
+   ("k" . kill-buffer-and-window)))
 
 (use-package dashboard
   :demand t
@@ -770,7 +794,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
   ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
   (setq dashboard-agenda-prefix-format " %i %s ")
-  (setq dashboard-agenda-release-buffers 't)
+  (setq dashboard-agenda-release-buffers t)
   ;; (setq initial-buffer-choice
   ;;       (lambda () (get-buffer-create "*dashboard*")))
   (dashboard-setup-startup-hook)
@@ -796,7 +820,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 ;; Set Garbage collection threshold back down after startup completes
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (setq gc-cons-threshold (* 2 1000 1000))
+            ;; (setq gc-cons-threshold (* 100 1000 1000))
             (setq file-name-handler-alist default-file-name-handler-alist)
             ))
 ;; (setq gc-cons-threshold (* 2 1000 1000))

@@ -18,7 +18,7 @@
 
 #+begin_src emacs-lisp :tangle ./early-init.el
   ;; Set Garbage collection threshold very high at startup
-  (setq gc-cons-threshold (* 50 1000 1000))
+  (setq gc-cons-threshold (* 100 1000 1000))
   (defvar default-file-name-handler-alist file-name-handler-alist)
   (setq file-name-handler-alist nil)
 #+end_src
@@ -307,8 +307,9 @@ Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
     ;; (custom-set-variables
     ;; '(doom-molokai-brighter-comments t))
     ;; (load-theme 'doom-monokai-classic t)
-    (load-theme 'doom-acario-dark t)
+    ;; (load-theme 'doom-acario-dark t)
     ;; (load-theme 'doom-moonlight t)
+    (load-theme 'doom-badger t)
 
     ;; customize the doom monkai theme
     (custom-set-faces
@@ -367,7 +368,7 @@ possible inputs
            ("C-h u" . counsel-unicode-char)
            ("C-h b" . counsel-descbinds)
            ("C-x b" . counsel-switch-buffer)
-           ("C-c t" . counsel-load-theme)
+           ("C-c T" . counsel-load-theme)
            :map minibuffer-local-map
            ("C-r" . counsel-minibuffer-history)
            ;; ("C-c g" . counsel-git)
@@ -467,12 +468,19 @@ possible key presses along with documentation for that key press.
 #+begin_src emacs-lisp
   (use-package treemacs
     :defer t
-    :custom (treemacs-python-executable "python")
-    :config (treemacs-project-follow-mode))
+    :custom
+    (treemacs-python-executable "python")
+
+    :config
+    (treemacs-project-follow-mode)
+    (setq treemacs-git-mode nil)
+    :hook (treemacs-select . windmove-right)
+    )
   ;; (use-package treemacs-icons-dired
   ;;   :after dired
   ;;   :config (treemacs-icons-dired-mode))
 #+end_src
+
 
 * Rotate Buffers
 #+begin_src emacs-lisp
@@ -546,9 +554,12 @@ and jump to definition functionality for a particular language
     :commands (lsp lsp-deferred)
     :init
     (setq lsp-keymap-prefix "C-x l")
+    (lsp-treemacs-sync-mode 1)
     :hook
     ;; (js-mode . lsp-deferred)
     (terraform-mode . lsp-deferred)
+    (lsp-mode . lsp-treemacs-symbols)
+    (lsp-mode . treemacs-select-window)
     ;; :custom
     ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
     ;; (lsp-terraform-ls-server
@@ -557,6 +568,7 @@ and jump to definition functionality for a particular language
     :config
     ;; (setq lsp-disabled-clients '(tfls))
     (lsp-enable-which-key-integration t)
+    (setq lsp-modeline-code-actions-mode nil)
     ;; (setq lsp-modeline-diagnostics-enable nil)
     (with-eval-after-load 'lsp-mode
       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\\.env.*\\'"))
@@ -846,12 +858,14 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
 #+begin_src emacs-lisp
   (use-package tsx-ts-mode
     :ensure nil
-    :mode ("\\.tsx\\'" "\\.ts\\'")
+    :mode ("\\.tsx\\'" "\\.ts\\'" "\\.jsx\\'")
     :hook
     (tsx-ts-mode . lsp-deferred)
-    (lsp-diagnostics-mode . (lambda ()
-                              (if (eq major-mode 'tsx-ts-mode)
-                                  (flycheck-select-checker 'javascript-eslint))))
+
+    ;;                           (if (eq major-mode 'tsx-ts-mode)
+    ;;                               (flycheck-select-checker
+    ;;                                'javascript-eslint))))
+
     )
 
   ;; (use-package typescript-mode
@@ -954,7 +968,8 @@ Color delimiters like parens and braces according to their depth
                   ("C-c C-n" . hydra-org/org-next-visible-heading)
                   ("M-n" . org-metadown)
                   ("M-p" . org-metaup)
-                  ("C-c C-j" . counsel-org-goto))
+                  ("C-c C-j" . counsel-org-goto)
+                  ("C-c t" . org-todo))
       :hook
       (org-mode . visual-line-mode)
       (org-mode . visual-fill-column-mode)
@@ -983,7 +998,9 @@ Color delimiters like parens and braces according to their depth
               ))
       (setq org-todo-keywords
             ;; '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)"))
-            '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)")))
+            '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)"))
+            ;; '((sequence "RECUR" "TODO" "CHOOSE" "|" "DONE"))
+            )
       (setq org-agenda-start-with-log-mode t)
       (setq org-agenda-log-mode-items '(clock state))
       (setq org-log-done 'time)
@@ -1184,7 +1201,7 @@ Simplify Swapping buffers
   ;; Set Garbage collection threshold back down after startup completes
   (add-hook 'emacs-startup-hook
             (lambda ()
-              (setq gc-cons-threshold (* 2 1000 1000))
+              ;; (setq gc-cons-threshold (* 100 1000 1000))
               (setq file-name-handler-alist default-file-name-handler-alist)
               ))
   ;; (setq gc-cons-threshold (* 2 1000 1000))
