@@ -1,19 +1,7 @@
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
-
-*** TODOS:
-**** TODO ADD Table of Contents for this document.
-**** TODO ADD general.el package (keybindings package).
-**** TODO TRY ergomacs or god-mode or evil mode.
-**** TODO TRY [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] mode. video: [[https://youtu.be/VcgjTEa0kU4?list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&t=2495][here]]
-*** TODOS: URGENT | For Work
-**** TODO Learn to configure Company Mode
-**** TODO Customize faces per theme
-**** TODO 'C-c c b' command to create comment block
-**** DONE Create Shortcut for lsp-find-references
-**** DONE Setup Hydra
-**** DONE Setup Tree-Sitter
+This is my my personal emacs config file. It is a literate config. Org mode will tangle this config into the colocated init.el file. This config uses lsp-mode and ivy as the primary convenience features. It is a bit disorganized as I've put together over time piece by piece and should refactor it to be more sane. I was primarily inspired by System Crafter's [[https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs From Scratch]] youtube series.
 * Emacs Performace
 
 #+begin_src emacs-lisp :tangle ./early-init.el
@@ -1206,3 +1194,15 @@ Simplify Swapping buffers
               ))
   ;; (setq gc-cons-threshold (* 2 1000 1000))
 #+end_src
+* TODOS:
+** TODO ADD Table of Contents for this document.
+** TODO ADD general.el package (keybindings package).
+** TODO TRY ergomacs or god-mode or evil mode.
+** TODO TRY [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] mode. video: [[https://youtu.be/VcgjTEa0kU4?list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ&t=2495][here]]
+** TODOS: URGENT | For Work
+*** TODO Learn to configure Company Mode
+*** TODO Customize faces per theme
+*** TODO 'C-c c b' command to create comment block
+*** DONE Create Shortcut for lsp-find-references
+*** DONE Setup Hydra
+*** DONE Setup Tree-Sitter
