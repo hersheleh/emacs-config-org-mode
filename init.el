@@ -55,8 +55,14 @@
 ;; Disable lock files. They are interfering with terraform-ls on linux
 (setq create-lockfiles nil)
 
+;; Disable emacs creating backup file *~
+(setq make-backup-files nil)
+
+(setq display-time-default-load-average nil)
+(display-time)
+
 (electric-indent-mode)
-(electric-pair-mode)
+(add-hook 'prog-mode-hook 'electric-pair-local-mode)
 ;; (electric-quote-mode)
 
 (defun move-line-up ()
@@ -312,17 +318,18 @@
   :defer t
   :custom
   (treemacs-python-executable "python")
-
   :config
-  (treemacs-project-follow-mode)
   (setq treemacs-git-mode nil)
-  :hook (treemacs-select . windmove-right)
+  (treemacs-project-follow-mode)
+  :hook
+  (treemacs-select . windmove-right)
+
   )
 ;; (use-package treemacs-icons-dired
 ;;   :after dired
 ;;   :config (treemacs-icons-dired-mode))
 
-(use-package rotate)
+;; (use-package rotate)
 
 (use-package hydra
   :init
@@ -340,7 +347,7 @@
   "
 ^Move^       ^Split^           ^Delete^             ^Shift^      ^Misc^
 ^^^^^^^^----------------------------------------------------------------------------------
-_i_: up      _v_: vertical     _o_: other windows   _I_: up      _r_: rotate layout
+_i_: up      _v_: vertical     _o_: other windows   _I_: up      ^ ^
 _k_: down    _h_: horizontal   _d_: this window     _K_: down    _b_: switch buffer
 _j_: left    ^ ^               ^ ^                  _J_: left    _F_: find file
 _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch project
@@ -357,7 +364,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ("K" buf-move-down)
   ("J" buf-move-left)
   ("L" buf-move-right)
-  ("r" rotate-layout)
+  ;; ("r" rotate-layout)
   ("b" counsel-switch-buffer)
   ("F" counsel-find-file)
   ("p" project-switch-project)
@@ -369,12 +376,13 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :commands (lsp lsp-deferred)
   :init
   (setq lsp-keymap-prefix "C-x l")
-  (lsp-treemacs-sync-mode 1)
+  (setq lsp-use-plists t)
+  ;; (lsp-treemacs-sync-mode 1)
   :hook
   ;; (js-mode . lsp-deferred)
   (terraform-mode . lsp-deferred)
-  (lsp-mode . lsp-treemacs-symbols)
-  (lsp-mode . treemacs-select-window)
+  ;; (lsp-mode . lsp-treemacs-symbols)
+  ;; (lsp-mode . treemacs-select-window)
   ;; :custom
   ;; ;; (lsp-terraform-server "C:/Users/GrishaKhachaturyan/stand_alone_prgrms/bin/terraform-lsp")
   ;; (lsp-terraform-ls-server
@@ -383,10 +391,11 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :config
   ;; (setq lsp-disabled-clients '(tfls))
   (lsp-enable-which-key-integration t)
-  (setq lsp-modeline-code-actions-mode nil)
+  (lsp-modeline-code-actions-mode -1)
   ;; (setq lsp-modeline-diagnostics-enable nil)
   (with-eval-after-load 'lsp-mode
-    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\\.env.*\\'"))
+    (add-to-list 'lsp-file-watch-ignored-directories
+                 "[/\\\\]\\\.env.*\\'"))
   )
 
 (use-package lsp-ui
@@ -394,6 +403,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :config
   ;; (setq lsp-eldoc-enable-hover nil)
   (setq lsp-ui-enable-hover nil)
+  ;; (setq lsp-ui-sideline-code-actions nil)
+
   (setq lsp-ui-doc-show-with-cursor t)
   (setq lsp-ui-doc-position 'bottom)
   (setq lsp-signature-auto-activate nil)
@@ -436,8 +447,11 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :custom
   (company-minimum-prefix-length 1)
   (company-idle-delay 0.0)
+  (company-tooltip-idle-delay 0.0)
+  (company-candidates-cache t)
   :hook
   (prog-mode . company-mode)            ; add completion to programming language modes
+  (inferior-python-mode-hook . company-mode)
   ;; (org-mode . company-mode)            ; add completion to org-mode
   )
 ;; :config
@@ -458,8 +472,8 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package iedit)
 
-;; (use-package yasnippet
-;;   :config (yas-global-mode 1))
+(use-package yasnippet
+  :config (yas-global-mode 1))
 
 (use-package treesit
   :ensure nil
@@ -530,12 +544,12 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   ;;         ("C-c r" . nil))
   :hook
   (python-mode . lsp-deferred)
-  (lsp-diagnostics-mode . (lambda ()
-                            ;; (flycheck-add-next-checker
-                            ;;  'lsp 'python-pylint)
-                            ;; (flycheck-disable-checker 'lsp)
-                            ;; (flycheck-select-checker 'python-pylint)
-                            ))
+  ;; (lsp-diagnostics-mode . (lambda ()
+  ;;                           ;; (flycheck-add-next-checker
+  ;;                           ;;  'lsp 'python-pylint)
+  ;;                           ;; (flycheck-disable-checker 'lsp)
+  ;;                           ;; (flycheck-select-checker 'python-pylint)
+  ;;                           ))
 
 
 
@@ -586,21 +600,35 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
 
 (use-package pyvenv)
 
-(use-package tsx-ts-mode
+(use-package pug-mode)
+
+(use-package jtsx-ts-mode
   :ensure nil
-  :mode ("\\.tsx\\'" "\\.ts\\'" "\\.jsx\\'")
+  :custom
+  (typescript-ts-mode-indent-offset 4)
+  :mode ("\\.tsx\\'" "\\.jsx\\'")
   :hook
   (tsx-ts-mode . lsp-deferred)
-
+  :config
+  ;; (setq standard-indent 2)
+  )
   ;;                           (if (eq major-mode 'tsx-ts-mode)
   ;;                               (flycheck-select-checker
-  ;;                                'javascript-eslint))))
+  ;;                                'javascript-eslint))
 
-  )
+(use-package typescript-ts-mode
+  :ensure nil
+  :mode ("\\.ts\\'" "\\.js\\'")
+  :hook
+  (typescript-ts-mode . lsp-deferred))
 
-;; (use-package typescript-mode
-;;   :hook
-;;   (typescript-mode . lsp-deferred))
+(use-package json-ts-mode
+  :ensure nil
+  :mode ("\\.json\\'")
+  :hook
+  (json-ts-mode . lsp-deferred)
+  :config
+  (setq js-indent-level 2))
 
 (use-package csharp-mode
   :ensure nil
@@ -651,6 +679,7 @@ _l_: right   ^ ^               ^ ^                  _L_: right   _p_: switch pro
   :hook
   (org-mode . visual-line-mode)
   (org-mode . visual-fill-column-mode)
+  (org-mode . electric-pair-local-mode)
   :custom
   (org-priority-highest 65)
   (org-priority-lowest 69)
