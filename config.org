@@ -357,6 +357,7 @@ possible inputs
            ("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
            ("C-x f" . counsel-find-file)
+           ("C-x d" . counsel-dired)
            ("C-c r" . counsel-recentf)    ; open recent file
            ("C-c f" . counsel-recentf)    ; open recent file
            ("C-c C-f" .  counsel-recentf)
@@ -859,21 +860,24 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
 
 
 ** Javascript
-*** tsx mode
+*** jtsx mode
+This mode expands
 #+begin_src emacs-lisp
-  (use-package jtsx-ts-mode
-    :ensure nil
-    :custom
-    (typescript-ts-mode-indent-offset 4)
-    :mode ("\\.tsx\\'" "\\.jsx\\'")
-    :hook
-    (tsx-ts-mode . lsp-deferred)
-    :config
-    ;; (setq standard-indent 2)
-    )
-    ;;                           (if (eq major-mode 'tsx-ts-mode)
-    ;;                               (flycheck-select-checker
-    ;;                                'javascript-eslint))
+    (use-package jtsx
+      :custom
+      (typescript-ts-mode-indent-offset 4)
+      :mode
+      ("\\.tsx\\'" . jtsx-tsx-mode)
+      ("\\.jsx\\'" . jtsx-jsx-mode)
+      :hook
+      (jtsx-tsx-mode . lsp-deferred)
+      (jtsx-js-mode . lsp-deferred)
+      :config
+      ;; (setq standard-indent 2)
+      )
+      ;;                           (if (eq major-mode 'tsx-ts-mode)
+      ;;                               (flycheck-select-checker
+      ;;                                'javascript-eslint))
 #+end_src
 *** typescript mode
 #+begin_src emacs-lisp
@@ -997,6 +1001,7 @@ Color delimiters like parens and braces according to their depth
     (org-mode . visual-fill-column-mode)
     (org-mode . electric-pair-local-mode)
     :custom
+    (org-agenda-window-setup 'current-window)
     (org-priority-highest 65)
     (org-priority-lowest 69)
     (org-priority-default 67)
