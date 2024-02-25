@@ -1063,7 +1063,8 @@ Color delimiters like parens and braces according to their depth
     ;; Add graphical timeline to org agenda
     (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
     (setq org-agenda-files
-      '("~/hub/orgs/my_todos.org"
+      '(
+        ;; "~/hub/orgs/my_todos.org"
         "~/hub/orgs/music_todos.org"
         "~/hub/orgs/house_todos.org"
         "~/hub/orgs/mental_todos.org"
@@ -1240,10 +1241,12 @@ Simplify Swapping buffers
     (setq dashboard-agenda-sort-strategy
           '(todo-state-down
             priority-up
-            time-down))
-    (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
+            time-up))
+    (setq dashboard-agenda-time-string-format "%b %d %Y %a %I:%M %p")
     ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
-    (setq dashboard-agenda-prefix-format " %i %s ")
+    ;; (setq dashboard-agenda-prefix-format "|%i %s %t | %-12c | ")
+    ;; (setq dashboard-agenda-prefix-format "|%i %s %t | ")
+    (setq dashboard-agenda-prefix-format "%i %s %t| ")
     (setq dashboard-agenda-release-buffers t)
     (setq initial-buffer-choice
           (lambda () (get-buffer-create "*dashboard*")))
