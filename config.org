@@ -285,22 +285,29 @@ Set the default font for different systems
 # Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
 Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
 :themes_I_like:
- * doom-ir-black (black theme)
- * doom-moonlight
- * doom-outrun-electric
- * doom-fairy-floss (nice light/dark theme)
- * doom-acario-light (good light theme)
- * doom-acario-dark (black theme)
- * doom-pine
- * doom-old-hope
- * wombat
- * doom-badger
+ * themes I like:
+   * doom-ir-black (black theme)
+   * doom-moonlight
+   * doom-outrun-electric
+   * doom-fairy-floss (nice light/dark theme)
+   * doom-acario-light (good light theme)
+   * doom-acario-dark (black theme)
+   * doom-pine
+   * doom-old-hope
+   * wombat
+   * doom-badger
+   * doom-dark+
+   * doom-snazzy
+   * doom-henna
+To select a theme use 'M-x customize-theme'
+
 :END:
 #+begin_src emacs-lisp
   (use-package doom-themes
     :demand t
-    ;; :custom
-    ;; (doom-monokai-classic-brighter-comments t)
+    :init (setq custom-safe-themes t)
+    :custom
+    (doom-monokai-classic-brighter-comments t)
     ;; (doom-acario-dark-brighter-comments t)
     :config
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
@@ -1007,6 +1014,9 @@ Color delimiters like parens and braces according to their depth
     (org-priority-default 67)
     (org-agenda-start-with-clockreport-mode t)
     (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
+    (org-confirm-babel-evaluate nil)
+    (org-babel-load-languages '((python . t)
+                                (emacs-lisp . t)))
     :config
     ;; Org Capture Configuration
     (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -1060,10 +1070,10 @@ Color delimiters like parens and braces according to their depth
       ;; ("M-k" org-metaup "move up")
       ("q" nil "quit"))
     )
-  ()
-  ;; org-agenda timeline view
+#+end_src
+** Org Timeline
+#+begin_src emacs-lisp
   (use-package org-timeline)
-
 #+end_src
 
 ** ORG SUPERSTAR
