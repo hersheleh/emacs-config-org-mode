@@ -1025,94 +1025,95 @@ Color delimiters like parens and braces according to their depth
 #+end_src
 ** Org Customizations
 #+begin_src emacs-lisp
-   (use-package org
-    :defer t
-    ;; :after (org-timeline)
-    :bind
-    ("C-c a" . org-agenda)
-    (:map org-mode-map
-      ("C-c C-f" . hydra-org/org-forward-heading-same-level)
-      ("C-c C-b" . hydra-org/org-backward-heading-same-level)
-      ("C-c C-p" . hydra-org/org-previous-visible-heading)
-      ("C-c C-n" . hydra-org/org-next-visible-heading)
-      ("M-n" . org-metadown)
-      ("M-p" . org-metaup)
-      ("C-c C-j" . counsel-org-goto)
-      ("C-c t" . org-todo))
+  (use-package org
+   :defer t
+   ;; :after (org-timeline)
+   :bind
+   ("C-c a" . org-agenda)
+   (:map org-mode-map
+     ("C-c C-f" . hydra-org/org-forward-heading-same-level)
+     ("C-c C-b" . hydra-org/org-backward-heading-same-level)
+     ("C-c C-p" . hydra-org/org-previous-visible-heading)
+     ("C-c C-n" . hydra-org/org-next-visible-heading)
+     ("M-n" . org-metadown)
+     ("M-p" . org-metaup)
+     ("C-c C-j" . counsel-org-goto)
+     ("C-c t" . org-todo))
 
-    :hook
-    (org-mode . visual-line-mode)
-    (org-mode . visual-fill-column-mode)
-    (org-mode . electric-pair-local-mode)
-    :custom
-    (org-src-window-setup 'current-window)
-    (org-hide-emphasis-markers t)
-    (org-priority-highest 65)
-    (org-priority-lowest 69)
-    (org-priority-default 67)
-    (org-agenda-window-setup 'current-window)
-    (org-agenda-start-with-clockreport-mode t)
-    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
-    (org-confirm-babel-evaluate nil)
-    :config
-    (org-babel-do-load-languages 'org-babel-load-languages
-                 (append org-babel-load-languages
-                     '((C . t) (python . t))))
-    ;; Org Capture Configuration
-    (setq org-default-notes-file (concat org-directory "/notes.org"))
-    ;; Org Agenda
-    (setq org-agenda-span 'day)
-    (setq org-agenda-include-diary nil)
-    ;; Add graphical timeline to org agenda
-    (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
-    (setq org-agenda-files
-      '(
-        ;; "~/hub/orgs/my_todos.org"
-        "~/hub/orgs/music_todos.org"
-        "~/hub/orgs/house_todos.org"
-        "~/hub/orgs/mental_todos.org"
-        "~/hub/orgs/work.org"
-        ;; "~/hub/new_projects/orgi/orgi_plan.org"
-        ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
-        ;; "~/.emacs.d/config.org"
-        ))
-    (setq org-todo-keywords
-      ;; '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)"))
-      '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)"))
-      ;; '((sequence "RECUR" "TODO" "CHOOSE" "|" "DONE"))
-      )
-    (setq org-agenda-start-with-log-mode t)
-    (setq org-agenda-log-mode-items '(clock state))
-    (setq org-log-done 'time)
-    (setq org-log-into-drawer t)
-
-    (setq org-startup-indented t)
-    (custom-set-faces
-     '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
-     '(org-level-2 ((t (:inherit outline-2 :height 1.17))))
-     '(org-level-3 ((t (:inherit outline-3 :height 1.15))))
-     '(org-level-4 ((t (:inherit outline-4 :height 1.12))))
-     '(org-level-5 ((t (:inherit outline-5 :height 1.10))))
+   :hook
+   (org-mode . visual-line-mode)
+   (org-mode . visual-fill-column-mode)
+   (org-mode . electric-pair-local-mode)
+   :custom
+   (org-src-window-setup 'current-window)
+   (org-hide-emphasis-markers t)
+   (org-priority-highest 65)
+   (org-priority-lowest 69)
+   (org-priority-default 67)
+   (org-agenda-window-setup 'current-window)
+   (org-agenda-start-with-clockreport-mode t)
+   (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
+   (org-confirm-babel-evaluate nil)
+   :config
+   (org-babel-do-load-languages 'org-babel-load-languages
+                (append org-babel-load-languages
+                    '((C . t) (python . t))))
+   ;; Org Capture Configuration
+   (setq org-default-notes-file (concat org-directory "/notes.org"))
+   ;; Org Agenda
+   (setq org-agenda-span 'day)
+   (setq org-agenda-include-diary nil)
+   ;; Add graphical timeline to org agenda
+   (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
+   (setq org-agenda-files
+     '(
+       ;; "~/hub/orgs/my_todos.org"
+       "~/hub/orgs/music_todos.org"
+       "~/hub/orgs/house_todos.org"
+       "~/hub/orgs/mental_todos.org"
+       "~/hub/orgs/work.org"
+       "~/hub/orgs/contracts.org"
+       ;; "~/hub/new_projects/orgi/orgi_plan.org"
+       ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
+       ;; "~/.emacs.d/config.org"
+       ))
+   (setq org-todo-keywords
+     ;; '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)"))
+     '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)"))
+     ;; '((sequence "RECUR" "TODO" "CHOOSE" "|" "DONE"))
      )
+   (setq org-agenda-start-with-log-mode t)
+   (setq org-agenda-log-mode-items '(clock state))
+   (setq org-log-done 'time)
+   (setq org-log-into-drawer t)
 
-    (add-to-list 'org-structure-template-alist '("sel" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("scl" . "src sclang"))
-
-    (defhydra hydra-org ()
-      "org hydra"
-      ("n" org-next-visible-heading "next visible")
-      ("p" org-previous-visible-heading "prev visible")
-      ("f" org-forward-heading-same-level "forward level")
-      ("b" org-backward-heading-same-level "backward level")
-      ("C-n" org-next-visible-heading)
-      ("C-p" org-previous-visible-heading)
-      ("C-f" org-forward-heading-same-level)
-      ("C-b" org-backward-heading-same-level)
-      ("TAB" org-cycle "cycle")
-      ;; ("M-j" org-metadown "move down")
-      ;; ("M-k" org-metaup "move up")
-      ("q" nil "quit"))
+   (setq org-startup-indented t)
+   (custom-set-faces
+    '(org-level-1 ((t (:inherit outline-1 :height 1.20))))
+    '(org-level-2 ((t (:inherit outline-2 :height 1.17))))
+    '(org-level-3 ((t (:inherit outline-3 :height 1.15))))
+    '(org-level-4 ((t (:inherit outline-4 :height 1.12))))
+    '(org-level-5 ((t (:inherit outline-5 :height 1.10))))
     )
+
+   (add-to-list 'org-structure-template-alist '("sel" . "src emacs-lisp"))
+   (add-to-list 'org-structure-template-alist '("scl" . "src sclang"))
+
+   (defhydra hydra-org ()
+     "org hydra"
+     ("n" org-next-visible-heading "next visible")
+     ("p" org-previous-visible-heading "prev visible")
+     ("f" org-forward-heading-same-level "forward level")
+     ("b" org-backward-heading-same-level "backward level")
+     ("C-n" org-next-visible-heading)
+     ("C-p" org-previous-visible-heading)
+     ("C-f" org-forward-heading-same-level)
+     ("C-b" org-backward-heading-same-level)
+     ("TAB" org-cycle "cycle")
+     ;; ("M-j" org-metadown "move down")
+     ;; ("M-k" org-metaup "move up")
+     ("q" nil "quit"))
+   )
 
 #+end_src
 ** Org Timeline
