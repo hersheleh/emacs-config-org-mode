@@ -1,9 +1,9 @@
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
-This is my my personal emacs config file. It is a literate config. Org mode will tangle this config into the co-located init.el file. This config uses lsp-mode and ivy-mode as the primary convenience features. It is a bit disorganized as I've assembled it sporadically over time piece by piece. I'm planning to refactor this config to be more organized so other's could use it for reference or inspiration. I was primarily inspired by System Crafter's [[https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs From Scratch]] youtube series.
+This is *my* personal emacs config file. It is a literate config. Org mode will tangle this config into the co-located init.el file. This config uses lsp-mode and ivy-mode as the primary convenience features. It is a bit disorganized as I've assembled it sporadically over time piece by piece. I'm planning to  refactor this config to be more organized so other's could use it for reference or inspiration. I was primarily inspired by David Wilson's [[https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs From Scratch]] youtube series.
 * Emacs Performace
-
+Increase garbage collection threshold to lower startup time.
 #+begin_src emacs-lisp :tangle ./early-init.el
   ;; Set Garbage collection threshold very high at startup
   (setq gc-cons-threshold (* 100 1000 1000))
@@ -94,7 +94,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (setq make-backup-files nil)
 #+end_src
 
-* Display time in the modeline
+* COMMENT Display time in the modeline
 #+begin_src emacs-lisp
   (setq display-time-default-load-average nil)
   (display-time)
@@ -235,10 +235,9 @@ Supress splash screen.
 ** Set Default Font
 Set the default font for different systems
 #+begin_src emacs-lisp
-
   (defun gsh/set-font ()
     (message "Setting font")
-    (set-frame-font "Ubuntu Mono-13:bold" nil t))
+    (set-frame-font "DM Mono-13:medium" nil t))
 
   (when my-macbook-p (set-frame-font "Menlo 14" nil t))
 
@@ -283,24 +282,30 @@ Set the default font for different systems
   #+end_src
 * THEME
 # Currently using the Doom [[https://github.com/tomasr/molokai][Molokai]] Theme
-Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme
-:themes_I_like:
- * themes I like:
-   * doom-ir-black (black theme)
-   * doom-moonlight
-   * doom-outrun-electric
-   * doom-fairy-floss (nice light/dark theme)
-   * doom-acario-light (good light theme)
-   * doom-acario-dark (black theme)
-   * doom-pine
-   * doom-old-hope
-   * wombat
-   * doom-badger
-   * doom-dark+
-   * doom-snazzy
-   * doom-henna
-To select a theme use 'M-x customize-theme'
+Currently using the [[https://monokai.pro/][Doom Monokai-Classic]] theme.
+You can choose a theme by executing *M-x customize-theme* you can turn off the safe dialog by executring *(setq custom-safe-themes t)*
 
+:themes_I_like:
+ * doom-ir-black (black theme)
+ * doom-moonlight
+ * doom-outrun-electric
+ * doom-fairy-floss (nice light/dark theme)
+ * doom-acario-light (good light theme)
+ * doom-acario-dark (black theme)
+ * doom-pine
+ * doom-old-hope
+ * wombat
+ * doom-badger
+ * doom-dark+
+ * doom-gruvbox
+ * doom-henna
+ * doom-manegarm
+ * doom-material-dark
+ * doom-snazzy
+ * doom-zenburn
+ * doom-horizon
+ * doom-feather-dark
+   To select a theme use 'M-x customize-theme'
 :END:
 #+begin_src emacs-lisp
   (use-package doom-themes
@@ -314,10 +319,6 @@ To select a theme use 'M-x customize-theme'
           doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
     ;; (custom-set-variables
     ;; '(doom-molokai-brighter-comments t))
-    ;; (load-theme 'doom-monokai-classic t)
-    ;; (load-theme 'doom-acario-dark t)
-    ;; (load-theme 'doom-moonlight t)
-    (load-theme 'doom-badger t)
 
     ;; customize the doom monkai theme
     (custom-set-faces
@@ -325,6 +326,8 @@ To select a theme use 'M-x customize-theme'
      ;; '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
      '(show-paren-match ((t (:background "#FD971F" :foreground "black"
                                          :weight ultra-bold))))))
+
+      (load-theme 'doom-oceanic-next t)
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -351,6 +354,12 @@ These are packages which assist in navigating emacs
 #+begin_src emacs-lisp
   ;; (recentf-mode 1)
 #+end_src
+* Avy (quickly jump to a char)
+#+begin_src emacs-lisp
+  (use-package avy
+    :bind (("C-:" . avy-goto-char)))
+#+end_src
+
 * IVY MODE
 Ivy Mode speeds up navigation by perfoming text matching against
 possible inputs
@@ -358,7 +367,7 @@ possible inputs
   (use-package ivy
     :bind (("C-s" . counsel-grep-or-swiper)
            ("C-M-s" . swiper-isearch)
-           ("C-r" . swiper-backward)
+           ;; ("C-r" . swiper-backward)
            ;; ("C-c C-r" . ivy-resume)
            ;; ("<f6>" . ivy-resume)
            ("M-x" . counsel-M-x)
@@ -765,12 +774,14 @@ This is a mode for the sclang language for SuperCollider
     :load-path
     (lambda ()
       (cond
-       (my-macbook-p "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
-       (my-sc-thinkpad-p "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
+       (my-macbook-p
+        "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
+       (my-sc-thinkpad-p
+        "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
     :mode ("\\.scd\\'" . sclang-mode)
     :bind(:map sclang-mode-map
                ("C-c C-l"    . sclang-eval-line)
-               ("C-<return>" . sclang-eval-defunsclang)
+               ("C-<return>" . sclang-eval-defun)
                ("C-." . sclang-main-stop)
                ("C-c C-h" . sclang-find-help-in-gui))
     :custom
@@ -782,6 +793,21 @@ This is a mode for the sclang language for SuperCollider
             (append
              exec-path
              '("/Applications/SuperCollider.app/Contents/MacOS/")))))
+#+end_src
+
+*** Org Babel SuperCollider
+Package to add supercollider support to org-babel
+#+begin_src emacs-lisp
+  (use-package ob-sclang
+    :ensure nil
+    :demand t
+    :bind (:map org-mode-map
+                ("C-." . sclang-main-stop))
+    :load-path "/home/grish/.emacs.d/git-lisp/ob-sclang"
+    :config
+    (org-babel-do-load-languages 'org-babel-load-languages
+                                 (append org-babel-load-languages
+                                         '((sclang . t) ))))
 #+end_src
 
 ** Python
@@ -846,8 +872,6 @@ This is a mode for the sclang language for SuperCollider
            :args "~/hub/ripl/pw-backend/src/pw_backend_app/parser/MW-562withoutfein_filled_out2.pdf"))
 
     )
-
-
 #+end_src
 Was getting encoding errors in run-python buffer on windows
 This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-executing-python-in-emacs-not-in-terminal][stackexchange]] answer suggested the following fix
@@ -922,6 +946,16 @@ This mode expands
   (use-package terraform-mode
     :defer t)
 #+end_src
+** Keymaps (Devicetree mode)
+#+begin_src emacs-lisp
+  (use-package dts-mode
+    :mode "\\.keymap\\'"
+    :custom
+    (tab-width 4)
+    (truncate-lines t)
+    ;;(display-line-numbers 'relative)
+    )
+#+end_src
 
 ** COMMENT Yaml
 #+begin_src emacs-lisp
@@ -991,33 +1025,39 @@ Color delimiters like parens and braces according to their depth
 #+end_src
 ** Org Customizations
 #+begin_src emacs-lisp
-  (use-package org
+   (use-package org
     :defer t
     ;; :after (org-timeline)
-    :bind (:map org-mode-map
-                ("C-c C-f" . hydra-org/org-forward-heading-same-level)
-                ("C-c C-b" . hydra-org/org-backward-heading-same-level)
-                ("C-c C-p" . hydra-org/org-previous-visible-heading)
-                ("C-c C-n" . hydra-org/org-next-visible-heading)
-                ("M-n" . org-metadown)
-                ("M-p" . org-metaup)
-                ("C-c C-j" . counsel-org-goto)
-                ("C-c t" . org-todo))
+    :bind
+    ("C-c a" . org-agenda)
+    (:map org-mode-map
+      ("C-c C-f" . hydra-org/org-forward-heading-same-level)
+      ("C-c C-b" . hydra-org/org-backward-heading-same-level)
+      ("C-c C-p" . hydra-org/org-previous-visible-heading)
+      ("C-c C-n" . hydra-org/org-next-visible-heading)
+      ("M-n" . org-metadown)
+      ("M-p" . org-metaup)
+      ("C-c C-j" . counsel-org-goto)
+      ("C-c t" . org-todo))
+
     :hook
     (org-mode . visual-line-mode)
     (org-mode . visual-fill-column-mode)
     (org-mode . electric-pair-local-mode)
     :custom
-    (org-agenda-window-setup 'current-window)
+    (org-src-window-setup 'current-window)
+    (org-hide-emphasis-markers t)
     (org-priority-highest 65)
     (org-priority-lowest 69)
     (org-priority-default 67)
+    (org-agenda-window-setup 'current-window)
     (org-agenda-start-with-clockreport-mode t)
     (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
     (org-confirm-babel-evaluate nil)
-    (org-babel-load-languages '((python . t)
-                                (emacs-lisp . t)))
     :config
+    (org-babel-do-load-languages 'org-babel-load-languages
+                 (append org-babel-load-languages
+                     '((C . t) (python . t))))
     ;; Org Capture Configuration
     (setq org-default-notes-file (concat org-directory "/notes.org"))
     ;; Org Agenda
@@ -1026,19 +1066,21 @@ Color delimiters like parens and braces according to their depth
     ;; Add graphical timeline to org agenda
     (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
     (setq org-agenda-files
-          '("~/hub/orgs/my_todos.org"
-            "~/hub/orgs/music_todos.org"
-            "~/hub/orgs/house_todos.org"
-            "~/hub/orgs/mental_todos.org"
-            ;; "~/hub/new_projects/orgi/orgi_plan.org"
-            ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
-            ;; "~/.emacs.d/config.org"
-            ))
+      '(
+        ;; "~/hub/orgs/my_todos.org"
+        "~/hub/orgs/music_todos.org"
+        "~/hub/orgs/house_todos.org"
+        "~/hub/orgs/mental_todos.org"
+        "~/hub/orgs/work.org"
+        ;; "~/hub/new_projects/orgi/orgi_plan.org"
+        ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
+        ;; "~/.emacs.d/config.org"
+        ))
     (setq org-todo-keywords
-          ;; '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)"))
-          '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)"))
-          ;; '((sequence "RECUR" "TODO" "CHOOSE" "|" "DONE"))
-          )
+      ;; '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)"))
+      '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)"))
+      ;; '((sequence "RECUR" "TODO" "CHOOSE" "|" "DONE"))
+      )
     (setq org-agenda-start-with-log-mode t)
     (setq org-agenda-log-mode-items '(clock state))
     (setq org-log-done 'time)
@@ -1053,7 +1095,8 @@ Color delimiters like parens and braces according to their depth
      '(org-level-5 ((t (:inherit outline-5 :height 1.10))))
      )
 
-    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("sel" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("scl" . "src sclang"))
 
     (defhydra hydra-org ()
       "org hydra"
@@ -1070,9 +1113,11 @@ Color delimiters like parens and braces according to their depth
       ;; ("M-k" org-metaup "move up")
       ("q" nil "quit"))
     )
+
 #+end_src
 ** Org Timeline
 #+begin_src emacs-lisp
+  ;; org-agenda timeline view
   (use-package org-timeline)
 #+end_src
 
@@ -1101,8 +1146,11 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 ** Visual Fill Column
 #+begin_src emacs-lisp
   (use-package visual-fill-column
+    :custom
+    (visual-fill-column-center-text t)
     :hook
-    (visual-fill-column-mode . (lambda () (setq visual-fill-column-width 80))))
+    (visual-fill-column-mode . (lambda ()
+                                 (setq visual-fill-column-width 80))))
 #+end_src
 
 ** COMMENT Org-Roam-UI
@@ -1163,14 +1211,15 @@ Installed this to browse Help documentation for SuperCollider
   (use-package w3m)
 #+end_src
 
-* COMMENT Buffer Move
+* Buffer Move
 Simplify Swapping buffers
 #+begin_src emacs-lisp
   (use-package buffer-move
-    :bind (("C-c b l" . buf-move-right)
-           ("C-c b j" . buf-move-left)
-           ("C-c b i" . buf-move-up)
-           ("C-c b k" . buf-move-down)))
+    ;; :bind (("C-c b l" . buf-move-right)
+    ;;        ("C-c b j" . buf-move-left)
+    ;;        ("C-c b i" . buf-move-up)
+    ;;        ("C-c b k" . buf-move-down))
+    )
 #+end_src
 
 * DASHBOARD
@@ -1179,6 +1228,7 @@ Simplify Swapping buffers
     :demand t
     :after (page-break-lines all-the-icons)
     :init
+    (setq dashboard-center-content nil)
     (setq dashboard-display-icons-p t)
     (setq dashboard-icon-type 'nerd-icons)
     (setq dashboard-set-heading-icons t)
@@ -1197,18 +1247,20 @@ Simplify Swapping buffers
     (setq dashboard-agenda-sort-strategy
           '(todo-state-down
             priority-up
-            time-down))
-    (setq dashboard-agenda-time-string-format "%b %d %Y %a ")
+            time-up))
+    (setq dashboard-agenda-time-string-format "%b %d %Y %a %I:%M %p")
     ;; (setq dashboard-agenda-prefix-format " %i %-12:c %s ")
-    (setq dashboard-agenda-prefix-format " %i %s ")
+    ;; (setq dashboard-agenda-prefix-format "|%i %s %t | %-12c | ")
+    ;; (setq dashboard-agenda-prefix-format "|%i %s %t | ")
+    (setq dashboard-agenda-prefix-format "%i %s %t| ")
     (setq dashboard-agenda-release-buffers t)
-    ;; (setq initial-buffer-choice
-    ;;       (lambda () (get-buffer-create "*dashboard*")))
+    (setq initial-buffer-choice
+          (lambda () (get-buffer-create "*dashboard*")))
     (dashboard-setup-startup-hook)
     ;; dashboard icons don't quite load.
-    ;; buffer needs to be reverted
-    ;; (add-hook 'server-after-make-frame-hook
-    ;;           'revert-buffer)
+    buffer needs to be reverted
+    (add-hook 'server-after-make-frame-hook
+              'revert-buffer)
     )
 
 #+end_src
@@ -1234,15 +1286,37 @@ Simplify Swapping buffers
     (savehist-mode 1)
     (setq history-length 25))
 #+end_src
+
+* PDF-Tools
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :mode ("\\.pdf\\'" . pdf-view-mode))
+#+end_src
+
+* Epub reader nov-mode
+#+begin_src emacs-lisp
+  (defun my-nov-font-setup ()
+    (face-remap-add-relative 'variable-pitch
+			     :family "Liberation Serif"
+			     :height 1.0))
+  (use-package nov
+    :mode ("\\.epub\\'" . nov-mode)
+    :hook
+    (nov-mode . my-nov-font-setup)
+    (nov-mode . visual-line-mode)
+    (nov-mode . visual-fill-column-mode)
+    :custom
+    (nov-text-width 80)
+    (nov-text-width t))
+#+end_src
 * Garbage Collection
 #+begin_src emacs-lisp
   ;; Set Garbage collection threshold back down after startup completes
   (add-hook 'emacs-startup-hook
-            (lambda ()
-              ;; (setq gc-cons-threshold (* 100 1000 1000))
-              (setq file-name-handler-alist default-file-name-handler-alist)
-              ))
-  ;; (setq gc-cons-threshold (* 2 1000 1000))
+        (lambda ()
+          ;; (setq gc-cons-threshold (* 100 1000 1000))
+          (setq file-name-handler-alist default-file-name-handler-alist)))
+          ;;(setq gc-cons-threshold (* 2 1000 1000))))
 #+end_src
 * TODOS:
 ** TODO ADD Table of Contents for this document.
