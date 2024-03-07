@@ -1169,25 +1169,41 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (use-package org-pomodoro
     :after org
+    :config
+    (cond
+     (my-macbook-p
+      (setq org-pomodoro-overtime-sound
+       "/Users/Grisha/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-start-sound
+       "/Users/Grisha/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-finished-sound
+       "/Users/Grisha/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-short-break-sound
+       "/Users/Grisha/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-long-break-sound
+       "/Users/Grisha/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      )
+     (my-sc-thinkpad-p
+      (setq org-pomodoro-overtime-sound
+       "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-start-sound
+       "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-finished-sound
+       "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-short-break-sound
+       "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
+      (setq org-pomodoro-long-break-sound
+       "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")))
+
     :custom
     ;; (org-pomodoro-audio-player (executable-find "play"))
-    (org-pomodoro-overtime-sound
-     "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
-    (org-pomodoro-start-sound
-     "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
-    (org-pomodoro-finished-sound
-     "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
-    (org-pomodoro-short-break-sound
-     "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
-    (org-pomodoro-long-break-sound
-     "/home/grish/.emacs.d/my-statics/pom_sounds/bell_quiet.wav")
-    (org-pomodoro-short-break-length 7)
-    (org-pomodoro-ticking-sound-p nil)
-    (org-pomodoro-manual-break t))
+      (org-pomodoro-short-break-length 6)
+      (org-pomodoro-ticking-sound-p nil)
+      (org-pomodoro-manual-break t))
 
-  ;; The following fixes sounds not working on windows
-  ;; (use-package sound-wav)
-  ;; (use-package powershell)
+     ;; The following fixes sounds not working on windows
+     ;; (use-package sound-wav)
+     ;; (use-package powershell)
 #+end_src
 * Helpful (better help documentation)
 #+begin_src emacs-lisp
