@@ -729,6 +729,7 @@ Syntax checking and linting.
     :mode ("\\.keymap\\'" . c-mode)
     :hook
     (c++-mode . lsp-deferred)
+    (c-mode . lsp-deferred)
     :config
     (require 'dap-cpptools)
     (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
@@ -969,6 +970,10 @@ This mode expands
   (use-package web-mode
     :mode
     ("\\.html"))
+#+end_src
+** Arduino Mode
+#+begin_src emacs-lisp
+(use-package arduino-mode)
 #+end_src
 
 * Markdown
