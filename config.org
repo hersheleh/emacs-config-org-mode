@@ -216,10 +216,11 @@ Show Columns in Modeline.
 Display Line Numbers Globaly.
 Supress splash screen.
 #+begin_src emacs-lisp
+(when (display-graphic-p)
   (scroll-bar-mode -1)          ; remove scroll bar
   (column-number-mode)          ; show column number in modline
   (tool-bar-mode -1)
-  (menu-bar-mode -1)
+  (menu-bar-mode -1))
   (setq ring-bell-function 'ignore)
   ;;(global-display-line-numbers-mode 1) ; enable line numbers in margin globably
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
