@@ -814,6 +814,7 @@ Package to add supercollider support to org-babel
     :load-path
     (lambda ()
       (cond
+       (my-macbook-p "/Users/Grisha/.emacs.d/git-lisp/ob-sclang")
        (my-sc-thinkpad-p "/home/grish/.emacs.d/git-lisp/ob-sclang")
        (my-steam-deck-p "/home/deck/.emacs.d/git-lisp/ob-sclang")))
     :config
