@@ -1003,6 +1003,8 @@ current way interferes with dap-mode terminal input
 #+begin_src emacs-lisp
   (use-package vterm
     :commands vterm
+    :config
+    (when my-steam-deck-p (setq vterm-shell "/usr/bin/fish"))
     ;; :hook
     ;; turn off line numbers in vterm
     ;; (vterm-mode . (lambda () (display-line-numbers-mode 0)))
@@ -1067,7 +1069,8 @@ Color delimiters like parens and braces according to their depth
     (org-mode . visual-fill-column-mode)
     (org-mode . electric-pair-local-mode)
     :custom
-    (org-tags-column -66)
+    (org-clock-display-default-range 'untilnow)
+    (org-tags-column -55)
     (org-src-window-setup 'current-window)
     (org-hide-emphasis-markers t)
     (org-priority-highest 65)
@@ -1096,6 +1099,8 @@ Color delimiters like parens and braces according to their depth
             "~/hub/orgs/mental_todos.org"
             "~/hub/orgs/work.org"
             "~/hub/orgs/contracts.org"
+            "~/hub/orgs/social_todos.org"
+            "~/hub/orgs/job.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
             ;; "~/.emacs.d/config.org"
@@ -1204,9 +1209,10 @@ Slip Card system for organizing thoughts. Zettelkasten Method
       (setq org-pomodoro-finished-sound bell_quiet)
       (setq org-pomodoro-short-break-sound bell_quiet)
       (setq org-pomodoro-long-break-sound bell_quiet))
-
+    (when my-steam-deck-p
+      (setq org-pomodoro-audio-player (executable-find "play")))
     :custom
-    ;; (org-pomodoro-audio-player (executable-find "play"))
+
       (org-pomodoro-short-break-length 6)
       (org-pomodoro-ticking-sound-p nil)
       (org-pomodoro-manual-break t))
