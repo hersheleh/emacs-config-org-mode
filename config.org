@@ -1095,12 +1095,12 @@ Color delimiters like parens and braces according to their depth
     (setq org-agenda-files
           '(
             ;; "~/hub/orgs/my_todos.org"
-            "~/hub/orgs/music_todos.org"
-            "~/hub/orgs/house_todos.org"
-            "~/hub/orgs/mental_todos.org"
+            "~/hub/orgs/music.org"
+            "~/hub/orgs/house.org"
+            "~/hub/orgs/mental.org"
             "~/hub/orgs/work.org"
             "~/hub/orgs/contracts.org"
-            "~/hub/orgs/social_todos.org"
+            "~/hub/orgs/social.org"
             "~/hub/orgs/job.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
