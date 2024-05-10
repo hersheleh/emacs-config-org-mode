@@ -1079,7 +1079,7 @@ Color delimiters like parens and braces according to their depth
     (org-priority-default 67)
     (org-agenda-window-setup 'current-window)
     (org-agenda-start-with-clockreport-mode t)
-    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
+    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3 :fileskip0 t))
     (org-confirm-babel-evaluate nil)
     :config
     (org-babel-do-load-languages 'org-babel-load-languages
@@ -1126,8 +1126,8 @@ Color delimiters like parens and braces according to their depth
      '(org-level-5 ((t (:inherit outline-5 :height 1.10))))
      )
 
-    (add-to-list 'org-structure-template-alist '("sel" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("scl" . "src sclang"))
+    (add-to-list 'org-structure-template-alist '("sc" . "src sclang"))
+    (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
 
     (defhydra hydra-org ()
       "org hydra"
