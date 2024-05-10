@@ -990,7 +990,8 @@ This mode expands
 #+end_src
 ** Arduino Mode
 #+begin_src emacs-lisp
-(use-package arduino-mode)
+  (use-package arduino-mode
+    :mode ("\\.ino\\'" . arduino-mode))
 #+end_src
 
 * Markdown
