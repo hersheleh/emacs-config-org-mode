@@ -1211,7 +1211,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
       (setq org-pomodoro-short-break-sound bell_quiet)
       (setq org-pomodoro-long-break-sound bell_quiet))
     (when my-steam-deck-p
-      (setq org-pomodoro-audio-player (executable-find "play")))
+      (setq org-pomodoro-audio-player (executable-find "aplay")))
     :custom
 
       (org-pomodoro-short-break-length 6)
