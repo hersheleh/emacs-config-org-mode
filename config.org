@@ -56,6 +56,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (defvar my-macbook-p (equal system-type 'darwin))
   (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
   (defvar my-steam-deck-p (string-match-p "steamdeck" system-name))
+  (defvar perfect-circuit-p (equal (system-name) "Grisha"))
   (defvar my-gnu-linux-p (equal system-type 'gnu/linux))
 
   (global-auto-revert-mode)        ; revert buffers when changed on disk
@@ -312,6 +313,7 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
  * doom-zenburn
  * doom-horizon
  * doom-feather-dark
+ * doom-ayu-dark
    To select a theme use 'M-x customize-theme'
 :END:
 #+begin_src emacs-lisp
@@ -320,6 +322,7 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
     :init (setq custom-safe-themes t)
     :custom
     (doom-monokai-classic-brighter-comments t)
+    (doom-henna-brighter-comments t)
     ;; (doom-acario-dark-brighter-comments t)
     :config
     (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
@@ -332,9 +335,13 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
      '(counsel--mark-ring-highlight ((t (:inherit highlight))))
      ;; '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
      '(show-paren-match ((t (:background "#FD971F" :foreground "black"
-                                         :weight ultra-bold))))))
+                                         :weight ultra-bold)))))
+    ;; (load-theme 'doom-henna t)
+    ;; (load-theme 'doom-oceanic-next t)
+    ;; (load-theme 'doom-ayu-dark t)
+    (load-theme 'doom-gruvbox t)
+    )
 
-      (load-theme 'doom-oceanic-next t)
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -494,14 +501,12 @@ possible key presses along with documentation for that key press.
   (use-package treemacs
     :defer t
     :custom
-    (treemacs-python-executable "python")
+    (treemacs-python-executable "python3")
+    (treemacs-git-mode nil)
     :config
-    (setq treemacs-git-mode nil)
     (treemacs-project-follow-mode)
     :hook
-    (treemacs-select . windmove-right)
-
-    )
+    (treemacs-select . windmove-right))
   ;; (use-package treemacs-icons-dired
   ;;   :after dired
   ;;   :config (treemacs-icons-dired-mode))
@@ -842,10 +847,6 @@ Package to add supercollider support to org-babel
     ;;                           ;; (flycheck-disable-checker 'lsp)
     ;;                           ;; (flycheck-select-checker 'python-pylint)
     ;;                           ))
-
-
-
-
     :config
     (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
     ;; (setq py-python-command "python3")
@@ -904,35 +905,53 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
 
 
 ** Javascript
-*** jtsx mode
-This mode expands
+*** js2 mode
 #+begin_src emacs-lisp
-    (use-package jtsx
-      :custom
-      (typescript-ts-mode-indent-offset 4)
-      :mode
-      ("\\.tsx\\'" . jtsx-tsx-mode)
-      ("\\.jsx\\'" . jtsx-jsx-mode)
-      :hook
-      (jtsx-tsx-mode . lsp-deferred)
-      (jtsx-js-mode . lsp-deferred)
-      :config
-      ;; (setq standard-indent 2)
-      )
-      ;;                           (if (eq major-mode 'tsx-ts-mode)
-      ;;                               (flycheck-select-checker
-      ;;                                'javascript-eslint))
+  (use-package js2-mode
+    :custom
+    (js2-strict-missing-semi-warning nil)
+    (js-indent-level 2)
+    :mode ("\\.js\\'")
+    :hook (js2-mode . lsp-deferred))
 #+end_src
 *** typescript mode
 #+begin_src emacs-lisp
   (use-package typescript-ts-mode
     :ensure nil
-    :mode ("\\.ts\\'" "\\.js\\'")
+    ;; :mode ("\\.ts\\'" "\\.js\\'")
+    :mode ("\\.ts\\'")
     :hook
     (typescript-ts-mode . lsp-deferred))
 #+end_src
+*** tsx-ts-mode
+#+begin_src emacs-lisp
+  (use-package tsx-ts-mode
+    :ensure nil
+    :mode ("\\.tsx\\'")
+    :hook (tsx-ts-mode . lsp-deferred))
+#+end_src
+*** jtsx mode
+This mode expands
+#+begin_src emacs-lisp
+  (use-package jtsx
+    :custom
+    (typescript-ts-mode-indent-offset 4)
+    :mode
+    ("\\.tsx\\'" . jtsx-tsx-mode)
+    ("\\.jsx\\'" . jtsx-jsx-mode)
+    ("\\/client\\/.*\\.js\\'" . jtsx-jsx-mode)
+    ;; ("/client\(/[^/]+\)+\\.js\\'" . jtsx-jsx-mode)
+    :hook
+    (jtsx-jsx-mode . lsp-deferred)
+    ;; (jtsx-js-mode . lsp-deferred)
+    ;; :config
+    ;; (setq standard-indent 2)
+    )
+  ;;                           (if (eq major-mode 'tsx-ts-mode)
+  ;;                               (flycheck-select-checker
+  ;;                                'javascript-eslint))
+#+end_src
 *** JSON
-
 #+begin_src emacs-lisp
   (use-package json-ts-mode
     :ensure nil
@@ -1061,6 +1080,7 @@ Color delimiters like parens and braces according to their depth
           ("C-c C-b" . hydra-org/org-backward-heading-same-level)
           ("C-c C-p" . hydra-org/org-previous-visible-heading)
           ("C-c C-n" . hydra-org/org-next-visible-heading)
+          ("C-c C-u" . hydra-org/outline-up-heading)
           ("M-n" . org-metadown)
           ("M-p" . org-metaup)
           ("C-c C-j" . counsel-org-goto)
@@ -1080,7 +1100,7 @@ Color delimiters like parens and braces according to their depth
     (org-priority-default 67)
     (org-agenda-window-setup 'current-window)
     (org-agenda-start-with-clockreport-mode t)
-    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3 :fileskip0 t))
+    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4 :fileskip0 t))
     (org-confirm-babel-evaluate nil)
     :config
     (org-babel-do-load-languages 'org-babel-load-languages
@@ -1104,6 +1124,8 @@ Color delimiters like parens and braces according to their depth
             "~/hub/orgs/contracts.org"
             "~/hub/orgs/social.org"
             "~/hub/orgs/job.org"
+            "~/hub/orgs/perfect_circuit.org"
+            "~/hub/orgs/programming.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
             ;; "~/.emacs.d/config.org"
@@ -1136,10 +1158,12 @@ Color delimiters like parens and braces according to their depth
       ("p" org-previous-visible-heading "prev visible")
       ("f" org-forward-heading-same-level "forward level")
       ("b" org-backward-heading-same-level "backward level")
+      ("u" outline-up-heading "up level")
       ("C-n" org-next-visible-heading)
       ("C-p" org-previous-visible-heading)
       ("C-f" org-forward-heading-same-level)
       ("C-b" org-backward-heading-same-level)
+      ("C-u" outline-up-heading)
       ("TAB" org-cycle "cycle")
       ;; ("M-j" org-metadown "move down")
       ;; ("M-k" org-metaup "move up")
@@ -1214,6 +1238,8 @@ Slip Card system for organizing thoughts. Zettelkasten Method
       (setq org-pomodoro-long-break-sound bell_quiet))
     (when my-steam-deck-p
       (setq org-pomodoro-audio-player (executable-find "aplay")))
+    (when perfect-circuit-p
+      (setq org-pomodoro-audio-player (executable-find "play")))
     :custom
 
       (org-pomodoro-short-break-length 6)
