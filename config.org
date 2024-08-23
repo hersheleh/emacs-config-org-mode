@@ -101,12 +101,11 @@ Define function to time Emacs startup and determine # of garbage collections
   (setq make-backup-files nil)
 #+end_src
 
-* COMMENT Display time in the modeline
+* MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
-  (setq display-time-default-load-average nil)
-  (display-time)
+  (use-package magit
+    :commands magit-status)
 #+end_src
-
 * Electricity
 #+begin_src emacs-lisp
   (electric-indent-mode)
@@ -243,9 +242,6 @@ Supress splash screen.
 ** Set Default Font
 Set the default font for different systems
 #+begin_src emacs-lisp
-  (defun gsh/set-font ()
-    (message "Setting font")
-    (set-frame-font "DM Mono-13:medium" nil t))
 
   (when my-macbook-p (set-frame-font "Menlo 14" nil t))
 
@@ -253,6 +249,10 @@ Set the default font for different systems
   ;; (set-frame-font "Consolas-11:bold" nil t)
 
   (when my-gnu-linux-p
+    (defun gsh/set-font ()
+      (message "Setting font")
+      (set-frame-font "DM Mono-11:medium" nil t))
+
     (if (daemonp)
         (add-hook 'after-make-frame-functions
                   (lambda(frame)
@@ -268,12 +268,6 @@ Set the default font for different systems
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)
       ))
-#+end_src
-
-* COMMENT Beacon (Flash the Cursor)
-#+begin_src emacs-lisp
-  (use-package beacon
-    :config (beacon-mode 1))
 #+end_src
 
 * Spaces OVER TABS
@@ -339,9 +333,8 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
     ;; (load-theme 'doom-henna t)
     ;; (load-theme 'doom-oceanic-next t)
     ;; (load-theme 'doom-ayu-dark t)
-    (load-theme 'doom-gruvbox t)
-    )
-
+    ;; (load-theme 'doom-gruvbox t)
+    (load-theme 'doom-pine t))
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -467,11 +460,6 @@ Provides function documentation and key binding info in ivy buffer
     ;; (setq ls-lisp-use-insert-directory-program t)
     )
 #+end_src
-* MAGIT (Git Porcelain)
-#+begin_src emacs-lisp
-  (use-package magit
-    :commands magit-status)
-#+end_src
 * WHICH KEY
 Given an initial key sequence Which Key provides hints about the next
 possible key presses along with documentation for that key press.
@@ -512,12 +500,12 @@ possible key presses along with documentation for that key press.
   ;;   :config (treemacs-icons-dired-mode))
 #+end_src
 
-
 * Rotate Buffers
 #+begin_src emacs-lisp
   ;; (use-package rotate)
 
 #+end_src
+
 * Hydra
 #+begin_src emacs-lisp
   (use-package hydra
@@ -598,6 +586,9 @@ and jump to definition functionality for a particular language
     ;; (lsp-terraform-ls-server
     ;;  "C:/Users/GrishaKhachaturyan/.vscode/extensions/hashicorp.terraform-2.25.1-win32-x64/bin/terraform-ls"
     ;;  )
+    :custom
+    (lsp-modeline-code-actions-enable nil)
+    ;; (lsp-treemacs-error-list-severity 1)
     :config
     ;; (setq lsp-disabled-clients '(tfls))
     (lsp-enable-which-key-integration t)
@@ -605,9 +596,10 @@ and jump to definition functionality for a particular language
     ;; (setq lsp-modeline-diagnostics-enable nil)
     (with-eval-after-load 'lsp-mode
       (add-to-list 'lsp-file-watch-ignored-directories
-                   "[/\\\\]\\\.env.*\\'"))
-    )
-
+                   "[/\\\\]\\\.env.*\\'")))
+#+end_src
+** LSP-UI
+#+begin_src emacs-lisp
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
     :config
@@ -961,6 +953,11 @@ This mode expands
     :config
     (setq js-indent-level 2))
 #+end_src
+*** COMMENT JSDOC
+#+begin_src emacs-lisp
+  (use-package jsdoc)
+#+end_src
+
 
 ** Fish Shell script mode
 #+begin_src emacs-lisp
@@ -1035,6 +1032,7 @@ current way interferes with dap-mode terminal input
     )
 #+end_src
 
+
 * Raindbow Delimiters
 Color delimiters like parens and braces according to their depth
 #+begin_src emacs-lisp
@@ -1042,19 +1040,6 @@ Color delimiters like parens and braces according to their depth
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
-* COMMENT Projectile (Project Management)
-#+begin_src emacs-lisp
-  (use-package projectile
-    :config (projectile-mode)
-    :bind-keymap
-    ("C-c p" . projectile-command-map)
-    :init
-    ;; (when (file-directory-p "~/hub")
-    ;;   (setq projectile-project-search-path
-    ;;         '("~/hub/new_projects"
-    ;;           "~/hub/recording_bullet_journal/super_collider_projects")))
-    (setq projectile-switch-project-action #'projectile-dired))
-#+end_src
 * ORG MODE ADDONS & CONFIGS
 ** Auto-tangle config files
 #+begin_src emacs-lisp
@@ -1267,22 +1252,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
      ("k" . kill-buffer-and-window)))
 #+end_src
 
-* COMMENT w3m (Web Browser for emacs)
-Installed this to browse Help documentation for SuperCollider
-#+begin_src emacs-lisp
-  (use-package w3m)
-#+end_src
-
-* Buffer Move
-Simplify Swapping buffers
-#+begin_src emacs-lisp
-  (use-package buffer-move
-    ;; :bind (("C-c b l" . buf-move-right)
-    ;;        ("C-c b j" . buf-move-left)
-    ;;        ("C-c b i" . buf-move-up)
-    ;;        ("C-c b k" . buf-move-down))
-    )
-#+end_src
 
 * DASHBOARD
 #+begin_src emacs-lisp
@@ -1321,8 +1290,9 @@ Simplify Swapping buffers
     (dashboard-setup-startup-hook)
     ;; dashboard icons don't quite load.
     ;; buffer needs to be reverted
-    (add-hook 'server-after-make-frame-hook
-              'revert-buffer)
+    ;; This line caused magit-commit to break
+    ;; (add-hook 'server-after-make-frame-hook
+    ;;           'revert-buffer)
     )
 
 #+end_src
@@ -1380,6 +1350,53 @@ Simplify Swapping buffers
           (setq file-name-handler-alist default-file-name-handler-alist)))
           ;;(setq gc-cons-threshold (* 2 1000 1000))))
 #+end_src
+
+
+
+* COMMENT Buffer Move
+Simplify Swapping buffers
+#+begin_src emacs-lisp
+  (use-package buffer-move
+    ;; :bind (("C-c b l" . buf-move-right)
+    ;;        ("C-c b j" . buf-move-left)
+    ;;        ("C-c b i" . buf-move-up)
+    ;;        ("C-c b k" . buf-move-down))
+    )
+#+end_src
+
+* COMMENT Beacon (Flash the Cursor)
+#+begin_src emacs-lisp
+  (use-package beacon
+    :config (beacon-mode 1))
+#+end_src
+
+* COMMENT Display time in the modeline
+#+begin_src emacs-lisp
+  (setq display-time-default-load-average nil)
+  (display-time)
+#+end_src
+
+* COMMENT w3m (Web Browser for emacs)
+Installed this to browse Help documentation for SuperCollider
+#+begin_src emacs-lisp
+  (use-package w3m)
+#+end_src
+
+* COMMENT Projectile (Project Management)
+#+begin_src emacs-lisp
+  (use-package projectile
+    :config (projectile-mode)
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    ;; (when (file-directory-p "~/hub")
+    ;;   (setq projectile-project-search-path
+    ;;         '("~/hub/new_projects"
+    ;;           "~/hub/recording_bullet_journal/super_collider_projects")))
+    (setq projectile-switch-project-action #'projectile-dired))
+#+end_src
+
+
 * TODOS:
 ** TODO ADD Table of Contents for this document.
 ** TODO ADD general.el package (keybindings package).
