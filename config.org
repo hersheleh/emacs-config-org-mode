@@ -374,6 +374,8 @@ possible inputs
   (use-package ivy
     :bind (("C-s" . counsel-grep-or-swiper)
            ("C-M-s" . swiper-isearch)
+           ("C-S" . swiper-isearch)
+
            ;; ("C-r" . swiper-backward)
            ;; ("C-c C-r" . ivy-resume)
            ;; ("<f6>" . ivy-resume)
