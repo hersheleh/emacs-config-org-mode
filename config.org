@@ -205,7 +205,31 @@ Define function to time Emacs startup and determine # of garbage collections
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-z") 'zap-up-to-char)
 #+end_src
-
+** Timesheet function
+#+begin_src emacs-lisp
+  (defun worktill (daynum hours clockin)
+    (let* ((dow (decoded-time-weekday (decode-time (current-time))))
+           (total_hours (* 8 daynum))
+           (delta_hours (- total_hours hours))
+           (clockin_dec (+ (/ (* (mod clockin 1) 100) 60) (truncate clockin 1)))
+           (clockout (+ clockin_dec delta_hours))
+           (clockout_hr (if (> clockout 12)
+                            (- (truncate clockout) 12)
+                          clockout))
+           (clockout_min (round (* (mod clockout 1) 60))))
+      (list
+       (string-to-number (format "%.2f" clockin_dec))
+       total_hours
+       (string-to-number (format "%.2f" delta_hours))
+       (string-to-number (format "%.2f" clockout)))
+      (print (format "Total Hours EOD: %f" total_hours))
+      (print (format "Worked this week: %.2f" hours))
+      (print (format "Last clocked in at: %f" clockin_dec))
+      (print (format "Hours left today: %.2f" delta_hours))
+      (print (format "You can leave at: %f" clockout))
+      (print (format "You can leave at: %d:%d" clockout_hr clockout_min))
+      ()))
+#+end_src
 * My Functions
 ** Easy Insert Underscore (M-SPC)
 #+begin_src emacs-lisp
