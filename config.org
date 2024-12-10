@@ -207,16 +207,33 @@ Define function to time Emacs startup and determine # of garbage collections
 #+end_src
 ** Timesheet function
 #+begin_src emacs-lisp
+  (defun time-dec-to-min (decimal_time)
+    (+ (/ (round (* (mod decimal_time  1) 60)) 100.0) (truncate decimal_time)))
+
+  (defun time-min-to-dec (time)
+    (+ (/ (* (mod time 1) 100) 60) (truncate time 1)))
+
+
+  (defun time-split-hr-min (time)
+    (let* ((hr (if (> time 12)
+                   (- (truncate time) 12)
+                 (truncate time)))
+           (min (round (* (mod time 1) 100))))
+      (list hr min)))
+
   (defun worktill (daynum hours clockin)
     (let* ((dow (decoded-time-weekday (decode-time (current-time))))
+           ;; Calculate Total hours you should work by end of day
            (total_hours (* 8 daynum))
+           ;; Calculate the hours you need to work get to total hours
            (delta_hours (- total_hours hours))
-           (clockin_dec (+ (/ (* (mod clockin 1) 100) 60) (truncate clockin 1)))
+           (hours_left (time-split-hr-min (time-dec-to-min delta_hours)))
+           ;; convert last clock in time to decimal minutes
+           (clockin_dec (time-min-to-dec clockin))
            (clockout (+ clockin_dec delta_hours))
-           (clockout_hr (if (> clockout 12)
-                            (- (truncate clockout) 12)
-                          clockout))
-           (clockout_min (round (* (mod clockout 1) 60))))
+           (clockout_dec (time-dec-to-min clockout))
+           (clockout_hr (car (time-split-hr-min clockout_dec)))
+           (clockout_min (cadr (time-split-hr-min clockout_dec))))
       (list
        (string-to-number (format "%.2f" clockin_dec))
        total_hours
@@ -225,11 +242,16 @@ Define function to time Emacs startup and determine # of garbage collections
       (print (format "Total Hours EOD: %f" total_hours))
       (print (format "Worked this week: %.2f" hours))
       (print (format "Last clocked in at: %f" clockin_dec))
-      (print (format "Hours left today: %.2f" delta_hours))
+      (print (format "Hours left today: %d:%d"
+                     (car hours_left) (cadr hours_left)))
       (print (format "You can leave at: %f" clockout))
       (print (format "You can leave at: %d:%d" clockout_hr clockout_min))
       ()))
 #+end_src
+
+#+RESULTS:
+: worktill
+
 * My Functions
 ** Easy Insert Underscore (M-SPC)
 #+begin_src emacs-lisp
