@@ -234,19 +234,18 @@ Define function to time Emacs startup and determine # of garbage collections
            (clockout_dec (time-dec-to-min clockout))
            (clockout_hr (car (time-split-hr-min clockout_dec)))
            (clockout_min (cadr (time-split-hr-min clockout_dec))))
-      (list
-       (string-to-number (format "%.2f" clockin_dec))
-       total_hours
-       (string-to-number (format "%.2f" delta_hours))
-       (string-to-number (format "%.2f" clockout)))
-      (print (format "Total Hours EOD: %f" total_hours))
+      (print (format "Total Hours EOD: %d" total_hours))
       (print (format "Worked this week: %.2f" hours))
       (print (format "Last clocked in at: %f" clockin_dec))
       (print (format "Hours left today: %d:%d"
                      (car hours_left) (cadr hours_left)))
       (print (format "You can leave at: %f" clockout))
-      (print (format "You can leave at: %d:%d" clockout_hr clockout_min))
-      ()))
+      (print (format "You can leave at: %d:%02d" clockout_hr clockout_min))
+      (list
+       (string-to-number (format "%.2f" clockin_dec))
+       total_hours
+       (string-to-number (format "%.2f" delta_hours))
+       (string-to-number (format "%.2f" clockout)))))
 #+end_src
 
 #+RESULTS:
