@@ -208,11 +208,13 @@ Define function to time Emacs startup and determine # of garbage collections
 ** Timesheet function
 #+begin_src emacs-lisp
   (defun time-dec-to-min (decimal_time)
-    (+ (/ (round (* (mod decimal_time  1) 60)) 100.0) (truncate decimal_time)))
+    (let ((min (round (* (mod decimal_time  1) 60))))
+      (if (< min 60)
+          (+ (/ min 100.0) (truncate decimal_time))
+        (+ 1 (truncate decimal_time)))))
 
   (defun time-min-to-dec (time)
     (+ (/ (* (mod time 1) 100) 60) (truncate time 1)))
-
 
   (defun time-split-hr-min (time)
     (let* ((hr (if (> time 12)
@@ -242,10 +244,11 @@ Define function to time Emacs startup and determine # of garbage collections
       (print (format "You can leave at: %f" clockout))
       (print (format "You can leave at: %d:%02d" clockout_hr clockout_min))
       (list
-       (string-to-number (format "%.2f" clockin_dec))
        total_hours
+       (string-to-number (format "%.2f" clockin_dec))
        (string-to-number (format "%.2f" delta_hours))
-       (string-to-number (format "%.2f" clockout)))))
+       clockout_hr
+       clockout_min)))
 #+end_src
 
 #+RESULTS:
