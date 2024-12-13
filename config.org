@@ -239,7 +239,7 @@ Define function to time Emacs startup and determine # of garbage collections
       (print (format "Total Hours EOD: %d" total_hours))
       (print (format "Worked this week: %.2f" hours))
       (print (format "Last clocked in at: %f" clockin_dec))
-      (print (format "Hours left today: %d:%d"
+      (print (format "Hours left today: %d:%02d"
                      (car hours_left) (cadr hours_left)))
       (print (format "You can leave at: %f" clockout))
       (print (format "You can leave at: %d:%02d" clockout_hr clockout_min))
@@ -250,9 +250,6 @@ Define function to time Emacs startup and determine # of garbage collections
        clockout_hr
        clockout_min)))
 #+end_src
-
-#+RESULTS:
-: worktill
 
 * My Functions
 ** Easy Insert Underscore (M-SPC)
@@ -1059,7 +1056,10 @@ This mode expands
   (use-package arduino-mode
     :mode ("\\.ino\\'" . arduino-mode))
 #+end_src
-
+** PHP Mode
+#+begin_src emacs-lisp
+  (use-package php-mode)
+#+end_src
 * Markdown
 #+begin_src emacs-lisp
   (use-package markdown-preview-mode)
