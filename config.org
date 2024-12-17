@@ -223,7 +223,7 @@ Define function to time Emacs startup and determine # of garbage collections
            (min (round (* (mod time 1) 100))))
       (list hr min)))
 
-  (defun worktill (daynum hours clockin)
+  (defun worktill (hours daynum clockin)
     (let* ((dow (decoded-time-weekday (decode-time (current-time))))
            ;; Calculate Total hours you should work by end of day
            (total_hours (* 8 daynum))
@@ -1135,8 +1135,9 @@ Color delimiters like parens and braces according to their depth
     (org-priority-default 67)
     (org-agenda-window-setup 'current-window)
     (org-agenda-start-with-clockreport-mode t)
-    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4 :fileskip0 t))
+    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :fileskip0 t))
     (org-confirm-babel-evaluate nil)
+    (org-cycle-separator-lines -1)
     :config
     (org-babel-do-load-languages 'org-babel-load-languages
                                  (append org-babel-load-languages
