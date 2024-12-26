@@ -1,3 +1,6 @@
+:PROPERTIES:
+:header-args:emacs-lisp: :results silent
+:END:
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
@@ -132,13 +135,11 @@ Define function to time Emacs startup and determine # of garbage collections
 
   (global-set-key (kbd "C-x q") 'save-buffers-kill-emacs)
 #+end_src
-
 ** UNMAP ACCIDENTAL KEY PRESSES
 #+begin_src emacs-lisp
   (global-unset-key (kbd "C-z"))          ; unmap suspend-frame from C-z
   (global-unset-key (kbd "C-x C-z"))
 #+end_src
-
 ** SWITCHING VISUAL BUFFERS
 
 #+begin_src emacs-lisp
@@ -165,7 +166,6 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
   ;; (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
 #+end_src
-
 ** SCROLL UP/DOWN LINES WITH: M-j M-k
 #+begin_src emacs-lisp
   (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
@@ -173,7 +173,6 @@ Define function to time Emacs startup and determine # of garbage collections
   (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
   (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
 #+end_src
-
 ** Whitespace Cleanup on Save
 #+begin_src emacs-lisp
   ;; (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -216,10 +215,10 @@ Define function to time Emacs startup and determine # of garbage collections
            (min (round (* (mod time 1) 100))))
       (list hr min)))
 
-  (defun worktill (hours daynum clockin)
+  (defun worktill (hours daynum clockin &optional minus-hr)
     (let* ((dow (decoded-time-weekday (decode-time (current-time))))
            ;; Calculate Total hours you should work by end of day
-           (total_hours (* 8 daynum))
+           (total_hours (- (* 8 daynum) (if minus-hr minus-hr 0)))
            ;; Calculate the hours you need to work get to total hours
            (delta_hours (- total_hours hours))
            (hours_left (time-split-hr-min (time-dec-to-min delta_hours)))
@@ -242,6 +241,20 @@ Define function to time Emacs startup and determine # of garbage collections
        (string-to-number (format "%.2f" delta_hours))
        clockout_hr
        clockout_min)))
+#+end_src
+
+** Distraction counter
+#+begin_src emacs-lisp
+  (defun distractions++ ()
+    (interactive)
+    (if (not (boundp 'distractions-today))
+        (setq distractions-today 1)
+      (setq distractions-today (+ distractions-today 1)))
+    (print distractions-today))
+
+  (defun distractions-reset ()
+    (interactive)
+    (setq distractions-today 0))
 #+end_src
 * My Functions
 ** Easy Insert Underscore (M-SPC)
@@ -1357,13 +1370,11 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (savehist-mode 1)
     (setq history-length 25))
 #+end_src
-
 * PDF-Tools
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :mode ("\\.pdf\\'" . pdf-view-mode))
 #+end_src
-
 * Epub reader nov-mode
 #+begin_src emacs-lisp
   (defun my-nov-font-setup ()
@@ -1389,9 +1400,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           (setq file-name-handler-alist default-file-name-handler-alist)))
           ;;(setq gc-cons-threshold (* 2 1000 1000))))
 #+end_src
-
-
-
 * COMMENT Buffer Move
 Simplify Swapping buffers
 #+begin_src emacs-lisp
@@ -1402,25 +1410,21 @@ Simplify Swapping buffers
     ;;        ("C-c b k" . buf-move-down))
     )
 #+end_src
-
 * COMMENT Beacon (Flash the Cursor)
 #+begin_src emacs-lisp
   (use-package beacon
     :config (beacon-mode 1))
 #+end_src
-
 * COMMENT Display time in the modeline
 #+begin_src emacs-lisp
   (setq display-time-default-load-average nil)
   (display-time)
 #+end_src
-
 * COMMENT w3m (Web Browser for emacs)
 Installed this to browse Help documentation for SuperCollider
 #+begin_src emacs-lisp
   (use-package w3m)
 #+end_src
-
 * COMMENT Projectile (Project Management)
 #+begin_src emacs-lisp
   (use-package projectile
