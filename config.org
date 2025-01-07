@@ -1,6 +1,4 @@
-:PROPERTIES:
-:header-args:emacs-lisp: :results silent
-:END:
+
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
@@ -198,7 +196,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (global-set-key (kbd "M-z") 'zap-up-to-char)
 #+end_src
 ** Timesheet function
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :results silent
   (defun time-dec-to-min (decimal_time)
     (let ((min (round (* (mod decimal_time  1) 60))))
       (if (< min 60)
@@ -242,7 +240,6 @@ Define function to time Emacs startup and determine # of garbage collections
        clockout_hr
        clockout_min)))
 #+end_src
-
 ** Distraction counter
 #+begin_src emacs-lisp
   (defun distractions++ ()
@@ -381,8 +378,8 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
     ;; (load-theme 'doom-henna t)
     ;; (load-theme 'doom-oceanic-next t)
     ;; (load-theme 'doom-ayu-dark t)
-    ;; (load-theme 'doom-gruvbox t)
-    (load-theme 'doom-pine t))
+    (load-theme 'doom-gruvbox-light t))
+    ;; (load-theme 'doom-pine t))
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -807,26 +804,21 @@ Syntax checking and linting.
   (use-package docker)
 #+end_src
 ** SuperCollider
-*** COMMENT scel ubuntu compiled from source install
-#+begin_src emacs-lisp
-  ;; in ~/.emacs
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
-  (require 'sclang)
-
-#+end_src
 
 *** SuperCollider scel (sclang mode for emacs)
 This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
   (use-package sclang
     :ensure nil
+    :demand t
     :load-path
     (lambda ()
       (cond
        (my-macbook-p
         "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
        (my-sc-thinkpad-p
-        "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
+        "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
+       (my-gnu-linux-p "/usr/local/share/emacs/site-lisp/SuperCollider/")))
     :mode ("\\.scd\\'" . sclang-mode)
     :bind (:map sclang-mode-map
                ("C-c C-l"    . sclang-eval-line)
@@ -841,10 +833,11 @@ This is a mode for the sclang language for SuperCollider
       (setq exec-path
             (append
              exec-path
-             '("/Applications/SuperCollider.app/Contents/MacOS/")))))
+             '("/Applications/SuperCollider.app/Contents/MacOS/"))))
+    (require 'sclang))
 #+end_src
 
-*** Org Babel SuperCollider
+*** COMMENT Org Babel SuperCollider
 Package to add supercollider support to org-babel
 #+begin_src emacs-lisp
   (use-package ob-sclang
