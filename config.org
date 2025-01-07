@@ -1,3 +1,4 @@
+
 #+TITLE: Grisha's Emacs Config
 #+AUTHOR: Grisha Khachaturyan
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
@@ -24,7 +25,6 @@ Define function to time Emacs startup and determine # of garbage collections
              gcs-done))
   (add-hook 'emacs-startup-hook #'gsh/display-startup-time)
 #+end_src
-
 * PACKAGE MANAGEMENT
 ** Setup package.el to work with MELPA.
 #+begin_src emacs-lisp
@@ -50,7 +50,6 @@ Define function to time Emacs startup and determine # of garbage collections
   (setq use-package-always-defer t)
   (setq use-package-verbose nil)
 #+end_src
-
 * System information
 #+begin_src emacs-lisp
   (defvar my-macbook-p (equal system-type 'darwin))
@@ -61,7 +60,6 @@ Define function to time Emacs startup and determine # of garbage collections
 
   (global-auto-revert-mode)        ; revert buffers when changed on disk
 #+end_src
-
 * Emacs display settings
 #+begin_src emacs-lisp
   (use-package frame
@@ -70,7 +68,6 @@ Define function to time Emacs startup and determine # of garbage collections
     (when my-macbook-p (setq initial-frame-alist '((fullscreen . maximized)))))
 
 #+end_src
-
 * Emacs System configs
 #+begin_src emacs-lisp
   ;; Set Dired default directory
@@ -100,7 +97,6 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; Disable emacs creating backup file *~
   (setq make-backup-files nil)
 #+end_src
-
 * MAGIT (Git Porcelain)
 #+begin_src emacs-lisp
   (use-package magit
@@ -112,7 +108,6 @@ Define function to time Emacs startup and determine # of garbage collections
   (add-hook 'prog-mode-hook 'electric-pair-local-mode)
   ;; (electric-quote-mode)
 #+end_src
-
 * Move Lines Up/Down
 #+begin_src emacs-lisp
   (defun move-line-up ()
@@ -129,7 +124,6 @@ Define function to time Emacs startup and determine # of garbage collections
   (global-set-key (kbd "M-<up>") 'move-line-up)
   (global-set-key (kbd "M-<down>") 'move-line-down)
 #+end_src
-
 * MY KEY BINDINGS
 ** EXITING EMACS
 #+begin_src emacs-lisp
@@ -139,13 +133,11 @@ Define function to time Emacs startup and determine # of garbage collections
 
   (global-set-key (kbd "C-x q") 'save-buffers-kill-emacs)
 #+end_src
-
 ** UNMAP ACCIDENTAL KEY PRESSES
 #+begin_src emacs-lisp
   (global-unset-key (kbd "C-z"))          ; unmap suspend-frame from C-z
   (global-unset-key (kbd "C-x C-z"))
 #+end_src
-
 ** SWITCHING VISUAL BUFFERS
 
 #+begin_src emacs-lisp
@@ -172,7 +164,6 @@ Define function to time Emacs startup and determine # of garbage collections
   ;; (global-set-key (kbd "C-c b o") 'delete-other-windows) ; (o)ne window
   ;; (global-set-key (kbd "C-c b c") 'delete-window)        ; (c)lose this window
 #+end_src
-
 ** SCROLL UP/DOWN LINES WITH: M-j M-k
 #+begin_src emacs-lisp
   (global-unset-key (kbd "M-j"))       ; was default-indent-new-line
@@ -180,7 +171,6 @@ Define function to time Emacs startup and determine # of garbage collections
   (global-set-key (kbd "M-j") 'scroll-up-line) ; scroll up
   (global-set-key (kbd "M-k") 'scroll-down-line) ; scroll down
 #+end_src
-
 ** Whitespace Cleanup on Save
 #+begin_src emacs-lisp
   ;; (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -205,7 +195,64 @@ Define function to time Emacs startup and determine # of garbage collections
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-z") 'zap-up-to-char)
 #+end_src
+** Timesheet function
+#+begin_src emacs-lisp :results silent
+  (defun time-dec-to-min (decimal_time)
+    (let ((min (round (* (mod decimal_time  1) 60))))
+      (if (< min 60)
+          (+ (/ min 100.0) (truncate decimal_time))
+        (+ 1 (truncate decimal_time)))))
 
+  (defun time-min-to-dec (time)
+    (+ (/ (* (mod time 1) 100) 60) (truncate time 1)))
+
+  (defun time-split-hr-min (time)
+    (let* ((hr (if (> time 12)
+                   (- (truncate time) 12)
+                 (truncate time)))
+           (min (round (* (mod time 1) 100))))
+      (list hr min)))
+
+  (defun worktill (hours daynum clockin &optional minus-hr)
+    (let* ((dow (decoded-time-weekday (decode-time (current-time))))
+           ;; Calculate Total hours you should work by end of day
+           (total_hours (- (* 8 daynum) (if minus-hr minus-hr 0)))
+           ;; Calculate the hours you need to work get to total hours
+           (delta_hours (- total_hours hours))
+           (hours_left (time-split-hr-min (time-dec-to-min delta_hours)))
+           ;; convert last clock in time to decimal minutes
+           (clockin_dec (time-min-to-dec clockin))
+           (clockout (+ clockin_dec delta_hours))
+           (clockout_dec (time-dec-to-min clockout))
+           (clockout_hr (car (time-split-hr-min clockout_dec)))
+           (clockout_min (cadr (time-split-hr-min clockout_dec))))
+      (print (format "Total Hours EOD: %d" total_hours))
+      (print (format "Worked this week: %.2f" hours))
+      (print (format "Last clocked in at: %f" clockin_dec))
+      (print (format "Hours left today: %d:%02d"
+                     (car hours_left) (cadr hours_left)))
+      (print (format "You can leave at: %f" clockout))
+      (print (format "You can leave at: %d:%02d" clockout_hr clockout_min))
+      (list
+       total_hours
+       (string-to-number (format "%.2f" clockin_dec))
+       (string-to-number (format "%.2f" delta_hours))
+       clockout_hr
+       clockout_min)))
+#+end_src
+** Distraction counter
+#+begin_src emacs-lisp
+  (defun distractions++ ()
+    (interactive)
+    (if (not (boundp 'distractions-today))
+        (setq distractions-today 1)
+      (setq distractions-today (+ distractions-today 1)))
+    (print distractions-today))
+
+  (defun distractions-reset ()
+    (interactive)
+    (setq distractions-today 0))
+#+end_src
 * My Functions
 ** Easy Insert Underscore (M-SPC)
 #+begin_src emacs-lisp
@@ -269,12 +316,10 @@ Set the default font for different systems
       (exec-path-from-shell-initialize)
       ))
 #+end_src
-
 * Spaces OVER TABS
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
 #+end_src
-
 * Whitespace Butler
 #+begin_src emacs-lisp
   (use-package ws-butler
@@ -333,8 +378,8 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
     ;; (load-theme 'doom-henna t)
     ;; (load-theme 'doom-oceanic-next t)
     ;; (load-theme 'doom-ayu-dark t)
-    ;; (load-theme 'doom-gruvbox t)
-    (load-theme 'doom-pine t))
+    (load-theme 'doom-gruvbox-light t))
+    ;; (load-theme 'doom-pine t))
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -366,7 +411,6 @@ These are packages which assist in navigating emacs
   (use-package avy
     :bind (("C-:" . avy-goto-char)))
 #+end_src
-
 * IVY MODE
 Ivy Mode speeds up navigation by perfoming text matching against
 possible inputs
@@ -374,7 +418,7 @@ possible inputs
   (use-package ivy
     :bind (("C-s" . counsel-grep-or-swiper)
            ("C-M-s" . swiper-isearch)
-           ("C-S" . swiper-isearch)
+           ;; ("C-S" . swiper-isearch)
 
            ;; ("C-r" . swiper-backward)
            ;; ("C-c C-r" . ivy-resume)
@@ -435,7 +479,6 @@ Provides function documentation and key binding info in ivy buffer
     :config
     (setq ivy-initial-inputs-alist nil))  ; Don't start searches with ^
 #+end_src
-
 * Dired
 #+begin_src emacs-lisp
   (use-package dired
@@ -475,7 +518,6 @@ possible key presses along with documentation for that key press.
     (setq which-key-idle-delay 0.8)
     (which-key-mode))
 #+end_src
-
 * Precient
 #+begin_src emacs-lisp
   (use-package ivy-prescient
@@ -501,13 +543,11 @@ possible key presses along with documentation for that key press.
   ;;   :after dired
   ;;   :config (treemacs-icons-dired-mode))
 #+end_src
-
 * Rotate Buffers
 #+begin_src emacs-lisp
   ;; (use-package rotate)
 
 #+end_src
-
 * Hydra
 #+begin_src emacs-lisp
   (use-package hydra
@@ -555,7 +595,6 @@ Code Completion, Documentaion, Syntax checking, Jump to Definition.
 ** Language Server Protocol Packages
 A Language Server provides: syntax checking, error correction,
 and jump to definition functionality for a particular language
-
 *** COMMENT EGLOT (Disabled)
 #+begin_src emacs-lisp
   ;; Setup eglot to wordk with clangd-10 (LSP for C/C++)
@@ -576,7 +615,7 @@ and jump to definition functionality for a particular language
     :commands (lsp lsp-deferred)
     :init
     (setq lsp-keymap-prefix "C-x l")
-    (setq lsp-use-plists t)
+    ;; (setq lsp-use-plists t)
     ;; (lsp-treemacs-sync-mode 1)
     :hook
     ;; (js-mode . lsp-deferred)
@@ -765,28 +804,23 @@ Syntax checking and linting.
   (use-package docker)
 #+end_src
 ** SuperCollider
-*** COMMENT scel ubuntu compiled from source install
-#+begin_src emacs-lisp
-  ;; in ~/.emacs
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/SuperCollider/")
-  (require 'sclang)
-
-#+end_src
 
 *** SuperCollider scel (sclang mode for emacs)
 This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
   (use-package sclang
     :ensure nil
+    :demand t
     :load-path
     (lambda ()
       (cond
        (my-macbook-p
         "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
        (my-sc-thinkpad-p
-        "~/.local/share/SuperCollider/downloaded-quarks/scel/el")))
+        "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
+       (my-gnu-linux-p "/usr/local/share/emacs/site-lisp/SuperCollider/")))
     :mode ("\\.scd\\'" . sclang-mode)
-    :bind(:map sclang-mode-map
+    :bind (:map sclang-mode-map
                ("C-c C-l"    . sclang-eval-line)
                ("C-<return>" . sclang-eval-defun)
                ("C-." . sclang-main-stop)
@@ -799,7 +833,8 @@ This is a mode for the sclang language for SuperCollider
       (setq exec-path
             (append
              exec-path
-             '("/Applications/SuperCollider.app/Contents/MacOS/")))))
+             '("/Applications/SuperCollider.app/Contents/MacOS/"))))
+    (require 'sclang))
 #+end_src
 
 *** COMMENT Org Babel SuperCollider
@@ -897,7 +932,6 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
   (use-package pug-mode)
 #+end_src
 
-
 ** Javascript
 *** js2 mode
 #+begin_src emacs-lisp
@@ -960,7 +994,6 @@ This mode expands
   (use-package jsdoc)
 #+end_src
 
-
 ** Fish Shell script mode
 #+begin_src emacs-lisp
 (use-package fish-mode)
@@ -1011,7 +1044,21 @@ This mode expands
   (use-package arduino-mode
     :mode ("\\.ino\\'" . arduino-mode))
 #+end_src
-
+** PHP Mode
+#+begin_src emacs-lisp
+  (use-package php-mode)
+#+end_src
+** Apache Mode
+#+begin_src emacs-lisp
+  (use-package apache-mode)
+#+end_src
+* Treesitter
+#+begin_src emacs-lisp
+  (use-package treesit
+    :ensure nil
+    :config
+    (setq treesit-extra-load-path '("/usr/local/lib")))
+#+end_src
 * Markdown
 #+begin_src emacs-lisp
   (use-package markdown-preview-mode)
@@ -1024,7 +1071,7 @@ current way interferes with dap-mode terminal input
   (use-package vterm
     :commands vterm
     :config
-    (when my-steam-deck-p (setq vterm-shell "/usr/bin/fish"))
+    (when (or my-gnu-linux-p my-steam-deck-p) (setq vterm-shell "/usr/bin/fish"))
     ;; :hook
     ;; turn off line numbers in vterm
     ;; (vterm-mode . (lambda () (display-line-numbers-mode 0)))
@@ -1033,15 +1080,12 @@ current way interferes with dap-mode terminal input
     ;; (vterm-mode . (lambda () (vterm-send-string "source ~/.bash_profile\n")))
     )
 #+end_src
-
-
 * Raindbow Delimiters
 Color delimiters like parens and braces according to their depth
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
-
 * ORG MODE ADDONS & CONFIGS
 ** Auto-tangle config files
 #+begin_src emacs-lisp
@@ -1087,8 +1131,9 @@ Color delimiters like parens and braces according to their depth
     (org-priority-default 67)
     (org-agenda-window-setup 'current-window)
     (org-agenda-start-with-clockreport-mode t)
-    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4 :fileskip0 t))
+    (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 5 :fileskip0 t))
     (org-confirm-babel-evaluate nil)
+    (org-cycle-separator-lines -1)
     :config
     (org-babel-do-load-languages 'org-babel-load-languages
                                  (append org-babel-load-languages
@@ -1146,6 +1191,7 @@ Color delimiters like parens and braces according to their depth
       ("f" org-forward-heading-same-level "forward level")
       ("b" org-backward-heading-same-level "backward level")
       ("u" outline-up-heading "up level")
+      ("c" org-comment-dwim "comment")
       ("C-n" org-next-visible-heading)
       ("C-p" org-previous-visible-heading)
       ("C-f" org-forward-heading-same-level)
@@ -1253,8 +1299,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
      :map helpful-mode-map
      ("k" . kill-buffer-and-window)))
 #+end_src
-
-
 * DASHBOARD
 #+begin_src emacs-lisp
   (use-package dashboard
@@ -1311,7 +1355,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
   (use-package dashboard-ls
     :demand t)
 #+end_src
-
 * Save History
 #+begin_src emacs-lisp
   (use-package savehist
@@ -1320,13 +1363,11 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (savehist-mode 1)
     (setq history-length 25))
 #+end_src
-
 * PDF-Tools
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :mode ("\\.pdf\\'" . pdf-view-mode))
 #+end_src
-
 * Epub reader nov-mode
 #+begin_src emacs-lisp
   (defun my-nov-font-setup ()
@@ -1352,9 +1393,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           (setq file-name-handler-alist default-file-name-handler-alist)))
           ;;(setq gc-cons-threshold (* 2 1000 1000))))
 #+end_src
-
-
-
 * COMMENT Buffer Move
 Simplify Swapping buffers
 #+begin_src emacs-lisp
@@ -1365,25 +1403,21 @@ Simplify Swapping buffers
     ;;        ("C-c b k" . buf-move-down))
     )
 #+end_src
-
 * COMMENT Beacon (Flash the Cursor)
 #+begin_src emacs-lisp
   (use-package beacon
     :config (beacon-mode 1))
 #+end_src
-
 * COMMENT Display time in the modeline
 #+begin_src emacs-lisp
   (setq display-time-default-load-average nil)
   (display-time)
 #+end_src
-
 * COMMENT w3m (Web Browser for emacs)
 Installed this to browse Help documentation for SuperCollider
 #+begin_src emacs-lisp
   (use-package w3m)
 #+end_src
-
 * COMMENT Projectile (Project Management)
 #+begin_src emacs-lisp
   (use-package projectile
@@ -1397,8 +1431,6 @@ Installed this to browse Help documentation for SuperCollider
     ;;           "~/hub/recording_bullet_journal/super_collider_projects")))
     (setq projectile-switch-project-action #'projectile-dired))
 #+end_src
-
-
 * TODOS:
 ** TODO ADD Table of Contents for this document.
 ** TODO ADD general.el package (keybindings package).
