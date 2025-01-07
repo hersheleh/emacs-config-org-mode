@@ -493,8 +493,8 @@ possible key presses along with documentation for that key press.
     :custom
     (treemacs-python-executable "python3")
     (treemacs-git-mode nil)
-    :config
-    (treemacs-project-follow-mode)
+    ;; :config
+    ;; (treemacs-project-follow-mode)
     :hook
     (treemacs-select . windmove-right))
   ;; (use-package treemacs-icons-dired
@@ -802,7 +802,7 @@ This is a mode for the sclang language for SuperCollider
              '("/Applications/SuperCollider.app/Contents/MacOS/")))))
 #+end_src
 
-*** Org Babel SuperCollider
+*** COMMENT Org Babel SuperCollider
 Package to add supercollider support to org-babel
 #+begin_src emacs-lisp
   (use-package ob-sclang
