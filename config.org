@@ -356,30 +356,31 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
    To select a theme use 'M-x customize-theme'
 :END:
 #+begin_src emacs-lisp
-  (use-package doom-themes
-    :demand t
-    :init (setq custom-safe-themes t)
-    :custom
-    (doom-monokai-classic-brighter-comments t)
-    (doom-henna-brighter-comments t)
-    ;; (doom-acario-dark-brighter-comments t)
-    :config
-    (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
-          doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
-    ;; (custom-set-variables
-    ;; '(doom-molokai-brighter-comments t))
+    (use-package doom-themes
+      :demand t
+      :init (setq custom-safe-themes t)
+      :custom
+      (doom-monokai-classic-brighter-comments t)
+      (doom-henna-brighter-comments t)
+      ;; (doom-acario-dark-brighter-comments t)
+      :config
+      (setq doom-themes-enable-bold t     ; if nil, bold is universally disabled
+            doom-themes-enable-italic t)  ; if nil, italcs is universally disabled
+      ;; (custom-set-variables
+      ;; '(doom-molokai-brighter-comments t))
 
-    ;; customize the doom monkai theme
-    (custom-set-faces
-     '(counsel--mark-ring-highlight ((t (:inherit highlight))))
-     ;; '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
-     '(show-paren-match ((t (:background "#FD971F" :foreground "black"
-                                         :weight ultra-bold)))))
-    ;; (load-theme 'doom-henna t)
-    ;; (load-theme 'doom-oceanic-next t)
-    ;; (load-theme 'doom-ayu-dark t)
-    (load-theme 'doom-gruvbox-light t))
-    ;; (load-theme 'doom-pine t))
+      ;; customize the doom monkai theme
+      (custom-set-faces
+       '(counsel--mark-ring-highlight ((t (:inherit highlight))))
+       ;; '(ivy-current-match ((t (:background "#fd971f" :foreground "black"))))
+       '(show-paren-match ((t (:background "#FD971F" :foreground "black"
+                                           :weight ultra-bold)))))
+      ;; (load-theme 'doom-henna t)
+      (load-theme 'doom-oceanic-next t)
+      ;; (load-theme 'doom-ayu-dark t)
+      ;; (load-theme 'doom-gruvbox-light t))
+      ;; (load-theme 'doom-pine t)
+      )
 #+end_src
 ** MODE LINE
 #+begin_src emacs-lisp
@@ -613,6 +614,8 @@ and jump to definition functionality for a particular language
   (use-package lsp-mode
     ;; :after flycheck
     :commands (lsp lsp-deferred)
+    :bind (:map lsp-mode-map
+                ("M-." . lsp-find-definition))
     :init
     (setq lsp-keymap-prefix "C-x l")
     ;; (setq lsp-use-plists t)
