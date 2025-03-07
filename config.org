@@ -969,8 +969,7 @@ This mode expands
     (typescript-ts-mode-indent-offset 4)
     :mode
     ("\\.tsx\\'" . jtsx-tsx-mode)
-    ("\\.jsx\\'" . jtsx-jsx-mode)
-    ("\\/client\\/.*\\.js\\'" . jtsx-jsx-mode)
+
     ;; ("/client\(/[^/]+\)+\\.js\\'" . jtsx-jsx-mode)
     :hook
     (jtsx-jsx-mode . lsp-deferred)
@@ -981,6 +980,15 @@ This mode expands
   ;;                           (if (eq major-mode 'tsx-ts-mode)
   ;;                               (flycheck-select-checker
   ;;                                'javascript-eslint))
+#+end_src
+*** rjsx mode
+#+begin_src emacs-lisp
+  (use-package rjsx-mode
+    :mode
+    ("\\.jsx\\'" . rjsx-mode)
+    ("\\/client\\/.*\\.js\\'" . rjsx-mode)
+    :hook
+    (rjsx-mode . lsp-deferred))
 #+end_src
 *** JSON
 #+begin_src emacs-lisp
