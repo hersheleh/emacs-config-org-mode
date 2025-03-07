@@ -536,8 +536,8 @@ possible key presses along with documentation for that key press.
     :custom
     (treemacs-python-executable "python3")
     (treemacs-git-mode nil)
-    :config
-    (treemacs-project-follow-mode)
+    ;; :config
+    ;; (treemacs-project-follow-mode)
     :hook
     (treemacs-select . windmove-right))
   ;; (use-package treemacs-icons-dired
@@ -680,7 +680,6 @@ and jump to definition functionality for a particular language
 #+end_src
 
 ** Debuggers
-
 *** DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
@@ -691,25 +690,37 @@ When debugging python dap-mode does not stop at breakpoints. (check back later).
 [[https://github.com/emacs-lsp/dap-mode/issues/678][This issue]] and [[https://github.com/emacs-lsp/lsp-treemacs/issues/144][this one]] highlight the issue.
 :dap_drawer:
 #+begin_src emacs-lisp
-  (use-package dap-mode
-    ;; :ensure t
-    :commands dap-debug
-    :config
-    (require 'dap-ui)
-    ;; (dap-auto-configure-mode 1)
+   (use-package dap-mode
+     ;; :ensure t
+     :commands dap-debug
+     :hook
+     (dap-session-created . dap-ui-show-many-windows)
+     ;; (dap-session-created . dap-ui-switch-session)
+     :config
+     (require 'dap-ui)
+     (dap-mode 1)
+     (dap-ui-mode 1)
+     ;; (dap-auto-configure-mode 1)
+     (dap-tooltip-mode 1)
+     (dap-ui-controls-mode 0)
+     (setq dap-ui-buffer-configurations
+           `(("*dap-ui-locals*" (side . left) (slot . 1) (window-width . 0.2))
+             ("*dap-ui-expressions*" (side . left) (slot . 2) (window-width . 0.2))
+             ("*dap-ui-breakpoints*" (side . right) (slot . 1) (window-width . 35))
+             ("*debug-window*" (side . bottom) (slot . 3) (window-width . 0.2))
+             ("*dap-ui-sessions*" (side . bottom) (slot . 2) (window-width . 0.2))
+             ("*dap-ui-repl*" (side . bottom) (slot . 1) (window-width . 0.2))))
+     (setq dap-ui-locals-expand-depth 3)
+     (setq dap-ui-expressions-expand-depth 3)
+     )
 
-    (dap-mode 1)
-    (dap-ui-mode 1)
-    (dap-tooltip-mode 1)
-    (dap-ui-controls-mode 1)
 
-    ;; lldb config
-    ;; (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
-    ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
-    (setq dap-print-io t))
+  ;; (setq dap-print-io t))
+
+  ;; lldb config
+  ;; (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
+  ;; (setq dap-lldb-debug-program '("/usr/local/bin/lldb-vscode"))
 #+end_src
-:END:
-
 *** Real-GUD
 Trying this debugger
 #+begin_src emacs-lisp
@@ -883,7 +894,7 @@ Package to add supercollider support to org-babel
     (require 'dap-python)                ; also not stopping at breakpoints. look at upgrading
     ;; (setq py-python-command "python3")
     ;; (setq py-shell-name "python")
-    (setq lsp-pylsp-server-command "~/.local/bin/pylsp")
+    ;; (setq lsp-pylsp-server-command "~/.local/bin/pylsp")
     (setq python-shell-interpreter "python3")
     ;; Debug Configuration for python unittest
     (dap-register-debug-template
@@ -943,7 +954,32 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
     (js2-strict-missing-semi-warning nil)
     (js-indent-level 2)
     :mode ("\\.js\\'")
-    :hook (js2-mode . lsp-deferred))
+    :hook
+    (js2-mode . lsp-deferred)
+    :config
+    (require 'dap-node)
+    (dap-register-debug-template
+     "Node: run script: noworker"
+     (list :type "node"
+           :request "launch"
+           :name "Run Script: noworker"
+           :cwd "${workspaceFolder}"
+           :program ""
+           :sourceMaps t
+           :skipFiles ["<node_internals>/**"]
+           :runtimeExecutable "npm"
+           :runtimeArgs '("run" "noworker")
+           :console "integratedTerminal"))
+    (dap-register-debug-template
+     "Node: Launch File"
+     (list :type "node"
+           :request "launch"
+           :name "Node: Launch File"
+           :program "${file}"
+           :sourceMaps t
+           :skipFiles '("<node_internals>/**" "${workspaceFolder}/node_modules/**/*.js")
+           :console "integratedTerminal"))
+    )
 #+end_src
 *** typescript mode
 #+begin_src emacs-lisp
@@ -1175,7 +1211,7 @@ Color delimiters like parens and braces according to their depth
             ))
     (setq org-todo-keywords
           ;; '((sequence "BACKLOG" "TODO(t)" "TEST(s)" "RECUR(r)" "NEXT(n)"  "|" "DONE(d!)"))
-          '((sequence "RECUR(r)" "TODO(t)" "CHOOSE(c)" "|" "DONE(d!)"))
+          '((sequence "TODO(t)" "RECUR(r)" "CHOOSE(c)" "|" "DONE(d!)"))
           ;; '((sequence "RECUR" "TODO" "CHOOSE" "|" "DONE"))
           )
     (setq org-agenda-start-with-log-mode t)
