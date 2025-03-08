@@ -1091,6 +1091,7 @@ This mode expands
   (use-package arduino-mode
     :mode ("\\.ino\\'" . arduino-mode))
 #+end_src
+
 ** PHP Mode
 #+begin_src emacs-lisp
   (use-package php-mode)
@@ -1106,6 +1107,7 @@ This mode expands
     :config
     (setq treesit-extra-load-path '("/usr/local/lib")))
 #+end_src
+
 * Markdown
 #+begin_src emacs-lisp
   (use-package markdown-preview-mode)
