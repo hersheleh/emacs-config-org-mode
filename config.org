@@ -680,6 +680,38 @@ and jump to definition functionality for a particular language
 #+end_src
 
 ** Debuggers
+
+*** Dape-mode
+#+begin_src emacs-lisp
+  (use-package dape
+    :config
+    (add-to-list 'dape-configs
+                 `(js-debug-node-run
+                   modes (js2-mode js-mode js-ts-mode)
+                   host "localhost"
+                   port 8123
+                   command "node"
+                   ;; command-args '("/home/grish/.emacs.d/var/dape-adapters/js-debug/src/dapDebugServer.js" 8123)
+                   command-args (,(expand-file-name
+                       (file-name-concat dape-adapter-dir
+                                                  "js-debug"
+                                                  "src"
+                                                  "dapDebugServer.js"))
+                                 :autoport)
+                   :type "pwa-node"
+                   :request "launch"
+                   ;; :program "index.js"
+                   :cwd dape-cwd
+                   :runtimeExecutable "npm"
+                   :runtimeArgs ["run" "dev"]
+                   :pauseForSourceMap nil
+                   ;; :args ("run" "dev")
+                   :console "internalConsole"
+                   )))
+#+end_src
+
+
+
 *** DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
