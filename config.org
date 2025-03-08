@@ -680,6 +680,43 @@ and jump to definition functionality for a particular language
 #+end_src
 
 ** Debuggers
+
+*** DAPE-Mode
+An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaante/dape][docs]]
+#+begin_src emacs-lisp
+  (use-package dape
+    :hook
+    (kill-emacs . dape-breakpoint-save)
+    (after-init . dape-breakpoint-load)
+    (prog-mode . eldoc-mode)
+    :config
+    (dape-breakpoint-global-mode)
+    (setq dape-inlay-hints t)
+    (add-to-list 'dape-configs
+                 `(js-debug-node-noworker
+                   modes (js-mode js-ts-mode js2-mode)
+                   command-args (,(expand-file-name
+                                  (file-name-concat dape-adapter-dir
+                                                    "js-debug"
+                                                    "src"
+                                                    "dapDebugServer.js"))
+                                 :autoport)
+                   :request "launch"
+                   :module "npm"
+                   :args ["run" "noworker"]
+                   :console "integratedTerminal"
+                   :showReturnValue t
+                   :justMyCode nil
+                   )))
+#+end_src
+
+**** Repeat
+This package is recomended for dape mode
+#+begin_src emacs-lisp
+  (use-package repeat
+    :config
+    (repeat-mode))
+#+end_src
 *** DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
@@ -726,7 +763,6 @@ Trying this debugger
 #+begin_src emacs-lisp
   (use-package realgud)                   ; RealGUD debugger
 #+end_src
-
 ** COMPANY MODE (Code Complettion)
 COMplete ANYthing: Code completion framework.
 #+begin_src emacs-lisp
@@ -956,29 +992,29 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
     :mode ("\\.js\\'")
     :hook
     (js2-mode . lsp-deferred)
-    :config
-    (require 'dap-node)
-    (dap-register-debug-template
-     "Node: run script: noworker"
-     (list :type "node"
-           :request "launch"
-           :name "Run Script: noworker"
-           :cwd "${workspaceFolder}"
-           :program ""
-           :sourceMaps t
-           :skipFiles ["<node_internals>/**"]
-           :runtimeExecutable "npm"
-           :runtimeArgs '("run" "noworker")
-           :console "integratedTerminal"))
-    (dap-register-debug-template
-     "Node: Launch File"
-     (list :type "node"
-           :request "launch"
-           :name "Node: Launch File"
-           :program "${file}"
-           :sourceMaps t
-           :skipFiles '("<node_internals>/**" "${workspaceFolder}/node_modules/**/*.js")
-           :console "integratedTerminal"))
+    ;; :config
+    ;; (require 'dap-node)
+    ;; (dap-register-debug-template
+    ;;  "Node: run script: noworker"
+    ;;  (list :type "node"
+    ;;        :request "launch"
+    ;;        :name "Run Script: noworker"
+    ;;        :cwd "${workspaceFolder}"
+    ;;        :program ""
+    ;;        :sourceMaps t
+    ;;        :skipFiles ["<node_internals>/**"]
+    ;;        :runtimeExecutable "npm"
+    ;;        :runtimeArgs '("run" "noworker")
+    ;;        :console "integratedTerminal"))
+    ;; (dap-register-debug-template
+    ;;  "Node: Launch File"
+    ;;  (list :type "node"
+    ;;        :request "launch"
+    ;;        :name "Node: Launch File"
+    ;;        :program "${file}"
+    ;;        :sourceMaps t
+    ;;        :skipFiles '("<node_internals>/**" "${workspaceFolder}/node_modules/**/*.js")
+    ;;        :console "integratedTerminal"))
     )
 #+end_src
 *** typescript mode
