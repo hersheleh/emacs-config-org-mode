@@ -680,7 +680,6 @@ and jump to definition functionality for a particular language
 #+end_src
 
 ** Debuggers
-
 *** DAPE-Mode
 An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaante/dape][docs]]
 #+begin_src emacs-lisp
@@ -691,22 +690,30 @@ An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaan
     (prog-mode . eldoc-mode)
     :config
     (dape-breakpoint-global-mode)
+    ;; (setq dape-request-timeout 60)
     (setq dape-inlay-hints t)
     (add-to-list 'dape-configs
                  `(js-debug-node-noworker
-                   modes (js-mode js-ts-mode js2-mode)
+                   modes (js2-mode js-mode js-ts-mode)
+                   host "localhost"
+                   port 8123
+                   command "node"
+                   ;; command-args '("/home/grish/.emacs.d/var/dape-adapters/js-debug/src/dapDebugServer.js" 8123)
                    command-args (,(expand-file-name
-                                  (file-name-concat dape-adapter-dir
-                                                    "js-debug"
-                                                    "src"
-                                                    "dapDebugServer.js"))
+                                   (file-name-concat dape-adapter-dir
+                                                     "js-debug"
+                                                     "src"
+                                                     "dapDebugServer.js"))
                                  :autoport)
+                   :type "pwa-node"
                    :request "launch"
-                   :module "npm"
-                   :args ["run" "noworker"]
-                   :console "integratedTerminal"
-                   :showReturnValue t
-                   :justMyCode nil
+                   ;; :program "index.js"
+                   :cwd dape-cwd
+                   :runtimeExecutable "npm"
+                   :runtimeArgs ["run-script" "noworker"]
+                   :pauseForSourceMap nil
+                   ;; :args ("run" "dev")
+                   :console "internalConsole"
                    )))
 #+end_src
 
@@ -992,29 +999,29 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
     :mode ("\\.js\\'")
     :hook
     (js2-mode . lsp-deferred)
-    ;; :config
-    ;; (require 'dap-node)
-    ;; (dap-register-debug-template
-    ;;  "Node: run script: noworker"
-    ;;  (list :type "node"
-    ;;        :request "launch"
-    ;;        :name "Run Script: noworker"
-    ;;        :cwd "${workspaceFolder}"
-    ;;        :program ""
-    ;;        :sourceMaps t
-    ;;        :skipFiles ["<node_internals>/**"]
-    ;;        :runtimeExecutable "npm"
-    ;;        :runtimeArgs '("run" "noworker")
-    ;;        :console "integratedTerminal"))
-    ;; (dap-register-debug-template
-    ;;  "Node: Launch File"
-    ;;  (list :type "node"
-    ;;        :request "launch"
-    ;;        :name "Node: Launch File"
-    ;;        :program "${file}"
-    ;;        :sourceMaps t
-    ;;        :skipFiles '("<node_internals>/**" "${workspaceFolder}/node_modules/**/*.js")
-    ;;        :console "integratedTerminal"))
+    :config
+    (require 'dap-node)
+    (dap-register-debug-template
+     "Node: run script: noworker"
+     (list :type "node"
+           :request "launch"
+           :name "Run Script: noworker"
+           :cwd "${workspaceFolder}"
+           :program ""
+           :sourceMaps t
+           :skipFiles ["<node_internals>/**"]
+           :runtimeExecutable "npm"
+           :runtimeArgs '("run" "noworker")
+           :console "integratedTerminal"))
+    (dap-register-debug-template
+     "Node: Launch File"
+     (list :type "node"
+           :request "launch"
+           :name "Node: Launch File"
+           :program "${file}"
+           :sourceMaps t
+           :skipFiles '("<node_internals>/**" "${workspaceFolder}/node_modules/**/*.js")
+           :console "integratedTerminal"))
     )
 #+end_src
 *** typescript mode
@@ -1127,6 +1134,7 @@ This mode expands
   (use-package arduino-mode
     :mode ("\\.ino\\'" . arduino-mode))
 #+end_src
+
 ** PHP Mode
 #+begin_src emacs-lisp
   (use-package php-mode)
@@ -1142,6 +1150,7 @@ This mode expands
     :config
     (setq treesit-extra-load-path '("/usr/local/lib")))
 #+end_src
+
 * Markdown
 #+begin_src emacs-lisp
   (use-package markdown-preview-mode)
