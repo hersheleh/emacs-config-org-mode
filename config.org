@@ -240,14 +240,22 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (org-roam-db-autosync-mode)
     (org-roam-setup))
 #+end_src
-** Visual Fill Column
+** Visual Fill column
 #+begin_src emacs-lisp
+  (defun scale-visual-fill-column ()
+    (interactive)
+    (message "Scaling visual fill column")
+    (setq visual-fill-column-width
+          (- 100 (+ 0 (* 25 text-scale-mode-amount)))))
   (use-package visual-fill-column
     :custom
     (visual-fill-column-center-text t)
+    (visual-fill-column-enable-sensible-window-split t)
+    (visual-fill-column-adjust-for-text-scale t)
     :hook
-    (visual-fill-column-mode . (lambda ()
-                                 (setq visual-fill-column-width 100))))
+    (visual-fill-column-mode . scale-visual-fill-column)
+    (text-scale-mode . scale-visual-fill-column)
+    )
 #+end_src
 ** COMMENT Org-Roam-UI
 #+begin_src emacs-lisp
@@ -490,7 +498,7 @@ Set the default font for different systems
   (when my-gnu-linux-p
     (defun gsh/set-font ()
       (message "Setting font")
-      (set-frame-font "DM Mono-11:medium" nil t))
+      (set-frame-font "DM Mono-10:medium" nil t))
 
     (if (daemonp)
         (add-hook 'after-make-frame-functions
@@ -909,8 +917,8 @@ An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaan
 This package is recomended for dape mode
 #+begin_src emacs-lisp
   (use-package repeat
-    :config
-    (repeat-mode))
+    :hook
+    (dape-mode . repeat-mode))
 #+end_src
 *** DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
@@ -1049,7 +1057,6 @@ Syntax checking and linting.
   (use-package docker)
 #+end_src
 ** SuperCollider
-
 *** SuperCollider scel (sclang mode for emacs)
 This is a mode for the sclang language for SuperCollider
 #+begin_src emacs-lisp
@@ -1059,6 +1066,8 @@ This is a mode for the sclang language for SuperCollider
     :load-path
     (lambda ()
       (cond
+       (my-steam-deck-p
+        "/home/deck/.local/share/SuperCollider/downloaded-quarks/scel/el")
        (my-macbook-p
         "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
        (my-sc-thinkpad-p
@@ -1082,7 +1091,10 @@ This is a mode for the sclang language for SuperCollider
     (require 'sclang))
 #+end_src
 
-*** COMMENT Org Babel SuperCollider
+#+RESULTS:
+: sclang-find-help-in-gui
+
+*** Org Babel SuperCollider
 Package to add supercollider support to org-babel
 #+begin_src emacs-lisp
   (use-package ob-sclang
@@ -1101,6 +1113,7 @@ Package to add supercollider support to org-babel
                                  (append org-babel-load-languages
                                          '((sclang . t) ))))
 #+end_src
+
 
 ** Python
 #+begin_src emacs-lisp
