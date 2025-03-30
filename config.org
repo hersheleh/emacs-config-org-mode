@@ -814,7 +814,7 @@ and jump to definition functionality for a particular language
                 ("M-." . lsp-find-definition))
     :init
     (setq lsp-keymap-prefix "C-x l")
-    ;; (setq lsp-use-plists t)
+    (when my-sc-thinkpad-p (setq lsp-use-plists t))
     ;; (lsp-treemacs-sync-mode 1)
     :hook
     ;; (js-mode . lsp-deferred)
