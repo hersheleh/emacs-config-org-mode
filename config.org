@@ -54,7 +54,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (defvar my-macbook-p (equal system-type 'darwin))
   (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
   (defvar my-steam-deck-p (string-match-p "steamdeck" system-name))
-  (defvar perfect-circuit-p (equal (system-name) "Grisha"))
+  (defvar perfect-circuit-p (equal (system-name) "grisha-pc"))
   (defvar my-gnu-linux-p (equal system-type 'gnu/linux))
 
   (global-auto-revert-mode)        ; revert buffers when changed on disk
@@ -243,7 +243,6 @@ Slip Card system for organizing thoughts. Zettelkasten Method
 #+begin_src emacs-lisp
   (defun scale-visual-fill-column ()
     (interactive)
-    (message "Scaling visual fill column")
     (setq visual-fill-column-width
           (- 100 (+ 0 (* 25 text-scale-mode-amount)))))
   (use-package visual-fill-column
@@ -253,8 +252,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (visual-fill-column-adjust-for-text-scale t)
     :hook
     (visual-fill-column-mode . scale-visual-fill-column)
-    (text-scale-mode . scale-visual-fill-column)
-    )
+    (text-scale-mode . scale-visual-fill-column))
 #+end_src
 ** COMMENT Org-Roam-UI
 #+begin_src emacs-lisp
@@ -275,17 +273,17 @@ Slip Card system for organizing thoughts. Zettelkasten Method
           (bell_quiet  ".emacs.d/my-statics/pom_sounds/bell_quiet.wav"))
       (cond (my-sc-thinkpad-p (setq prefix "/home/grish/"))
             (my-steam-deck-p (setq prefix "/home/deck/"))
-            (my-macbook-p (setq prefix "/Users/Grisha/")))
+            (my-macbook-p (setq prefix "/Users/Grisha/"))
+            (perfect-circuit-p (setq prefix "/home/grisha/")))
       (setq bell_quiet (concat prefix bell_quiet))
-
       (setq org-pomodoro-overtime-sound bell_quiet)
       (setq org-pomodoro-finished-sound bell_quiet)
       (setq org-pomodoro-short-break-sound bell_quiet)
       (setq org-pomodoro-long-break-sound bell_quiet))
     (when my-steam-deck-p
       (setq org-pomodoro-audio-player (executable-find "aplay")))
-    (when perfect-circuit-p
-      (setq org-pomodoro-audio-player (executable-find "play")))
+    ;; (when perfect-circuit-p
+    ;;   (setq org-pomodoro-audio-player (executable-find "play")))
     :custom
 
       (org-pomodoro-short-break-length 6)
@@ -1111,7 +1109,8 @@ Package to add supercollider support to org-babel
       (cond
        (my-macbook-p "/Users/Grisha/.emacs.d/git-lisp/ob-sclang")
        (my-sc-thinkpad-p "/home/grish/.emacs.d/git-lisp/ob-sclang")
-       (my-steam-deck-p "/home/deck/.emacs.d/git-lisp/ob-sclang")))
+       (my-steam-deck-p "/home/deck/.emacs.d/git-lisp/ob-sclang")
+       (perfect-circuit-p "/home/grisha/.emacs.d/git-lisp/ob-sclang")))
     :config
     (org-babel-do-load-languages 'org-babel-load-languages
                                  (append org-babel-load-languages
@@ -1489,8 +1488,8 @@ Distinguish between file buffers and pure buffers
 #+begin_src emacs-lisp
   (defun my-nov-font-setup ()
     (face-remap-add-relative 'variable-pitch
-			     :family "Liberation Serif"
-			     :height 1.0))
+                 :family "Liberation Serif"
+                 :height 1.0))
   (use-package nov
     :mode ("\\.epub\\'" . nov-mode)
     :hook
