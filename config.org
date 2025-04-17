@@ -581,7 +581,8 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
     ;; (load-theme 'doom-oceanic-next t)
     ;; (load-theme 'doom-ayu-dark t)
     ;; (load-theme 'doom-gruvbox-light t))
-    (load-theme 'doom-pine t)
+    ;; (load-theme 'doom-pine t)
+    (load-theme 'doom-gruvbox t)
     )
 #+end_src
 ** MODE LINE
@@ -912,9 +913,26 @@ An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaan
                    :pauseForSourceMap nil
                    ;; :args ("run" "dev")
                    :console "internalConsole"
-                   )))
+                   ))
+    (add-to-list 'dape-configs
+                 `(js-debug-attach-chrome
+                   modes (rjsx-mode)
+                   host "localhost"
+                   port 8123
+                   command "node"
+                   command-args (,(expand-file-name
+                                   (file-name-concat dape-adapter-dir
+                                                     "js-debug"
+                                                     "src"
+                                                     "dapDebugServer.js"))
+                                 :autoport)
+                   :type "pwa-chrome"
+                   :request "launch"
+                   :runtimeExecutable "brave"
+                   :url "http://localhost:3000"
+                   :sourceMaps t
+                   :webRoot dape-cwd)))
 #+end_src
-
 **** Repeat
 This package is recomended for dape mode
 #+begin_src emacs-lisp
@@ -1283,9 +1301,12 @@ This mode expands
     :config
     (setq js-indent-level 2))
 #+end_src
-*** COMMENT JSDOC
+*** prettier mode
 #+begin_src emacs-lisp
-  (use-package jsdoc)
+  (use-package prettier
+    :hook
+    (rjsx-mode . prettier-mode)
+    (tsx-ts-mode . prettier-mode))
 #+end_src
 
 ** Fish Shell script mode
