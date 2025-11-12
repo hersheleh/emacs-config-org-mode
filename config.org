@@ -251,6 +251,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (visual-fill-column-enable-sensible-window-split t)
     (visual-fill-column-adjust-for-text-scale t)
     :hook
+    (prog-mode . visual-fill-column-mode)
     (visual-fill-column-mode . scale-visual-fill-column)
     (text-scale-mode . scale-visual-fill-column))
 #+end_src
@@ -423,7 +424,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
            (clockout_dec (time-dec-to-min clockout))
            (clockout_hr (car (time-split-hr-min clockout_dec)))
            (clockout_min (cadr (time-split-hr-min clockout_dec))))
-      (print (format "Total Hours EOD: %d" total_hours))
+      (print (format "Total Hours EOD: %.2f" total_hours))
       (print (format "Worked this week: %.2f" hours))
       (print (format "Last clocked in at: %f" clockin_dec))
       (print (format "Hours left today: %d:%02d"
@@ -841,7 +842,7 @@ and jump to definition functionality for a particular language
       (add-to-list 'lsp-file-watch-ignored-directories
                    "[/\\\\]\\\.env.*\\'")))
 #+end_src
-** LSP-UI
+*** LSP-UI
 #+begin_src emacs-lisp
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
@@ -931,8 +932,30 @@ An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaan
                    :runtimeExecutable "brave"
                    :url "http://localhost:3000"
                    :sourceMaps t
-                   :webRoot dape-cwd)))
+                   :webRoot dape-cwd))
+    ;; (add-to-list 'dape-configs
+    ;;              `(js-debug-brave
+    ;;                modes (js-mode js-ts-mode)
+    ;;                command "node"
+    ;;                port 8123
+    ;;                command-args (,(expand-file-name
+    ;;                                (file-name-concat dape-adapter-dir
+    ;;                                                  "js-debug"
+    ;;                                                  "src"
+    ;;                                                  "dapDebugServer.js"))
+    ;;                              :autoport)
+    ;;                :type "pwa-chrome"
+    ;;                :name "Debug react"
+    ;;                :trace t
+    ;;                :url ,(lambda ()
+    ;;                        (read-string "Url: "
+    ;;                                     "http://localhost:3000"))
+    ;;                :webRoot "/home/grisha/hub/perfect_circuit/reactor/" ;
+    ;;                :outputCapture "console"
+    ;;                ))
+    )
 #+end_src
+
 **** Repeat
 This package is recomended for dape mode
 #+begin_src emacs-lisp
@@ -1223,6 +1246,7 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
     (js2-mode . lsp-deferred)
     :config
     (require 'dap-node)
+    (setq js2-mode-show-strict-warnings nil)
     (dap-register-debug-template
      "Node: run script: noworker"
      (list :type "node"
@@ -1306,7 +1330,8 @@ This mode expands
   (use-package prettier
     :hook
     (rjsx-mode . prettier-mode)
-    (tsx-ts-mode . prettier-mode))
+    (tsx-ts-mode . prettier-mode)
+    (js2-mode . prettier-mode))
 #+end_src
 
 ** Fish Shell script mode
@@ -1407,10 +1432,10 @@ Color delimiters like parens and braces according to their depth
   (use-package spacious-padding
     :ensure t
     :hook (after-init . spacious-padding-mode)
-    :config
-    (setq spacious-padding-widths
-          '(:internal-border-width 15 :header-line-width 4 :mode-line-width 6 :tab-width 4
-                                   :right-divider-width 10 :scroll-bar-width 8 :fringe-width 8))
+    ;; :config
+    ;; (setq spacious-padding-widths
+    ;;       '(:internal-border-width 15 :header-line-width 4 :mode-line-width 6 :tab-width 4
+    ;;                                :right-divider-width 10 :scroll-bar-width 8 :fringe-width 8))
     )
 #+end_src
 * Solair
