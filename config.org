@@ -167,7 +167,7 @@ Define function to time Emacs startup and determine # of garbage collections
             "~/hub/orgs/social.org"
             "~/hub/orgs/job.org"
             "~/hub/orgs/perfect_circuit.org"
-            "~/hub/orgs/programming.org"
+            "~/hub/orgs/computers.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
             ;; "~/.emacs.d/config.org"
