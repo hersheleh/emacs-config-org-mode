@@ -1545,6 +1545,11 @@ Distinguish between file buffers and pure buffers
     (nov-text-width 80)
     (nov-text-width t))
 #+end_src
+* Structure & Interpretation of Computer Programs
+#+begin_src emacs-lisp
+  (use-package sicp
+    :demand t)
+#+end_src
 * Garbage Collection
 #+begin_src emacs-lisp
   ;; Set Garbage collection threshold back down after startup completes
