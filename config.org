@@ -252,6 +252,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (visual-fill-column-adjust-for-text-scale t)
     :hook
     (prog-mode . visual-fill-column-mode)
+    (Info-mode . visual-fill-column-mode)
     (visual-fill-column-mode . scale-visual-fill-column)
     (text-scale-mode . scale-visual-fill-column))
 #+end_src
