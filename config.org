@@ -56,6 +56,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (defvar my-steam-deck-p (string-match-p "steamdeck" system-name))
   (defvar perfect-circuit-p (equal (system-name) "grisha-pc"))
   (defvar my-gnu-linux-p (equal system-type 'gnu/linux))
+  (defvar my-sage-arch-p (equal (system-name) "sage"))
 
   (global-auto-revert-mode)        ; revert buffers when changed on disk
 #+end_src
@@ -147,7 +148,7 @@ Define function to time Emacs startup and determine # of garbage collections
     :config
     (org-babel-do-load-languages 'org-babel-load-languages
                                  (append org-babel-load-languages
-                                         '((C . t) (python . t))))
+                                         '((C . t) (python . t) (scheme . t))))
     ;; Org Capture Configuration
     (setq org-default-notes-file (concat org-directory "/notes.org"))
     ;; Org Agenda
@@ -166,7 +167,7 @@ Define function to time Emacs startup and determine # of garbage collections
             "~/hub/orgs/contracts.org"
             "~/hub/orgs/social.org"
             "~/hub/orgs/job.org"
-            "~/hub/orgs/perfect_circuit.org"
+            "~/hub/orgs/work/perfect_circuit.org"
             "~/hub/orgs/computers.org"
             ;; "~/hub/new_projects/orgi/orgi_plan.org"
             ;; "~/hub/recording_bullet_journal/super_collider_projects/sc_bujo.org"
@@ -193,6 +194,7 @@ Define function to time Emacs startup and determine # of garbage collections
 
     (add-to-list 'org-structure-template-alist '("sc" . "src sclang"))
     (add-to-list 'org-structure-template-alist '("se" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("sch" . "src scheme"))
 
     (defhydra hydra-org ()
       "org hydra"
@@ -1110,13 +1112,15 @@ This is a mode for the sclang language for SuperCollider
     :load-path
     (lambda ()
       (cond
+       (my-sage-arch-p "/home/grisha/.local/share/SuperCollider/downloaded-quarks/scel/el")
        (my-steam-deck-p
         "/home/deck/.local/share/SuperCollider/downloaded-quarks/scel/el")
        (my-macbook-p
         "/Users/Grisha/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
        (my-sc-thinkpad-p
         "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
-       (my-gnu-linux-p "/usr/local/share/emacs/site-lisp/SuperCollider/")))
+       (my-gnu-linux-p "/usr/local/share/emacs/site-lisp/SuperCollider/")
+       ))
     :mode ("\\.scd\\'" . sclang-mode)
     :bind (:map sclang-mode-map
                ("C-c C-l"    . sclang-eval-line)
@@ -1134,10 +1138,6 @@ This is a mode for the sclang language for SuperCollider
              '("/Applications/SuperCollider.app/Contents/MacOS/"))))
     (require 'sclang))
 #+end_src
-
-#+RESULTS:
-: sclang-find-help-in-gui
-
 *** Org Babel SuperCollider
 Package to add supercollider support to org-babel
 #+begin_src emacs-lisp
@@ -1152,14 +1152,13 @@ Package to add supercollider support to org-babel
        (my-macbook-p "/Users/Grisha/.emacs.d/git-lisp/ob-sclang")
        (my-sc-thinkpad-p "/home/grish/.emacs.d/git-lisp/ob-sclang")
        (my-steam-deck-p "/home/deck/.emacs.d/git-lisp/ob-sclang")
-       (perfect-circuit-p "/home/grisha/.emacs.d/git-lisp/ob-sclang")))
+       (perfect-circuit-p "/home/grisha/.emacs.d/git-lisp/ob-sclang")
+       (my-sage-arch-p "/home/grisha/.emacs.d/git-lisp/ob-sclang/")))
     :config
     (org-babel-do-load-languages 'org-babel-load-languages
                                  (append org-babel-load-languages
-                                         '((sclang . t) ))))
+                                         '((sclang . t)))))
 #+end_src
-
-
 ** Python
 #+begin_src emacs-lisp
   (use-package python
@@ -1234,7 +1233,6 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
 #+begin_src emacs-lisp
   (use-package pug-mode)
 #+end_src
-
 ** Javascript
 *** js2 mode
 #+begin_src emacs-lisp
@@ -1334,7 +1332,6 @@ This mode expands
     (tsx-ts-mode . prettier-mode)
     (js2-mode . prettier-mode))
 #+end_src
-
 ** Fish Shell script mode
 #+begin_src emacs-lisp
 (use-package fish-mode)
@@ -1346,7 +1343,6 @@ This mode expands
     :hook
     (c-sharp-mode . lsp-deferred))
 #+end_src
-
 ** Shader
 #+begin_src emacs-lisp
 (use-package shader-mode)
@@ -1366,7 +1362,6 @@ This mode expands
     ;;(display-line-numbers 'relative)
     )
 #+end_src
-
 ** COMMENT Yaml
 #+begin_src emacs-lisp
   (use-package yaml-mode
@@ -1385,7 +1380,6 @@ This mode expands
   (use-package arduino-mode
     :mode ("\\.ino\\'" . arduino-mode))
 #+end_src
-
 ** PHP Mode
 #+begin_src emacs-lisp
   (use-package php-mode)
@@ -1398,14 +1392,19 @@ This mode expands
 #+begin_src emacs-lisp
   (use-package markdown-preview-mode)
 #+end_src
-* Treesitter
+** Geiser (Lisp)
+#+begin_src emacs-lisp
+  (use-package 'geiser-mit)
+#+end_src
+
+* COMMENT Treesitter
 #+begin_src emacs-lisp
   (use-package treesit
     :ensure nil
     :config
     (setq treesit-extra-load-path '("/usr/local/lib")))
 #+end_src
-* VTERM
+* COMMENT VTERM
 A very good shell in emacs
 Notes: need to find a way to execute bash profile.
 current way interferes with dap-mode terminal input
