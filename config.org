@@ -274,7 +274,8 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     :config
     (let ((prefix "")
           (bell_quiet  ".emacs.d/my-statics/pom_sounds/bell_quiet.wav"))
-      (cond (my-sc-thinkpad-p (setq prefix "/home/grish/"))
+      (cond (my-sage-arch-p (setq prefix "/home/grisha/"))
+            (my-sc-thinkpad-p (setq prefix "/home/grish/"))
             (my-steam-deck-p (setq prefix "/home/deck/"))
             (my-macbook-p (setq prefix "/Users/Grisha/"))
             (perfect-circuit-p (setq prefix "/home/grisha/")))
