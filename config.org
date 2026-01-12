@@ -812,8 +812,7 @@ and jump to definition functionality for a particular language
 *** DONE make alias for clangd -> clangd-10
 
 
-*** LSP MODE (Enabled)
-
+*** COMMENT LSP MODE (Enabled)
 #+begin_src emacs-lisp
   (use-package lsp-mode
     ;; :after flycheck
@@ -1073,8 +1072,8 @@ Syntax checking and linting.
     :ensure nil
     :mode ("\\.keymap\\'" . c-mode)
     :hook
-    (c++-mode . lsp-deferred)
-    (c-mode . lsp-deferred)
+    ;; (c++-mode . lsp-deferred)
+    ;; (c-mode . lsp-deferred)
     :config
     (require 'dap-cpptools)
     (require 'dap-lldb)                  ; not stopping at breakpoints. look at upgrading
@@ -1171,8 +1170,8 @@ Package to add supercollider support to org-babel
 
     ;; :bind ( :map python-mode-map
     ;;         ("C-c r" . nil))
-    :hook
-    (python-mode . lsp-deferred)
+    ;; :hook
+    ;; (python-mode . lsp-deferred)
     ;; (lsp-diagnostics-mode . (lambda ()
     ;;                           ;; (flycheck-add-next-checker
     ;;                           ;;  'lsp 'python-pylint)
@@ -1242,9 +1241,10 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
     (js2-strict-missing-semi-warning nil)
     (js-indent-level 2)
     :mode ("\\.js\\'")
-    :hook
-    (js2-mode . lsp-deferred)
-    :config
+    ;; :hook
+    ;; (js2-mode . lsp-deferred)
+    ;; :
+    config
     (require 'dap-node)
     (setq js2-mode-show-strict-warnings nil)
     (dap-register-debug-template
@@ -1272,58 +1272,61 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
 #+end_src
 *** typescript mode
 #+begin_src emacs-lisp
-  (use-package typescript-ts-mode
-    :ensure nil
-    ;; :mode ("\\.ts\\'" "\\.js\\'")
-    :mode ("\\.ts\\'")
-    :hook
-    (typescript-ts-mode . lsp-deferred))
+    (use-package typescript-ts-mode
+      :ensure nil
+      ;; :mode ("\\.ts\\'" "\\.js\\'")
+      :mode ("\\.ts\\'")
+  ;;  :hook
+  ;;   (typescript-ts-mode . lsp-deferred)
+      )
 #+end_src
 *** tsx-ts-mode
 #+begin_src emacs-lisp
-  (use-package tsx-ts-mode
-    :ensure nil
-    :mode ("\\.tsx\\'")
-    :hook (tsx-ts-mode . lsp-deferred))
+    (use-package tsx-ts-mode
+      :ensure nil
+      :mode ("\\.tsx\\'")
+  ;;     :hook (tsx-ts-mode . lsp-deferred)
+      )
 #+end_src
 *** jtsx mode
 This mode expands
 #+begin_src emacs-lisp
-  (use-package jtsx
-    :custom
-    (typescript-ts-mode-indent-offset 4)
-    :mode
-    ("\\.tsx\\'" . jtsx-tsx-mode)
+    (use-package jtsx
+      :custom
+      (typescript-ts-mode-indent-offset 4)
+      :mode
+      ("\\.tsx\\'" . jtsx-tsx-mode)
 
-    ;; ("/client\(/[^/]+\)+\\.js\\'" . jtsx-jsx-mode)
-    :hook
-    (jtsx-jsx-mode . lsp-deferred)
-    ;; (jtsx-js-mode . lsp-deferred)
-    ;; :config
-    ;; (setq standard-indent 2)
-    )
-  ;;                           (if (eq major-mode 'tsx-ts-mode)
-  ;;                               (flycheck-select-checker
-  ;;                                'javascript-eslint))
+      ;; ("/client\(/[^/]+\)+\\.js\\'" . jtsx-jsx-mode)
+      ;; :hook
+      ;; (jtsx-jsx-mode . lsp-deferred)
+      ;; (jtsx-js-mode . lsp-deferred)
+      ;; :config
+      ;; (setq standard-indent 2)
+      )
+    ;;                           (if (eq major-mode 'tsx-ts-mode)
+    ;;                               (flycheck-select-checker
+    ;;                                'javascript-eslint))
 #+end_src
 *** rjsx mode
 #+begin_src emacs-lisp
-  (use-package rjsx-mode
-    :mode
-    ("\\.jsx\\'" . rjsx-mode)
-    ("\\/client\\/.*\\.js\\'" . rjsx-mode)
-    :hook
-    (rjsx-mode . lsp-deferred))
+      (use-package rjsx-mode
+        :mode
+        ("\\.jsx\\'" . rjsx-mode)
+        ("\\/client\\/.*\\.js\\'" . rjsx-mode)
+        ;; :hook
+    ;;     (rjsx-mode . lsp-deferred)
+        )
 #+end_src
 *** JSON
 #+begin_src emacs-lisp
   (use-package json-ts-mode
-    :ensure nil
-    :mode ("\\.json\\'")
-    :hook
-    (json-ts-mode . lsp-deferred)
-    :config
-    (setq js-indent-level 2))
+      :ensure nil
+      :mode ("\\.json\\'")
+      ;; :hook
+  ;;     (json-ts-mode . lsp-deferred)
+      :config
+      (setq js-indent-level 2))
 #+end_src
 *** prettier mode
 #+begin_src emacs-lisp
@@ -1339,10 +1342,11 @@ This mode expands
 #+end_src
 ** CSharp
 #+begin_src emacs-lisp
-  (use-package csharp-mode
-    :ensure nil
-    :hook
-    (c-sharp-mode . lsp-deferred))
+    (use-package csharp-mode
+      :ensure nil
+      ;; :hook
+      ;; (c-sharp-mode . lsp-deferred)
+      )
 #+end_src
 ** Shader
 #+begin_src emacs-lisp
