@@ -823,9 +823,9 @@ and jump to definition functionality for a particular language
     (setq lsp-keymap-prefix "C-x l")
     (when my-sc-thinkpad-p (setq lsp-use-plists t))
     ;; (lsp-treemacs-sync-mode 1)
-    :hook
+    ;; :hook
     ;; (js-mode . lsp-deferred)
-    (terraform-mode . lsp-deferred)
+    ;; (terraform-mode . lsp-deferred)
     ;; (lsp-mode . lsp-treemacs-symbols)
     ;; (lsp-mode . treemacs-select-window)
     ;; :custom
@@ -883,7 +883,7 @@ and jump to definition functionality for a particular language
 #+end_src
 
 ** Debuggers
-*** DAPE-Mode
+*** COMMENT DAPE-Mode
 An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaante/dape][docs]]
 #+begin_src emacs-lisp
   (use-package dape
@@ -1071,7 +1071,7 @@ Syntax checking and linting.
   (use-package cc
     :ensure nil
     :mode ("\\.keymap\\'" . c-mode)
-    :hook
+    ;; :hook
     ;; (c++-mode . lsp-deferred)
     ;; (c-mode . lsp-deferred)
     :config
@@ -1236,39 +1236,38 @@ This [[https://emacs.stackexchange.com/questions/31282/unicodeencodeerror-execut
 ** Javascript
 *** js2 mode
 #+begin_src emacs-lisp
-  (use-package js2-mode
-    :custom
-    (js2-strict-missing-semi-warning nil)
-    (js-indent-level 2)
-    :mode ("\\.js\\'")
-    ;; :hook
-    ;; (js2-mode . lsp-deferred)
-    ;; :
-    config
-    (require 'dap-node)
-    (setq js2-mode-show-strict-warnings nil)
-    (dap-register-debug-template
-     "Node: run script: noworker"
-     (list :type "node"
-           :request "launch"
-           :name "Run Script: noworker"
-           :cwd "${workspaceFolder}"
-           :program ""
-           :sourceMaps t
-           :skipFiles ["<node_internals>/**"]
-           :runtimeExecutable "npm"
-           :runtimeArgs '("run" "noworker")
-           :console "integratedTerminal"))
-    (dap-register-debug-template
-     "Node: Launch File"
-     (list :type "node"
-           :request "launch"
-           :name "Node: Launch File"
-           :program "${file}"
-           :sourceMaps t
-           :skipFiles '("<node_internals>/**" "${workspaceFolder}/node_modules/**/*.js")
-           :console "integratedTerminal"))
-    )
+   (use-package js2-mode
+     :custom
+     (js2-strict-missing-semi-warning nil)
+     (js-indent-level 2)
+     :mode "\\.js\\'"
+     ;; :hook
+     ;; (js2-mode . lsp-deferred)
+     :config
+     (require 'dap-node)
+     (setq js2-mode-show-strict-warnings nil)
+     ;; (dap-register-debug-template
+     ;;  "Node: run script: noworker"
+     ;;  (list :type "node"
+     ;;        :request "launch"
+     ;;        :name "Run Script: noworker"
+     ;;        :cwd "${workspaceFolder}"
+     ;;        :program ""
+     ;;        :sourceMaps t
+     ;;        :skipFiles ["<node_internals>/**"]
+     ;;        :runtimeExecutable "npm"
+     ;;        :runtimeArgs '("run" "noworker")
+     ;;        :console "integratedTerminal"))
+     ;; (dap-register-debug-template
+     ;;  "Node: Launch File"
+     ;;  (list :type "node"
+     ;;        :request "launch"
+     ;;        :name "Node: Launch File"
+     ;;        :program "${file}"
+     ;;        :sourceMaps t
+     ;;        :skipFiles '("<node_internals>/**" "${workspaceFolder}/node_modules/**/*.js")
+     ;;        :console "integratedTerminal"))
+  )
 #+end_src
 *** typescript mode
 #+begin_src emacs-lisp
@@ -1310,13 +1309,13 @@ This mode expands
 #+end_src
 *** rjsx mode
 #+begin_src emacs-lisp
-      (use-package rjsx-mode
-        :mode
-        ("\\.jsx\\'" . rjsx-mode)
-        ("\\/client\\/.*\\.js\\'" . rjsx-mode)
-        ;; :hook
-    ;;     (rjsx-mode . lsp-deferred)
-        )
+    (use-package rjsx-mode
+      :mode
+      ("\\.jsx\\'" . rjsx-mode)
+      ("\\/client\\/.*\\.js\\'" . rjsx-mode)
+      ;; :hook
+  ;;     (rjsx-mode . lsp-deferred)
+      )
 #+end_src
 *** JSON
 #+begin_src emacs-lisp
@@ -1399,7 +1398,7 @@ This mode expands
 #+end_src
 ** Geiser (Lisp)
 #+begin_src emacs-lisp
-  (use-package 'geiser-mit)
+  (use-package geiser-mit)
 #+end_src
 
 * COMMENT Treesitter
