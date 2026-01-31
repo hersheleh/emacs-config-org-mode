@@ -156,6 +156,7 @@ Define function to time Emacs startup and determine # of garbage collections
     (setq org-agenda-include-diary nil)
     ;; Add graphical timeline to org agenda
     (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
+    (setq org-default-notes-file "~/hub/orgs/capture.org")
     (setq org-agenda-files
           '(
             ;; "~/hub/orgs/my_todos.org"
