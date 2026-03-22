@@ -1574,7 +1574,7 @@ A package to search documentation offline
           (setq file-name-handler-alist default-file-name-handler-alist)))
           ;;(setq gc-cons-threshold (* 2 1000 1000))))
 #+end_src
-* COMMENT Buffer Move
+* Buffer Move
 Simplify Swapping buffers
 #+begin_src emacs-lisp
   (use-package buffer-move
