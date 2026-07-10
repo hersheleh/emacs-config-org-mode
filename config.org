@@ -889,61 +889,161 @@ and jump to definition functionality for a particular language
 *** DAPE-Mode
 An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaante/dape][docs]]
 #+begin_src emacs-lisp
+  (defvar my/reactor-root "/home/grisha/hub/perfect_circuit/reactor-18"
+    "Project root for reactor dape configs.")
+  (defun my/dape-node-base ()
+    (list 'modes '(js2-mode js-ts-mode typescript-mode typescript-ts-mode)
+          'ensure 'dape-ensure-command
+          'fn 'dape-config-autoport
+          'command "node"
+          'command-cwd 'dape-command-cwd
+          'command-args (list (expand-file-name
+                               "js-debug/src/dapDebugServer.js"
+                               dape-adapter-dir)
+                              :autoport)
+          'port :autoport
+          :type "pwa-node"
+          :request "launch"
+          :cwd my/reactor-root
+          :console "integratedTerminal"
+          :outputCapture "console"
+          :skipFiles ["<node_internals/**>"]))
+
+  (defun my/dape-register-node (name &rest overrides)
+    (setf (alist-get name dape-configs)
+          (append overrides (my/dape-node-base))))
+
   (use-package dape
     :hook
     (kill-emacs . dape-breakpoint-save)
     (after-init . dape-breakpoint-load)
     (prog-mode . eldoc-mode)
+    :bind (:map dape-repl-mode-map
+                ("TAB" . completion-at-point))
     :config
     (dape-breakpoint-global-mode)
     ;; (setq dape-request-timeout 60)
     (setq dape-inlay-hints t)
-    (add-to-list 'dape-configs
-                 `(npm-noworker
-                   modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
-                   ensure dape-ensure-command
-                   fn dape-config-autoport
-                   command "node"
-                   command-cwd dape-command-cwd
-                   command-args (,(expand-file-name
-                                   "js-debug/src/dapDebugServer.js"
-                                   dape-adapter-dir)
-                                 :autoport)
-                   port :autoport
-                   :type "pwa-node"
-                   :request "launch"
-                   :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
-                   :runtimeExecutable "npm"
-                   :runtimeArgs ["run" "noworker"]
-                   :console "integratedTerminal"
-                   :outputCapture "console"
-                   :skipFiles ["<node_internals>/**"]
-                   ))
-    (add-to-list 'dape-configs
-                 `(reactor-file
-                   modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
-                   ensure dape-ensure-command
-                   fn dape-config-autoport
-                   command "node"
-                   command-cwd dape-command-cwd
-                   command-args (,(expand-file-name
-                                   "js-debug/src/dapDebugServer.js"
-                                   dape-adapter-dir)
-                                 :autoport)
-                   port :autoport
-                   :type "pwa-node"
-                   :request "launch"
-                   :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
-                   :runtimeExecutable "npm"
-                   :runtimeArgs ,(lambda ()
-                                   (vector "run" "runWithMongo" "--"
-                                           (or (buffer-file-name)
-                                             (user-error "Current buffer is not visiting a file"))))
-                   :env (:NODE_ENV "development")
-                   :console "integratedTerminal"
-                   :outputCapture "console"
-                   :skipFiles ["<node_internals>/**"]))
+
+    (my/dape-register-node
+     'reactor-file
+     :runtimeExecutable "npm"
+     :env '(:NODE_ENV "development")
+     :runtimeArgs (lambda ()
+                    (vector "run" "runWithMongo" "--"
+                            (or (buffer-file-name)
+                                (user-error "Current buffer is not visiting a file")))))
+    (my/dape-register-node
+     'npm-noworker
+     :runtimeExecutable "npm"
+     :runtimeArgs ["run" "noworker"])
+    (my/dape-register-node
+     'mocha-file
+     :autoAttachChildProcesses t
+     :program (expand-file-name "node_modules/mocha/bin/mocha.js" my/reactor-root)
+     :args (lambda ()
+             (vector "--no-timeouts"
+                     (or (buffer-file-name)
+                         (user-error "Current buffer is not visiting a test file")))))
+    (my/dape-register-node
+     'mocha-grep
+     :autoAttachChildProcesses t
+     :program (expand-file-name "node_modules/mocha/bin/mocha.js" my/reactor-root)
+     :args (lambda ()
+             (vector "--no-timeouts" "--grep" (read-string "mocha --grep: ")
+                     (or (buffer-file-name)
+                         (user-error "Current buffer is not visiting a test file")))))
     )
+    ;; (add-to-list 'dape-configs
+    ;;              `(npm-noworker
+    ;;                modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
+    ;;                ensure dape-ensure-command
+    ;;                fn dape-config-autoport
+    ;;                command "node"
+    ;;                command-cwd dape-command-cwd
+    ;;                command-args (,(expand-file-name
+    ;;                                "js-debug/src/dapDebugServer.js"
+    ;;                                dape-adapter-dir)
+    ;;                              :autoport)
+    ;;                port :autoport
+    ;;                :type "pwa-node"
+    ;;                :request "launch"
+    ;;                :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
+    ;;                :runtimeExecutable "npm"
+    ;;                :runtimeArgs ["run" "noworker"]
+    ;;                :console "integratedTerminal"
+    ;;                :outputCapture "console"
+    ;;                :skipFiles ["<node_internals>/**"]
+    ;;                ))
+    ;; (add-to-list 'dape-configs
+    ;;              `(reactor-file
+    ;;                modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
+    ;;                ensure dape-ensure-command
+    ;;                fn dape-config-autoport
+    ;;                command "node"
+    ;;                command-cwd dape-command-cwd
+    ;;                command-args (,(expand-file-name
+    ;;                                "js-debug/src/dapDebugServer.js"
+    ;;                                dape-adapter-dir)
+    ;;                              :autoport)
+    ;;                port :autoport
+    ;;                :type "pwa-node"
+    ;;                :request "launch"
+    ;;                :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
+    ;;                :runtimeExecutable "npm"
+    ;;                :runtimeArgs ,(lambda ()
+    ;;                                (vector "run" "runWithMongo" "--"
+    ;;                                        (or (buffer-file-name)
+    ;;                                          (user-error "Current buffer is not visiting a file"))))
+    ;;                :env (:NODE_ENV "development")
+    ;;                :console "integratedTerminal"
+    ;;                :outputCapture "console"
+    ;;                :skipFiles ["<node_internals>/**"]))
+    ;; (add-to-list 'dape-configs
+    ;;              `(mocha-file
+    ;;                modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
+    ;;                ensure dape-ensure-command
+    ;;                fn dape-config-autoport
+    ;;                command "node"
+    ;;                command-cwd dape-command-cwd
+    ;;                command-args (,(expand-file-name
+    ;;                                "js-debug/src/dapDebugServer.js"
+    ;;                                dape-adapter-dir)
+    ;;                              :autoport)
+    ;;                port :autoport
+    ;;                :type "pwa-node"
+    ;;                :request "launch"
+    ;;                :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
+    ;;                :program "/home/grisha/hub/perfect_circuit/reactor-18/node_modules/mocha/bin/mocha.js"
+    ;;                :args ,(lambda ()
+    ;;                         (vector "--no-timeouts"
+    ;;                                 (or (buffer-file-name)
+    ;;                                     (user-error "Current buffer is not visiting a test file"))))
+    ;;                :autoAttachChildProcess t
+    ;;                :console "integratedTerminal"
+    ;;                :outputCapture: "console"
+    ;;                :skipFiles ["<node_internals>/**"]
+    ;;                ))
+    ;; (add-to-list 'dape-configs
+    ;;              `(mocha-grep
+    ;;                modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
+    ;;                ensure dape-ensure-command
+    ;;                fn dape-config-autoport
+    ;;                command "node"
+    ;;                command-cwd dape-command-cwd
+    ;;                command-args (,(expand-file-name
+    ;;                                "js-debug/src/dapDebugServer.js"
+    ;;                                dape-adapter-dir)
+    ;;                              :autoport)
+    ;;                port :autoport
+    ;;                :type "pwa-node"
+    ;;                :request "launch"
+    ;;                :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
+    ;;                :program "/home/grisha/hub/perfect_circuit/reactor-18/node_modules/mocha/bin/mocha.js"
+
+    ;; ))
+  ;; )
+
 #+end_src
 
 **** Repeat
