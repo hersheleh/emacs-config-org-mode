@@ -2,7 +2,8 @@
 #+AUTHOR: Grisha Khachaturyan
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 This is *my* personal emacs config file. It is a literate config. Org mode will tangle this config into the co-located init.el file. This config uses lsp-mode and ivy-mode as the primary convenience features. It is a bit disorganized as I've assembled it sporadically over time piece by piece. I'm planning to  refactor this config to be more organized so other's could use it for reference or inspiration. I was primarily inspired by David Wilson's [[https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs From Scratch]] youtube series.
-* Emacs Performace
+* Bootstrap & Performance
+** Emacs Performace
 Increase garbage collection threshold to lower startup time.
 #+begin_src emacs-lisp :tangle ./early-init.el
   ;; Set Garbage collection threshold very high at startup
@@ -24,8 +25,8 @@ Define function to time Emacs startup and determine # of garbage collections
              gcs-done))
   (add-hook 'emacs-startup-hook #'gsh/display-startup-time)
 #+end_src
-* PACKAGE MANAGEMENT
-** Setup package.el to work with MELPA.
+** PACKAGE MANAGEMENT
+*** Setup package.el to work with MELPA.
 #+begin_src emacs-lisp
   (require 'package)
   (setq package-archives
@@ -39,8 +40,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (unless package-archive-contents
     (package-refresh-contents))
 #+end_src
-
-** Installing use-package
+*** Installing use-package
 #+begin_src emacs-lisp
   ;; (unless (package-installed-p 'use-package)
   ;;   (package-install 'use-package))
@@ -49,7 +49,7 @@ Define function to time Emacs startup and determine # of garbage collections
   (setq use-package-always-defer t)
   (setq use-package-verbose nil)
 #+end_src
-* System information
+** System information
 #+begin_src emacs-lisp
   (defvar my-macbook-p (equal system-type 'darwin))
   (defvar my-sc-thinkpad-p (equal (system-name) "opamp"))
@@ -59,6 +59,15 @@ Define function to time Emacs startup and determine # of garbage collections
   (defvar my-sage-arch-p (equal (system-name) "sage"))
 
   (global-auto-revert-mode)        ; revert buffers when changed on disk
+#+end_src
+** Exec Path From Shell
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :demand t
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)
+      ))
 #+end_src
 * Emacs display settings
 #+begin_src emacs-lisp
@@ -130,7 +139,7 @@ Define function to time Emacs startup and determine # of garbage collections
 
     :hook
     (org-mode . visual-line-mode)
-    (org-mode . visual-fill-column-mode)
+    ;; (org-mode . visual-fill-column-mode)
     (org-mode . electric-pair-local-mode)
     :custom
     (org-clock-display-default-range 'untilnow)
@@ -242,7 +251,7 @@ Slip Card system for organizing thoughts. Zettelkasten Method
     (org-roam-db-autosync-mode)
     (org-roam-setup))
 #+end_src
-** Visual Fill column
+** COMMENT Visual Fill column
 #+begin_src emacs-lisp
   (defun scale-visual-fill-column ()
     (interactive)
@@ -288,11 +297,10 @@ Slip Card system for organizing thoughts. Zettelkasten Method
       (setq org-pomodoro-long-break-sound bell_quiet))
     (when my-steam-deck-p
       (setq org-pomodoro-audio-player (executable-find "aplay")))
-    ;; (when perfect-circuit-p
-    ;;   (setq org-pomodoro-audio-player (executable-find "play")))
+    (when perfect-circuit-p
+       (setq org-pomodoro-audio-player (executable-find "play")))
     :custom
-
-      (org-pomodoro-short-break-length 6)
+    (org-pomodoro-short-break-length 6)
       (org-pomodoro-ticking-sound-p nil)
       (org-pomodoro-manual-break t))
 
@@ -515,15 +523,6 @@ Set the default font for different systems
   ;;                      (gsh/set-font))))
   ;;      (gsh/set-font)))
 #+end_src
-* Exec Path From Shell
-#+begin_src emacs-lisp
-  (use-package exec-path-from-shell
-    :demand t
-    :config
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)
-      ))
-#+end_src
 * Spaces OVER TABS
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -588,7 +587,10 @@ You can choose a theme by executing *M-x customize-theme* you can turn off the s
     ;; (load-theme 'doom-ayu-dark t)
     ;; (load-theme 'doom-gruvbox-light t))
     ;; (load-theme 'doom-pine t)
-    (load-theme 'doom-gruvbox t)
+    ;; (load-theme 'doom-gruvbox t)
+    ;; (load-theme 'doom-earl-grey t)
+    ;; (load-theme 'doom-lantern t)
+    (load-theme 'doom-monokai-spectrum t)
     )
 #+end_src
 ** MODE LINE
@@ -625,7 +627,6 @@ possible inputs
     :bind (("C-s" . counsel-grep-or-swiper)
            ("C-M-s" . swiper-isearch)
            ;; ("C-S" . swiper-isearch)
-
            ;; ("C-r" . swiper-backward)
            ;; ("C-c C-r" . ivy-resume)
            ;; ("<f6>" . ivy-resume)
@@ -883,8 +884,9 @@ and jump to definition functionality for a particular language
 
 #+end_src
 
+
 ** Debuggers
-*** COMMENT DAPE-Mode
+*** DAPE-Mode
 An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaante/dape][docs]]
 #+begin_src emacs-lisp
   (use-package dape
@@ -897,66 +899,50 @@ An newer alternative Debug Adapter Protocol for Emacs [[https://github.com/svaan
     ;; (setq dape-request-timeout 60)
     (setq dape-inlay-hints t)
     (add-to-list 'dape-configs
-                 `(js-debug-node-noworker
-                   modes (js2-mode js-mode js-ts-mode)
-                   host "localhost"
-                   port 8123
+                 `(npm-noworker
+                   modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
+                   ensure dape-ensure-command
+                   fn dape-config-autoport
                    command "node"
-                   ;; command-args '("/home/grish/.emacs.d/var/dape-adapters/js-debug/src/dapDebugServer.js" 8123)
+                   command-cwd dape-command-cwd
                    command-args (,(expand-file-name
-                                   (file-name-concat dape-adapter-dir
-                                                     "js-debug"
-                                                     "src"
-                                                     "dapDebugServer.js"))
+                                   "js-debug/src/dapDebugServer.js"
+                                   dape-adapter-dir)
                                  :autoport)
+                   port :autoport
                    :type "pwa-node"
                    :request "launch"
-                   ;; :program "index.js"
-                   :cwd dape-cwd
+                   :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
                    :runtimeExecutable "npm"
-                   :runtimeArgs ["run-script" "noworker"]
-                   :pauseForSourceMap nil
-                   ;; :args ("run" "dev")
-                   :console "internalConsole"
+                   :runtimeArgs ["run" "noworker"]
+                   :console "integratedTerminal"
+                   :outputCapture "console"
+                   :skipFiles ["<node_internals>/**"]
                    ))
     (add-to-list 'dape-configs
-                 `(js-debug-attach-chrome
-                   modes (rjsx-mode)
-                   host "localhost"
-                   port 8123
+                 `(reactor-file
+                   modes (js2-mode js-ts-mode typescript-mode typescript-ts-mode)
+                   ensure dape-ensure-command
+                   fn dape-config-autoport
                    command "node"
+                   command-cwd dape-command-cwd
                    command-args (,(expand-file-name
-                                   (file-name-concat dape-adapter-dir
-                                                     "js-debug"
-                                                     "src"
-                                                     "dapDebugServer.js"))
+                                   "js-debug/src/dapDebugServer.js"
+                                   dape-adapter-dir)
                                  :autoport)
-                   :type "pwa-chrome"
+                   port :autoport
+                   :type "pwa-node"
                    :request "launch"
-                   :runtimeExecutable "brave"
-                   :url "http://localhost:3000"
-                   :sourceMaps t
-                   :webRoot dape-cwd))
-    ;; (add-to-list 'dape-configs
-    ;;              `(js-debug-brave
-    ;;                modes (js-mode js-ts-mode)
-    ;;                command "node"
-    ;;                port 8123
-    ;;                command-args (,(expand-file-name
-    ;;                                (file-name-concat dape-adapter-dir
-    ;;                                                  "js-debug"
-    ;;                                                  "src"
-    ;;                                                  "dapDebugServer.js"))
-    ;;                              :autoport)
-    ;;                :type "pwa-chrome"
-    ;;                :name "Debug react"
-    ;;                :trace t
-    ;;                :url ,(lambda ()
-    ;;                        (read-string "Url: "
-    ;;                                     "http://localhost:3000"))
-    ;;                :webRoot "/home/grisha/hub/perfect_circuit/reactor/" ;
-    ;;                :outputCapture "console"
-    ;;                ))
+                   :cwd "/home/grisha/hub/perfect_circuit/reactor-18"
+                   :runtimeExecutable "npm"
+                   :runtimeArgs ,(lambda ()
+                                   (vector "run" "runWithMongo" "--"
+                                           (or (buffer-file-name)
+                                             (user-error "Current buffer is not visiting a file"))))
+                   :env (:NODE_ENV "development")
+                   :console "integratedTerminal"
+                   :outputCapture "console"
+                   :skipFiles ["<node_internals>/**"]))
     )
 #+end_src
 
@@ -967,7 +953,7 @@ This package is recomended for dape mode
     :hook
     (dape-mode . repeat-mode))
 #+end_src
-*** DAP-MODE
+*** COMMENT DAP-MODE
 Dap mode is an emacs interface to the [[https://code.visualstudio.com/api/extension-guides/debugger-extension][Debug Adapter Protocol]]
 Instructions/Documentation on configuration files can be found [[https://github.com/llvm/llvm-project/tree/main/lldb/tools/lldb-vscode][here]]
 Thread/Session attaching fixed. But dap-mode is still buggy.
@@ -1097,7 +1083,6 @@ Syntax checking and linting.
            :program "${workspaceFolder}cpp/reverse_string"
            :name "LLDB::Run reverse_string")))
 #+end_src
-
 ** Docker
 #+begin_src emacs-lisp
   (use-package dockerfile-mode)
@@ -1397,11 +1382,10 @@ This mode expands
 #+begin_src emacs-lisp
   (use-package markdown-preview-mode)
 #+end_src
-** Geiser (Lisp)
+** COMMENT Geiser (Lisp)
 #+begin_src emacs-lisp
   (use-package geiser-mit)
 #+end_src
-
 * COMMENT Treesitter
 #+begin_src emacs-lisp
   (use-package treesit
@@ -1551,7 +1535,7 @@ Distinguish between file buffers and pure buffers
     (nov-text-width 80)
     (nov-text-width t))
 #+end_src
-* Structure & Interpretation of Computer Programs
+* COMMENT Structure & Interpretation of Computer Programs
 #+begin_src emacs-lisp
   (use-package sicp
     :demand t)
@@ -1561,10 +1545,7 @@ A package to search documentation offline
 #+begin_src emacs-lisp
   (use-package devdocs
     :bind (("C-h D" . devdocs-lookup)))
-
 #+end_src
-
-
 * Garbage Collection
 #+begin_src emacs-lisp
   ;; Set Garbage collection threshold back down after startup completes
