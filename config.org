@@ -1665,6 +1665,15 @@ Simplify Swapping buffers
     ;;        ("C-c b k" . buf-move-down))
     )
 #+end_src
+* Project Mode config
+#+begin_src emacs-lisp
+  (use-package project
+    :config
+    (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)
+    (define-key project-prefix-map "m" #'magit-project-status)
+    (add-to-list 'project-switch-commands)
+    )
+#+end_src
 * COMMENT Beacon (Flash the Cursor)
 #+begin_src emacs-lisp
   (use-package beacon
